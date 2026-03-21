@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build
+.next/
+out/
+build/
+dist/
+
+# Java/Gradle
+backend/build/
+backend/.gradle/
+*.class
+*.jar
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# MinIO data
+minio-data/
+
+# PostgreSQL data
+pgdata/
+
+# Cloudflare
+.cloudflared/
+
+# Claude Code
+.claude/

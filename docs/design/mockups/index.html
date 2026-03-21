@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DraftURL - LLM이 만든 문서를 3초 만에 공유하세요</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a2e;
+      --bg-elevated: #1e1e32;
+      --border: #2a2a40;
+      --border-hover: #3a3a55;
+      --text-primary: #e8e8f0;
+      --text-secondary: #9090a8;
+      --text-muted: #606078;
+      --accent: #7c5cfc;
+      --accent-hover: #6a48e8;
+      --accent-glow: rgba(124, 92, 252, 0.15);
+      --accent-subtle: rgba(124, 92, 252, 0.08);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-xs);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-tertiary);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary-lg {
+      background: linear-gradient(135deg, var(--accent), #6a48e8);
+      color: white;
+      font-weight: 600;
+      padding: 14px 32px;
+      font-size: 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 24px rgba(124, 92, 252, 0.3);
+    }
+
+    .btn-primary-lg:hover {
+      box-shadow: 0 0 32px rgba(124, 92, 252, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 48px 24px 32px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, #a78bfa, var(--accent), #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      color: var(--text-secondary);
+      font-size: clamp(14px, 2vw, 16px);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Main Editor Area */
+    .main-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    /* File Drop Zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      text-align: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .drop-zone-icon {
+      font-size: 20px;
+      opacity: 0.6;
+    }
+
+    .drop-zone-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .drop-zone-text strong {
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Tabs */
+    .editor-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow: hidden;
+    }
+
+    .editor-tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      position: relative;
+    }
+
+    .editor-tab:hover {
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+    }
+
+    .editor-tab.active {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .editor-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Editor Split */
+    .editor-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      .editor-split {
+        grid-template-columns: 1fr;
+        min-height: 600px;
+      }
+    }
+
+    .editor-pane {
+      position: relative;
+      background: var(--bg-secondary);
+    }
+
+    .editor-pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      height: calc(100% - 36px);
+      min-height: 384px;
+      background: var(--bg-secondary);
+      color: #d4d4f0;
+      border: none;
+      padding: 16px;
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      tab-size: 2;
+    }
+
+    .editor-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .preview-pane {
+      border-left: 1px solid var(--border);
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+      .preview-pane {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+    }
+
+    .preview-content {
+      flex: 1;
+      padding: 0;
+      overflow: auto;
+    }
+
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 384px;
+      border: none;
+    }
+
+    /* Publish Area */
+    .publish-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      padding: 32px 24px;
+    }
+
+    .expire-notice {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .expire-notice a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .expire-notice a:hover {
+      text-decoration: underline;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-hover);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Line numbers */
+    .line-numbers {
+      position: absolute;
+      left: 0;
+      top: 36px;
+      bottom: 0;
+      width: 44px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding-top: 16px;
+      text-align: right;
+      user-select: none;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .line-numbers span {
+      display: block;
+      padding-right: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .editor-textarea.with-lines {
+      padding-left: 52px;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 20px;
+      font-size: 14px;
+      color: var(--text-primary);
+      z-index: 100;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Publish result modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-check {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 28px;
+    }
+
+    .modal h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .url-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .url-display input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'SF Mono', monospace;
+      outline: none;
+    }
+
+    .url-copy-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">D</div>
+      DraftURL
+    </a>
+    <div class="header-actions">
+      <a href="dashboard.html" class="btn btn-ghost">내 문서</a>
+      <a href="login.html" class="btn btn-outline">로그인</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>LLM이 만든 문서를 <span class="gradient-text">3초 만에</span> 공유하세요</h1>
+    <p>HTML이나 Markdown을 붙여넣으면 즉시 공유 URL이 생성됩니다. 가입도 필요 없어요.</p>
+  </section>
+
+  <!-- Main Editor -->
+  <main class="main-container">
+
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+      <span class="drop-zone-icon">&#128206;</span>
+      <span class="drop-zone-text">.html 또는 .md 파일을 여기에 드래그하거나 <strong id="fileSelectTrigger">파일 선택</strong></span>
+      <input type="file" id="fileInput" accept=".html,.htm,.md,.markdown" style="display:none">
+    </div>
+
+    <!-- Editor Tabs -->
+    <div class="editor-tabs">
+      <button class="editor-tab active" data-type="html">HTML</button>
+      <button class="editor-tab" data-type="markdown">Markdown</button>
+    </div>
+
+    <!-- Editor Split View -->
+    <div class="editor-split">
+      <div class="editor-pane">
+        <div class="editor-pane-header">
+          <span id="editorLabel">편집기</span>
+          <span id="charCount">0 bytes</span>
+        </div>
+        <div class="line-numbers" id="lineNumbers"></div>
+        <textarea class="editor-textarea with-lines" id="editor" placeholder="HTML 또는 Markdown을 붙여넣으세요..." spellcheck="false"></textarea>
+      </div>
+      <div class="preview-pane">
+        <div class="editor-pane-header" style="background: #f0f0f4; color: #666; border-bottom-color: #ddd;">
+          <span>미리보기</span>
+          <span id="previewStatus" style="color: #34d399;">실시간</span>
+        </div>
+        <div class="preview-content">
+          <iframe class="preview-iframe" id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Publish -->
+    <div class="publish-area">
+      <button class="btn btn-primary-lg" id="publishBtn" onclick="handlePublish()">
+        &#9889; 공유하기
+      </button>
+      <p class="expire-notice">비로그인 시 24시간 후 만료됩니다. <a href="login.html">로그인하면 영구 보관!</a></p>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">&#9889;</div>
+        <h3>3초 배포</h3>
+        <p>붙여넣고 버튼 하나면 끝. 가입, 설정, 빌드 없이 즉시 URL이 생성됩니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128064;</div>
+        <h3>실시간 미리보기</h3>
+        <p>코드를 편집하면 즉시 결과를 확인할 수 있습니다. HTML과 Markdown 모두 지원합니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128279;</div>
+        <h3>깔끔한 URL</h3>
+        <p>drafturl.com/xK9mP2nQ 형태의 간결하고 공유하기 쉬운 URL을 발급합니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#129302;</div>
+        <h3>AI 수정 (Coming Soon)</h3>
+        <p>곧 AI에게 "표를 보기 좋게 정리해줘" 같은 수정 요청이 가능해집니다.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Publish Result Modal -->
+  <div class="modal-overlay" id="publishModal">
+    <div class="modal">
+      <div class="modal-check">&#10003;</div>
+      <h2>공유 URL이 생성되었습니다!</h2>
+      <p>아래 URL을 복사해서 공유하세요. 비로그인 문서는 24시간 후 만료됩니다.</p>
+      <div class="url-display">
+        <input type="text" id="generatedUrl" value="https://drafturl.com/xK9mP2nQ" readonly>
+        <button class="btn btn-primary url-copy-btn" onclick="copyUrl()">복사</button>
+      </div>
+      <div class="modal-actions">
+        <a href="shared.html" class="btn btn-outline">상세 보기</a>
+        <button class="btn btn-ghost" onclick="closeModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.editor-tab');
+    const editor = document.getElementById('editor');
+    let currentType = 'html';
+
+    const sampleHTML = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>주간 보고서</title>
+  <style>
+    body { font-family: system-ui; max-width: 680px; margin: 40px auto; padding: 0 20px; color: #1a1a2e; }
+    h1 { color: #7c5cfc; border-bottom: 2px solid #e8e8f0; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
+    th { background: #f5f5ff; font-weight: 600; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .done { background: #d1fae5; color: #065f46; }
+    .progress { background: #fef3c7; color: #92400e; }
+  </style>
+</head>
+<body>
+  <h1>2026년 3월 3주차 주간 보고서</h1>
+  <p>AI 개발팀 - 작성자: 김개발</p>
+
+  <h2>이번 주 성과</h2>
+  <table>
+    <tr><th>태스크</th><th>상태</th><th>비고</th></tr>
+    <tr><td>API 엔드포인트 구현</td><td><span class="badge done">완료</span></td><td>문서 CRUD 전체</td></tr>
+    <tr><td>미리보기 기능</td><td><span class="badge done">완료</span></td><td>HTML + MD 지원</td></tr>
+    <tr><td>인증 시스템</td><td><span class="badge progress">진행중</span></td><td>Google OAuth 연동 중</td></tr>
+  </table>
+
+  <h2>다음 주 계획</h2>
+  <ul>
+    <li>인증 시스템 완료 및 테스트</li>
+    <li>대시보드 UI 개발</li>
+    <li>CDN 캐싱 설정</li>
+  </ul>
+</body>
+</html>`;
+
+    const sampleMD = `# API 문서 - DraftURL REST API
+
+> v1.0 | 최종 수정: 2026-03-21
+
+## 인증
+
+모든 API 요청에는 \`Authorization\` 헤더가 필요합니다.
+
+\`\`\`
+Authorization: Bearer YOUR_API_KEY
+\`\`\`
+
+## 엔드포인트
+
+### 문서 생성
+
+\`\`\`
+POST /api/documents
+\`\`\`
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| content | string | O | HTML 또는 Markdown 내용 |
+| type | string | O | \`html\` 또는 \`markdown\` |
+| title | string | X | 문서 제목 |
+
+**응답 예시:**
+
+\`\`\`json
+{
+  "url": "https://drafturl.com/xK9mP2nQ",
+  "slug": "xK9mP2nQ",
+  "expiresAt": "2026-03-22T15:30:00Z"
+}
+\`\`\`
+
+### 문서 조회
+
+\`\`\`
+GET /api/documents/:slug
+\`\`\`
+
+---
+
+*이 문서는 Claude가 생성했습니다.*`;
+
+    // Initialize with sample HTML
+    editor.value = sampleHTML;
+    updatePreview();
+    updateLineNumbers();
+    updateCharCount();
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentType = tab.dataset.type;
+        editor.value = currentType === 'html' ? sampleHTML : sampleMD;
+        editor.placeholder = currentType === 'html'
+          ? 'HTML 코드를 붙여넣으세요...'
+          : 'Markdown을 붙여넣으세요...';
+        updatePreview();
+        updateLineNumbers();
+        updateCharCount();
+      });
+    });
+
+    // Live preview
+    editor.addEventListener('input', () => {
+      updatePreview();
+      updateLineNumbers();
+      updateCharCount();
+    });
+
+    editor.addEventListener('scroll', () => {
+      document.getElementById('lineNumbers').scrollTop = editor.scrollTop;
+    });
+
+    function updatePreview() {
+      const frame = document.getElementById('previewFrame');
+      const content = editor.value;
+      if (currentType === 'html') {
+        frame.srcdoc = content;
+      } else {
+        // Basic markdown rendering for mockup
+        let html = content
+          .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+          .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+          .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+          .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/`([^`]+)`/g, '<code style="background:#f0f0f4;padding:2px 6px;border-radius:4px;font-size:0.9em;">$1</code>')
+          .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre style="background:#1a1a2e;color:#d4d4f0;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;"><code>$2</code></pre>')
+          .replace(/^\|(.+)\|$/gm, (match) => {
+            const cells = match.split('|').filter(c => c.trim());
+            return '<tr>' + cells.map(c => `<td style="border:1px solid #ddd;padding:8px 12px;">${c.trim()}</td>`).join('') + '</tr>';
+          })
+          .replace(/^- (.+)$/gm, '<li>$1</li>')
+          .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0;">')
+          .replace(/\n\n/g, '<br><br>');
+        frame.srcdoc = `<html><head><style>body{font-family:system-ui,-apple-system,sans-serif;max-width:680px;margin:40px auto;padding:0 20px;color:#1a1a2e;line-height:1.7;}h1{font-size:28px;border-bottom:2px solid #e8e8f0;padding-bottom:8px;}h2{font-size:22px;margin-top:32px;}h3{font-size:18px;}blockquote{border-left:3px solid #7c5cfc;padding-left:16px;color:#666;margin:16px 0;}table{width:100%;border-collapse:collapse;margin:16px 0;}li{margin:4px 0;margin-left:20px;}</style></head><body>${html}</body></html>`;
+      }
+    }
+
+    function updateLineNumbers() {
+      const lines = editor.value.split('\n').length;
+      const container = document.getElementById('lineNumbers');
+      container.innerHTML = Array.from({length: lines}, (_, i) => `<span>${i + 1}</span>`).join('');
+    }
+
+    function updateCharCount() {
+      const bytes = new Blob([editor.value]).size;
+      const label = bytes < 1024 ? `${bytes} bytes` : `${(bytes / 1024).toFixed(1)} KB`;
+      document.getElementById('charCount').textContent = label;
+    }
+
+    // File drop
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    document.getElementById('fileSelectTrigger').addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['html', 'htm', 'md', 'markdown'].includes(ext)) {
+        showToast('HTML 또는 Markdown 파일만 지원합니다.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        editor.value = e.target.result;
+        const isHTML = ['html', 'htm'].includes(ext);
+        currentType = isHTML ? 'html' : 'markdown';
+        tabs.forEach(t => {
+          t.classList.toggle('active', t.dataset.type === currentType);
+        });
+        updatePreview();
+        updateLineNumbers();
+        updateCharCount();
+        showToast(`${file.name} 파일을 불러왔습니다.`);
+      };
+      reader.readAsText(file);
+    }
+
+    // Publish
+    function handlePublish() {
+      if (!editor.value.trim()) {
+        showToast('문서 내용을 입력해주세요.');
+        return;
+      }
+      const btn = document.getElementById('publishBtn');
+      btn.textContent = '배포 중...';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = '&#9889; 공유하기';
+        btn.disabled = false;
+        document.getElementById('publishModal').classList.add('show');
+      }, 800);
+    }
+
+    function closeModal() {
+      document.getElementById('publishModal').classList.remove('show');
+    }
+
+    function copyUrl() {
+      const input = document.getElementById('generatedUrl');
+      input.select();
+      document.execCommand('copy');
+      showToast('URL이 클립보드에 복사되었습니다!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('publishModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handlePublish();
+      }
+    });
+  </script>
+</body>
+</html>
