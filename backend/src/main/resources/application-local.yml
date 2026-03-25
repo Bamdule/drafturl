@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/drafturl
+    username: drafturl
+    password: drafturl
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+app:
+  storage:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket: drafturl-files
+    region: us-east-1
+  jwt:
+    secret: local-dev-secret-key-must-be-at-least-256-bits-long-for-hs256
+    access-token-expiry: 3600000
+    refresh-token-expiry: 604800000
+  cors:
+    allowed-origins: http://localhost:3000
+  oauth2:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:placeholder}
+      client-secret: ${GOOGLE_CLIENT_SECRET:placeholder}
+    github:
+      client-id: ${GITHUB_CLIENT_ID:placeholder}
+      client-secret: ${GITHUB_CLIENT_SECRET:placeholder}
+  frontend-url: http://localhost:3000
+  slug-length: 8
+  anonymous-expiry-hours: 24

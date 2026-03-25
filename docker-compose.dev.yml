@@ -1,0 +1,43 @@
+# 개발 서버: 외부 접근용 (Cloudflare Tunnel)
+# Backend :8050, Frontend :3000 (프로덕션 빌드)
+# 사용: docker compose -f docker-compose.dev.yml up -d --build
+services:
+  dev-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: drafturl-dev-backend
+    ports:
+      - "8050:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://drafturl-db:5432/drafturl
+      SPRING_DATASOURCE_USERNAME: drafturl
+      SPRING_DATASOURCE_PASSWORD: drafturl
+      APP_STORAGE_ENDPOINT: http://drafturl-storage:9000
+      APP_STORAGE_ACCESS_KEY: minioadmin
+      APP_STORAGE_SECRET_KEY: minioadmin
+      APP_STORAGE_BUCKET: drafturl-files
+      APP_CORS_ALLOWED_ORIGINS: https://drafturl.com,https://www.drafturl.com
+      APP_FRONTEND_URL: https://drafturl.com
+    networks:
+      - drafturl-net
+    restart: on-failure
+
+  dev-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: drafturl-dev-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      INTERNAL_API_URL: http://drafturl-dev-backend:8080
+    networks:
+      - drafturl-net
+    depends_on:
+      - dev-backend
+
+networks:
+  drafturl-net:
+    external: true

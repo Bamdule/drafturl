@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    driver-class-name: org.postgresql.Driver
+
+app:
+  storage:
+    endpoint: ${R2_ENDPOINT}
+    access-key: ${R2_ACCESS_KEY}
+    secret-key: ${R2_SECRET_KEY}
+    bucket: ${R2_BUCKET_NAME:drafturl-files}
+    region: auto
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiry: 3600000
+    refresh-token-expiry: 604800000
+  oauth2:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
+    github:
+      client-id: ${GITHUB_CLIENT_ID}
+      client-secret: ${GITHUB_CLIENT_SECRET}
+  cors:
+    allowed-origins: ${FRONTEND_URL}
+  frontend-url: ${FRONTEND_URL}
+  slug-length: 8
+  anonymous-expiry-hours: 24

@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+app:
+  storage:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket: test-bucket
+    region: us-east-1
+  jwt:
+    secret: test-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
+    access-token-expiry: 3600000
+    refresh-token-expiry: 604800000
+  oauth2:
+    google:
+      client-id: test-google-client-id
+      client-secret: test-google-client-secret
+    github:
+      client-id: test-github-client-id
+      client-secret: test-github-client-secret
+  cors:
+    allowed-origins: http://localhost:3000
+  frontend-url: http://localhost:3000
+  slug-length: 8
+  anonymous-expiry-hours: 24
+
+sentry:
+  dsn:

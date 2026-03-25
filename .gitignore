@@ -46,3 +46,9 @@ pgdata/
 
 # Claude Code
 .claude/
+
+# Playwright MCP logs
+.playwright-mcp/
+
+# Temporary screenshots
+*.png

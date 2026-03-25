@@ -1,0 +1,11 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+ENV NEXT_PUBLIC_API_URL=https://api.drafturl.com
+RUN npm run build
+EXPOSE 3000
+
+# 시작 후 주요 페이지 워밍업
+CMD sh -c 'npm run start & sleep 3 && wget -q -O /dev/null http://localhost:3000 && wget -q -O /dev/null http://localhost:3000/auth/login && wget -q -O /dev/null http://localhost:3000/auth/signup && wget -q -O /dev/null http://localhost:3000/dashboard && echo "[warmup] done" && wait'

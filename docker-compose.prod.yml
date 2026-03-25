@@ -1,0 +1,13 @@
+# 배포용: 프론트엔드 포함 전체 스택
+# 사용: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      INTERNAL_API_URL: http://backend:8080
+    depends_on:
+      - backend

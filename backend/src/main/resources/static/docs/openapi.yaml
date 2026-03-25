@@ -1,0 +1,946 @@
+openapi: 3.0.1
+info:
+  title: DraftURL API
+  description: DraftURL 백엔드 REST API 문서
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+tags: []
+paths:
+  /api/v1/documents:
+    get:
+      tags:
+      - Document API
+      summary: 내 문서 목록 조회
+      description: 로그인한 사용자의 ACTIVE 상태 문서 목록을 페이지네이션으로 조회합니다. 인증이 필요합니다.
+      operationId: document-list
+      parameters:
+      - name: page
+        in: query
+        description: "페이지 번호 (0부터 시작, 기본값: 0)"
+        required: false
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: "페이지 크기 (기본값: 20, 최대: 50)"
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents1154739013"
+              examples:
+                document-list:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "documents" : [ {
+                          "id" : "abc12345",
+                          "slug" : "abc12345",
+                          "url" : "http://localhost:3000/abc12345",
+                          "title" : "첫 번째 문서",
+                          "docType" : "html",
+                          "contentSize" : 1024,
+                          "status" : "active",
+                          "expiresAt" : null,
+                          "createdAt" : "2026-03-22T10:00:00",
+                          "updatedAt" : "2026-03-22T10:00:00"
+                        }, {
+                          "id" : "def67890",
+                          "slug" : "def67890",
+                          "url" : "http://localhost:3000/def67890",
+                          "title" : "두 번째 문서",
+                          "docType" : "markdown",
+                          "contentSize" : 2048,
+                          "status" : "active",
+                          "expiresAt" : null,
+                          "createdAt" : "2026-03-21T09:00:00",
+                          "updatedAt" : "2026-03-21T15:30:00"
+                        } ],
+                        "pagination" : {
+                          "page" : 0,
+                          "size" : 20,
+                          "totalElements" : 2,
+                          "totalPages" : 1
+                        }
+                      },
+                      "error" : null
+                    }
+    post:
+      tags:
+      - Document API
+      summary: 문서 생성
+      description: "새 문서를 생성합니다. 로그인 사용자는 영구 문서, 비로그인 사용자는 24시간 만료 임시 문서가 생성됩니다."
+      operationId: document-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api-v1-documents1902791741"
+            examples:
+              document-create:
+                value: |-
+                  {
+                    "content" : "<h1>Hello World</h1>",
+                    "type" : "html",
+                    "title" : "내 첫 문서"
+                  }
+      responses:
+        "201":
+          description: "201"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents853865337"
+              examples:
+                document-create:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "abc12345",
+                        "slug" : "abc12345",
+                        "url" : "http://localhost:3000/abc12345",
+                        "title" : "내 첫 문서",
+                        "docType" : "html",
+                        "contentSize" : 20,
+                        "status" : "active",
+                        "expiresAt" : null,
+                        "createdAt" : "2026-03-22T10:00:00",
+                        "updatedAt" : "2026-03-22T10:00:00"
+                      },
+                      "error" : null
+                    }
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - Auth API
+      summary: 로그아웃
+      description: Refresh Token을 무효화하여 로그아웃을 처리합니다.
+      operationId: auth-logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api-v1-auth-logout913878229"
+            examples:
+              auth-logout:
+                value: |-
+                  {
+                    "refreshToken" : "rt_abcdef123456"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-auth-logout-1308105853"
+              examples:
+                auth-logout:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : null,
+                      "error" : null
+                    }
+  /api/v1/auth/me:
+    get:
+      tags:
+      - Auth API
+      summary: 현재 사용자 조회
+      description: 현재 로그인한 사용자의 정보와 스토리지 사용량을 조회합니다. 인증이 필요합니다.
+      operationId: auth-me
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-auth-me-1801873934"
+              examples:
+                auth-me:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "00000000-0000-0000-0000-000000000001",
+                        "email" : "user@example.com",
+                        "name" : "홍길동",
+                        "profileImage" : "https://example.com/avatar.jpg",
+                        "plan" : "free",
+                        "storageUsage" : {
+                          "totalBytes" : 102400,
+                          "documentCount" : 5
+                        }
+                      },
+                      "error" : null
+                    }
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - Auth API
+      summary: 토큰 갱신
+      description: Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 발급합니다. Refresh
+        Token Rotation이 적용되어 기존 Refresh Token은 무효화됩니다.
+      operationId: auth-refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api-v1-auth-refresh1051830133"
+            examples:
+              auth-refresh:
+                value: |-
+                  {
+                    "refreshToken" : "rt_abcdef123456"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-auth-refresh-141030569"
+              examples:
+                auth-refresh:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "accessToken" : "eyJhbGciOiJIUzI1NiJ9.new_access_token.example",
+                        "refreshToken" : "rt_newtoken789",
+                        "expiresIn" : 3600,
+                        "user" : {
+                          "id" : "00000000-0000-0000-0000-000000000001",
+                          "email" : "user@example.com",
+                          "name" : "홍길동",
+                          "profileImage" : "https://example.com/avatar.jpg",
+                          "plan" : "free"
+                        }
+                      },
+                      "error" : null
+                    }
+  /api/v1/documents/{slug}:
+    get:
+      tags:
+      - Document API
+      summary: 편집용 문서 상세 조회
+      description: 소유자가 문서를 편집하기 위해 상세 정보를 조회합니다. R2에서 원본 콘텐츠를 함께 로드합니다. 인증이 필요합니다.
+      operationId: document-edit-detail
+      parameters:
+      - name: slug
+        in: path
+        description: 문서 슬러그
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents-slug1147524705"
+              examples:
+                document-edit-detail:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "abc12345",
+                        "slug" : "abc12345",
+                        "url" : "http://localhost:3000/abc12345",
+                        "title" : "내 첫 문서",
+                        "docType" : "html",
+                        "content" : "<h1>Hello World</h1>",
+                        "contentSize" : 20,
+                        "status" : "active",
+                        "expiresAt" : null,
+                        "createdAt" : "2026-03-22T10:00:00",
+                        "updatedAt" : "2026-03-22T10:00:00"
+                      },
+                      "error" : null
+                    }
+    put:
+      tags:
+      - Document API
+      summary: 문서 수정
+      description: 소유자가 문서를 수정합니다. content 또는 title 중 최소 하나는 포함해야 합니다. 타입 변경은 허용되지
+        않습니다. 인증이 필요합니다.
+      operationId: document-update
+      parameters:
+      - name: slug
+        in: path
+        description: 문서 슬러그
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api-v1-documents-slug74533326"
+            examples:
+              document-update:
+                value: |-
+                  {
+                    "content" : "<h1>Updated Content</h1>",
+                    "title" : "수정된 제목"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents-slug178088773"
+              examples:
+                document-update:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "abc12345",
+                        "slug" : "abc12345",
+                        "url" : "http://localhost:3000/abc12345",
+                        "title" : "수정된 제목",
+                        "docType" : "html",
+                        "contentSize" : 25,
+                        "status" : "active",
+                        "expiresAt" : null,
+                        "createdAt" : "2026-03-22T10:00:00",
+                        "updatedAt" : "2026-03-22T11:30:00"
+                      },
+                      "error" : null
+                    }
+    delete:
+      tags:
+      - Document API
+      summary: 문서 삭제
+      description: 소유자가 문서를 삭제합니다. soft delete(status=DELETED)로 처리됩니다. 인증이 필요합니다.
+      operationId: document-delete
+      parameters:
+      - name: slug
+        in: path
+        description: 문서 슬러그
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents-slug-1077736068"
+              examples:
+                document-delete:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "abc12345",
+                        "slug" : "abc12345",
+                        "deletedAt" : "2026-03-22T12:42:49.58607"
+                      },
+                      "error" : null
+                    }
+  /api/v1/documents/{slug}/view:
+    get:
+      tags:
+      - Document API
+      summary: 문서 서빙 (공개 조회)
+      description: 공유 URL로 접근 시 문서를 조회합니다. 인증이 필요하지 않습니다. Cache-Control 및 ETag 헤더가
+        포함됩니다.
+      operationId: document-view
+      parameters:
+      - name: slug
+        in: path
+        description: 문서 슬러그
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-documents-slug-view443791607"
+              examples:
+                document-view:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "id" : "abc12345",
+                        "title" : "내 첫 문서",
+                        "docType" : "html",
+                        "content" : "<h1>Hello World</h1>",
+                        "createdAt" : "2026-03-22T10:00:00",
+                        "updatedAt" : "2026-03-22T12:00:00"
+                      },
+                      "error" : null
+                    }
+  /api/v1/auth/oauth2/callback/{provider}:
+    post:
+      tags:
+      - Auth API
+      summary: OAuth2 콜백 처리
+      description: "OAuth2 인가 코드를 사용하여 로그인 또는 회원가입을 처리하고 JWT 토큰을 발급합니다. 지원 Provider:\
+        \ github, google"
+      operationId: auth-oauth-callback
+      parameters:
+      - name: provider
+        in: path
+        description: "OAuth2 Provider (github, google)"
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api-v1-auth-oauth2-callback-provider1241930397"
+            examples:
+              auth-oauth-callback:
+                value: |-
+                  {
+                    "code" : "auth_code_abc123",
+                    "redirectUri" : "http://localhost:3000/auth/callback",
+                    "state" : "random_state_value"
+                  }
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api-v1-auth-oauth2-callback-provider-321854121"
+              examples:
+                auth-oauth-callback:
+                  value: |-
+                    {
+                      "success" : true,
+                      "data" : {
+                        "accessToken" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcklkIjoiMDAwMDAwMDAifQ.example",
+                        "refreshToken" : "rt_abcdef123456",
+                        "expiresIn" : 3600,
+                        "user" : {
+                          "id" : "00000000-0000-0000-0000-000000000001",
+                          "email" : "user@example.com",
+                          "name" : "홍길동",
+                          "profileImage" : "https://example.com/avatar.jpg",
+                          "plan" : "free"
+                        }
+                      },
+                      "error" : null
+                    }
+components:
+  schemas:
+    api-v1-auth-refresh1051830133:
+      required:
+      - refreshToken
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh Token
+    api-v1-auth-logout-1308105853:
+      required:
+      - data
+      - error
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-documents-slug1147524705:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - contentSize
+          - createdAt
+          - docType
+          - id
+          - slug
+          - status
+          - title
+          - updatedAt
+          - url
+          type: object
+          properties:
+            createdAt:
+              type: string
+              description: 생성 일시
+            docType:
+              type: string
+              description: 문서 타입
+            contentSize:
+              type: number
+              description: 콘텐츠 크기 (바이트)
+            id:
+              type: string
+              description: 문서 ID
+            title:
+              type: string
+              description: 문서 제목
+            content:
+              type: string
+              description: 문서 원본 내용
+            url:
+              type: string
+              description: 문서 공유 URL
+            slug:
+              type: string
+              description: 문서 슬러그
+            updatedAt:
+              type: string
+              description: 수정 일시
+            status:
+              type: string
+              description: 문서 상태
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-documents-slug-view443791607:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - content
+          - createdAt
+          - docType
+          - id
+          - title
+          - updatedAt
+          type: object
+          properties:
+            createdAt:
+              type: string
+              description: 생성 일시
+            docType:
+              type: string
+              description: 문서 타입
+            id:
+              type: string
+              description: 문서 ID
+            title:
+              type: string
+              description: 문서 제목
+            content:
+              type: string
+              description: 문서 내용
+            updatedAt:
+              type: string
+              description: 수정 일시 (ETag 생성용)
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-auth-oauth2-callback-provider-321854121:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - accessToken
+          - expiresIn
+          - refreshToken
+          type: object
+          properties:
+            expiresIn:
+              type: number
+              description: Access Token 만료 시간 (초)
+            accessToken:
+              type: string
+              description: JWT Access Token
+            user:
+              required:
+              - email
+              - id
+              - name
+              - plan
+              - profileImage
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 이름
+                profileImage:
+                  type: string
+                  description: 프로필 이미지 URL
+                id:
+                  type: string
+                  description: 사용자 ID
+                plan:
+                  type: string
+                  description: "요금제 (free, pro)"
+                email:
+                  type: string
+                  description: 이메일
+            refreshToken:
+              type: string
+              description: Refresh Token
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-auth-me-1801873934:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - email
+          - id
+          - name
+          - plan
+          - profileImage
+          type: object
+          properties:
+            storageUsage:
+              required:
+              - documentCount
+              - totalBytes
+              type: object
+              properties:
+                documentCount:
+                  type: number
+                  description: 문서 수
+                totalBytes:
+                  type: number
+                  description: 총 사용 용량 (바이트)
+            name:
+              type: string
+              description: 이름
+            profileImage:
+              type: string
+              description: 프로필 이미지 URL
+            id:
+              type: string
+              description: 사용자 ID
+            plan:
+              type: string
+              description: "요금제 (free, pro)"
+            email:
+              type: string
+              description: 이메일
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-auth-logout913878229:
+      required:
+      - refreshToken
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: 무효화할 Refresh Token
+    api-v1-auth-refresh-141030569:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - accessToken
+          - expiresIn
+          - refreshToken
+          type: object
+          properties:
+            expiresIn:
+              type: number
+              description: Access Token 만료 시간 (초)
+            accessToken:
+              type: string
+              description: 새로운 JWT Access Token
+            user:
+              required:
+              - email
+              - id
+              - name
+              - plan
+              - profileImage
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 이름
+                profileImage:
+                  type: string
+                  description: 프로필 이미지 URL
+                id:
+                  type: string
+                  description: 사용자 ID
+                plan:
+                  type: string
+                  description: "요금제 (free, pro)"
+                email:
+                  type: string
+                  description: 이메일
+            refreshToken:
+              type: string
+              description: 새로운 Refresh Token
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-documents1154739013:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            pagination:
+              required:
+              - page
+              - size
+              - totalElements
+              - totalPages
+              type: object
+              properties:
+                size:
+                  type: number
+                  description: 페이지 크기
+                totalPages:
+                  type: number
+                  description: 전체 페이지 수
+                page:
+                  type: number
+                  description: 현재 페이지 번호
+                totalElements:
+                  type: number
+                  description: 전체 문서 수
+            documents:
+              type: array
+              items:
+                required:
+                - contentSize
+                - createdAt
+                - docType
+                - id
+                - slug
+                - status
+                - title
+                - updatedAt
+                - url
+                type: object
+                properties:
+                  createdAt:
+                    type: string
+                    description: 생성 일시
+                  docType:
+                    type: string
+                    description: 문서 타입
+                  contentSize:
+                    type: number
+                    description: 콘텐츠 크기 (바이트)
+                  id:
+                    type: string
+                    description: 문서 ID
+                  title:
+                    type: string
+                    description: 문서 제목
+                  url:
+                    type: string
+                    description: 문서 공유 URL
+                  slug:
+                    type: string
+                    description: 문서 슬러그
+                  updatedAt:
+                    type: string
+                    description: 수정 일시
+                  status:
+                    type: string
+                    description: 문서 상태
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-documents1902791741:
+      required:
+      - content
+      - type
+      type: object
+      properties:
+        title:
+          type: string
+          description: 문서 제목 (선택)
+          nullable: true
+        type:
+          type: string
+          description: 문서 타입 (html 또는 markdown)
+        content:
+          type: string
+          description: 문서 내용 (최대 5MB)
+    api-v1-documents-slug178088773:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - contentSize
+          - createdAt
+          - docType
+          - id
+          - slug
+          - status
+          - title
+          - updatedAt
+          - url
+          type: object
+          properties:
+            createdAt:
+              type: string
+              description: 생성 일시
+            docType:
+              type: string
+              description: 문서 타입
+            contentSize:
+              type: number
+              description: 콘텐츠 크기 (바이트)
+            id:
+              type: string
+              description: 문서 ID
+            title:
+              type: string
+              description: 문서 제목
+            url:
+              type: string
+              description: 문서 공유 URL
+            slug:
+              type: string
+              description: 문서 슬러그
+            updatedAt:
+              type: string
+              description: 수정 일시
+            status:
+              type: string
+              description: 문서 상태
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-auth-oauth2-callback-provider1241930397:
+      required:
+      - code
+      - redirectUri
+      - state
+      type: object
+      properties:
+        redirectUri:
+          type: string
+          description: 리다이렉트 URI
+        code:
+          type: string
+          description: OAuth2 인가 코드
+        state:
+          type: string
+          description: CSRF 방지를 위한 state 값
+    api-v1-documents853865337:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - contentSize
+          - createdAt
+          - docType
+          - id
+          - slug
+          - status
+          - title
+          - updatedAt
+          - url
+          type: object
+          properties:
+            createdAt:
+              type: string
+              description: 생성 일시
+            docType:
+              type: string
+              description: 문서 타입
+            contentSize:
+              type: number
+              description: 콘텐츠 크기 (바이트)
+            id:
+              type: string
+              description: 문서 ID
+            title:
+              type: string
+              description: 문서 제목
+            url:
+              type: string
+              description: 문서 공유 URL
+            slug:
+              type: string
+              description: 문서 슬러그 (URL 경로)
+            updatedAt:
+              type: string
+              description: 수정 일시
+            status:
+              type: string
+              description: "문서 상태 (active, expired, deleted)"
+        success:
+          type: boolean
+          description: 요청 성공 여부
+    api-v1-documents-slug74533326:
+      type: object
+      properties:
+        title:
+          type: string
+          description: 수정할 문서 제목 (선택)
+          nullable: true
+        content:
+          type: string
+          description: 수정할 문서 내용 (선택)
+          nullable: true
+    api-v1-documents-slug-1077736068:
+      required:
+      - error
+      - success
+      type: object
+      properties:
+        data:
+          required:
+          - deletedAt
+          - id
+          - slug
+          type: object
+          properties:
+            deletedAt:
+              type: string
+              description: 삭제 일시
+            id:
+              type: string
+              description: 삭제된 문서 ID
+            slug:
+              type: string
+              description: 삭제된 문서 슬러그
+        success:
+          type: boolean
+          description: 요청 성공 여부
