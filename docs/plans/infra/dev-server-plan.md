@@ -360,6 +360,97 @@ GitHub Actions → Docker 이미지 빌드 → Container Registry → 클라우�
 
 ---
 
+## 6-1. 환경변수 관리 전략
+
+### 원칙
+
+- **로컬**: docker-compose 파일 내 기본값 사용 (현재와 동일)
+- **개발/운영**: **GitHub Secrets + Environments**로 관리
+
+### GitHub Environments 구성
+
+```
+GitHub repo Settings → Environments
+  ├── dev                ← Galaxy Book 개발서버
+  └── production         ← 클라우드 운영서버 (나중에 추가)
+```
+
+### 환경변수 목록
+
+| 변수명 | 로컬 | dev | production | 비고 |
+|--------|------|-----|------------|------|
+| `POSTGRES_PASSWORD` | drafturl (하드코딩) | GitHub Secret | GitHub Secret | |
+| `JWT_SECRET` | local-dev-secret... (하드코딩) | GitHub Secret | GitHub Secret | 환경별 다른 값 필수 |
+| `R2_ACCESS_KEY` | minioadmin (하드코딩) | GitHub Secret | GitHub Secret | dev=MinIO, prod=R2 |
+| `R2_SECRET_KEY` | minioadmin (하드코딩) | GitHub Secret | GitHub Secret | |
+| `R2_ENDPOINT` | http://localhost:9000 | GitHub Secret | GitHub Secret | dev=MinIO, prod=R2 URL |
+| `GITHUB_CLIENT_ID` | - | GitHub Secret | GitHub Secret | OAuth용 |
+| `GITHUB_CLIENT_SECRET` | - | GitHub Secret | GitHub Secret | |
+| `GOOGLE_CLIENT_ID` | - | GitHub Secret | GitHub Secret | |
+| `GOOGLE_CLIENT_SECRET` | - | GitHub Secret | GitHub Secret | |
+| `FRONTEND_URL` | http://localhost:3000 | https://drafturl.com | https://drafturl.com | |
+| `SPRING_PROFILES_ACTIVE` | local | dev | prod | |
+
+### 워크플로우에서 사용
+
+```yaml
+# .github/workflows/deploy-dev.yml
+name: Deploy to Dev Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: dev              # ← dev 환경의 secrets 사용
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create env file
+        run: |
+          cat > .env << EOF
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          R2_ACCESS_KEY=${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY=${{ secrets.R2_SECRET_KEY }}
+          R2_ENDPOINT=${{ secrets.R2_ENDPOINT }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          SPRING_PROFILES_ACTIVE=dev
+          EOF
+
+      - name: Deploy
+        run: |
+          docker compose --env-file .env -f docker-compose.yml up -d
+          docker compose --env-file .env -f docker-compose.dev.yml up -d --build
+          rm .env    # 배포 후 env 파일 삭제 (보안)
+          echo "배포 완료: $(date)"
+```
+
+```yaml
+# .github/workflows/deploy-prod.yml (운영 전환 시 추가)
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production       # ← production 환경의 secrets 사용
+    steps:
+      # Fly.io 또는 클라우드 배포 ...
+```
+
+### 왜 GitHub Secrets?
+
+| 항목 | 장점 |
+|------|------|
+| 무료 | GitHub Free 플랜에 포함 |
+| 암호화 | 저장 및 로그에서 마스킹 처리 |
+| 환경 분리 | dev / production 별도 관리 |
+| 서버 독립 | 서버를 교체해도 secrets는 GitHub에 남아있음 |
+| Runner 연동 | Self-hosted Runner에서 바로 사용 가능 |
+
+---
+
 ## 7. 네트워크 구성
 
 ### Cloudflare Tunnel 설정
