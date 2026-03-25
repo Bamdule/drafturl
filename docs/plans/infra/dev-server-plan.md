@@ -270,6 +270,88 @@ git remote add dev user@galaxy-book:~/drafturl.git
 git push dev main
 ```
 
+### 원격 자동 배포 (GitHub Actions 연동)
+
+Galaxy Book은 가정용 WiFi(NAT) 뒤에 있어 외부에서 직접 SSH 접근이 불가능하다.
+이를 해결하는 방법은 두 가지:
+
+#### 방식 A: Cloudflare Tunnel로 SSH 노출
+
+```yaml
+# Galaxy Book의 ~/.cloudflared/config.yml에 SSH 추가
+ingress:
+  - hostname: drafturl.com
+    service: http://localhost:3000
+  - hostname: api.drafturl.com
+    service: http://localhost:8080
+  - hostname: ssh.drafturl.com          # SSH 터널 추가
+    service: ssh://localhost:22
+  - service: http_status:404
+```
+
+GitHub Actions에서 `cloudflared access`로 SSH 접속하여 배포.
+단점: SSH 포트가 외부에 노출됨.
+
+#### 방식 B: Self-hosted Runner (권장)
+
+Galaxy Book에 GitHub Actions Runner를 설치하면, GitHub push 시 Galaxy Book이 직접 빌드/배포를 수행한다.
+SSH 연결 자체가 필요 없음.
+
+```
+[Git Push] → [GitHub Actions 트리거] → [Galaxy Book Runner가 감지]
+                                            ↓
+                                    git pull + docker compose up --build
+```
+
+**장점:**
+- NAT/방화벽 문제 없음 (Runner가 GitHub에 아웃바운드 연결)
+- SSH 포트 노출 불필요 (보안적으로 우수)
+- 설치 간단
+
+**설치 방법:**
+
+```bash
+# 1. GitHub repo Settings → Actions → Runners → New self-hosted runner
+
+# 2. Galaxy Book에서 실행
+mkdir actions-runner && cd actions-runner
+curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64-2.321.0.tar.gz
+tar xzf actions-runner-linux-x64.tar.gz
+./config.sh --url https://github.com/Bamdule/drafturl --token <RUNNER_TOKEN>
+
+# 3. 시스템 서비스로 등록 (부팅 시 자동 시작)
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
+
+**GitHub Actions 워크플로우 예시:**
+
+```yaml
+# .github/workflows/deploy-dev.yml
+name: Deploy to Dev Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted    # Galaxy Book Runner에서 실행
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          docker compose -f docker-compose.yml up -d
+          docker compose -f docker-compose.dev.yml up -d --build
+          echo "배포 완료: $(date)"
+```
+
+**권장: B안 (Self-hosted Runner)**
+- 보안: SSH 노출 없음
+- 간편: push만 하면 자동 배포
+- 안정: Runner가 로컬에서 직접 실행하므로 네트워크 지연 없음
+
 ### 장기 (운영 전환 시)
 
 ```
