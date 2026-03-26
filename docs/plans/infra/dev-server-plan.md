@@ -158,76 +158,49 @@ WantedBy=multi-user.target
 
 ## 5. 파일 저장소 전략
 
-### 선택지 비교
+### 결정: Cloudflare R2 (처음부터 사용)
 
-| 항목 | MinIO (로컬 Docker) | Cloudflare R2 | AWS S3 |
-|------|---------------------|---------------|--------|
-| 비용 | 무료 | 무료 티어 10GB/월 | 유료 (소량이면 거의 무료) |
-| 지연 시간 | 최소 (같은 서버) | 낮음 (Cloudflare 엣지) | 보통 |
-| 안정성 | 서버 의존 (디스크 장애 = 데이터 손실) | 높음 (분산 저장) | 매우 높음 |
-| 백업 | 수동 구성 필요 | 자동 | 자동 |
-| 운영 이전 | 마이그레이션 필요 | 그대로 사용 가능 | 그대로 사용 가능 |
-| 설정 난이도 | 낮음 (현재와 동일) | 중간 | 중간 |
+MinIO(로컬)를 거치지 않고 **R2를 처음부터 모든 환경에서 사용**한다.
 
-### 권장: 단계적 전환
+#### R2 vs S3 vs MinIO 비교
 
-```
-[현재] MinIO (로컬)
-  ↓ 개발서버 이전 시
-[단기] MinIO (Galaxy Book) ← 현재와 동일, 빠르게 이전 가능
-  ↓ 운영 전환 시
-[장기] Cloudflare R2 ← drafturl.com이 이미 Cloudflare 위에 있으므로 자연스러운 선택
-```
+| 항목 | Cloudflare R2 | AWS S3 | MinIO (로컬) |
+|------|--------------|--------|-------------|
+| 이그레스(다운로드) 비용 | **$0 (무료)** | $0.09/GB | $0 |
+| 저장 비용 | $0.015/GB/월 | $0.023/GB/월 | $0 |
+| 무료 티어 | **10GB + 1천만 읽기/월** | 5GB (12개월만) | 무제한 |
+| 안정성 | 높음 (분산 저장) | 매우 높음 | 서버 의존 |
+| 기존 생태계 | **Cloudflare 동일 대시보드** | AWS 별도 계정 | Docker 컨테이너 |
+| 마이그레이션 | 없음 (처음부터 사용) | - | 나중에 옮겨야 함 |
+| S3 호환 | O | 원본 | O |
 
-**근거:**
-- 개발 단계에서는 로컬 MinIO가 가장 간단하고 비용 없음
-- 운영 전환 시 R2로 이전하면 Cloudflare 생태계 안에서 일관성 유지
-- MinIO는 S3 호환이므로 코드 변경 최소화 (엔드포인트 URL만 변경)
-- R2 무료 티어: 10GB 저장 + 1천만 읽기/월 → DraftURL 초기 운영에 충분
+#### R2를 처음부터 쓰는 이유
 
-### MinIO → R2 마이그레이션 상세
+1. **MinIO 컨테이너 제거** — Docker 구성 단순화 (6개 → 5개)
+2. **마이그레이션 불필요** — 개발/운영 동일 저장소
+3. **이그레스 무료** — 문서 공유 서비스는 읽기가 압도적, 트래픽 증가해도 비용 예측 가능
+4. **Cloudflare 생태계 통합** — DNS, Pages, R2 모두 한 대시보드에서 관리
+5. 50ms 지연은 파일 업로드/다운로드에서 체감 없음
 
-MinIO와 R2 모두 **S3 호환 API**이므로 전환 난이도가 매우 낮다.
+#### R2 연동 작업 순서
 
-#### 코드 변경 범위
+| # | 작업 | 위치 | 비고 |
+|---|------|------|------|
+| 1 | Cloudflare 대시보드에서 R2 버킷 생성 | Cloudflare | `drafturl-files` |
+| 2 | R2 API 토큰 발급 (S3 호환) | Cloudflare | Access Key + Secret Key |
+| 3 | 백엔드 환경변수 변경 (endpoint, key) | `application.yml` 등 | S3Client 코드는 변경 없음 |
+| 4 | docker-compose에서 MinIO 컨테이너 제거 | `docker-compose.yml` | storage 서비스 삭제 |
+| 5 | 기존 MinIO 데이터를 R2로 마이그레이션 | rclone 1줄 | 기존 문서 보존 |
+| 6 | GitHub Secrets에 R2 키 등록 | GitHub Settings | dev/production 환경 |
+| 7 | 동작 테스트 (업로드/다운로드) | 브라우저 | |
 
-백엔드 `R2Config`에서 **환경 변수 3개만 변경**:
+#### 환경별 설정
 
-| 항목 | MinIO (현재) | Cloudflare R2 |
-|------|-------------|---------------|
-| endpoint | `http://localhost:9000` | `https://<account-id>.r2.cloudflarestorage.com` |
-| accessKey | `minioadmin` | R2 Access Key |
-| secretKey | `minioadmin` | R2 Secret Key |
+| 환경 | endpoint | accessKey | secretKey |
+|------|----------|-----------|-----------|
+| 로컬/개발/운영 | `https://<account-id>.r2.cloudflarestorage.com` | R2 Access Key | R2 Secret Key |
 
-애플리케이션 코드(S3Client 호출부)는 **변경 없음**.
-
-#### 데이터 마이그레이션
-
-```bash
-# rclone 설치
-sudo apt install rclone
-
-# rclone 설정 (minio + r2 리모트 추가)
-rclone config
-
-# 한 줄로 전체 데이터 복사
-rclone sync minio:drafturl-documents r2:drafturl-documents
-```
-
-#### 예상 소요 시간
-
-| 작업 | 소요 시간 | 비고 |
-|------|----------|------|
-| R2 버킷 생성 + API 키 발급 | 5분 | Cloudflare 대시보드 |
-| 환경 변수 변경 | 5분 | endpoint, key 3개 |
-| rclone 데이터 복사 | 5~10분 | 문서 수백~수천 개 기준 |
-| 업로드/다운로드 테스트 | 10분 | |
-| **합계** | **~30분** | 난이도: 낮음 |
-
-#### 결론
-
-개발 단계에서 로컬 MinIO를 쓰다가 운영 시 R2로 전환해도 전혀 부담 없는 수준.
-오히려 개발 중에는 로컬 MinIO가 네트워크 지연 없이 더 빠르고 디버깅도 편하다.
+**모든 환경이 동일한 R2 버킷을 사용** (환경별 버킷 분리가 필요하면 `drafturl-dev` / `drafturl-prod`로 나눌 수 있음)
 
 ---
 
