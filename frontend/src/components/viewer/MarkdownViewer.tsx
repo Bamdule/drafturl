@@ -4,19 +4,28 @@ import { useEffect, useState } from "react";
 import { renderMarkdown } from "@/lib/markdown";
 
 interface MarkdownViewerProps {
-  content: string;
+  contentUrl: string;
   title?: string | null;
 }
 
 export default function MarkdownViewer({
-  content,
+  contentUrl,
   title,
 }: MarkdownViewerProps) {
   const [html, setHtml] = useState("");
 
   useEffect(() => {
-    renderMarkdown(content).then(setHtml);
-  }, [content]);
+    fetch(contentUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch markdown: ${res.status}`);
+        return res.text();
+      })
+      .then((text) => renderMarkdown(text))
+      .then(setHtml)
+      .catch((err) => {
+        console.error("Failed to load markdown content:", err);
+      });
+  }, [contentUrl]);
 
   const wrappedHtml = `<!DOCTYPE html>
 <html><head>

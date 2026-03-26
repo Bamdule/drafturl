@@ -53,7 +53,7 @@ export interface DocumentView {
   id: string;
   title: string | null;
   docType: DocType;
-  content: string;
+  contentUrl: string;
   createdAt: string;
 }
 

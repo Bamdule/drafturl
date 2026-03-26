@@ -1,15 +1,15 @@
 "use client";
 
 interface HtmlViewerProps {
-  content: string;
+  contentUrl: string;
   title?: string | null;
 }
 
-export default function HtmlViewer({ content, title }: HtmlViewerProps) {
+export default function HtmlViewer({ contentUrl, title }: HtmlViewerProps) {
   return (
     <div className="flex h-full w-full flex-col">
       <iframe
-        srcDoc={content}
+        src={contentUrl}
         className="flex-1 w-full bg-white"
         sandbox="allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"
         title={title ?? "문서"}

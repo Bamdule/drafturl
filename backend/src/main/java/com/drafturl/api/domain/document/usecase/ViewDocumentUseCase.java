@@ -6,26 +6,26 @@ import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.DocumentExpiredException;
 import com.drafturl.api.domain.document.exception.DocumentGoneException;
 import com.drafturl.api.domain.document.exception.DocumentNotFoundException;
-import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.repository.DocumentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 /**
  * 공개 문서 서빙 유스케이스.
- * 상태/만료 확인 후 R2에서 콘텐츠를 로드하여 반환한다.
+ * 상태/만료 확인 후 CDN URL을 생성하여 반환한다.
  */
 @Component
 public class ViewDocumentUseCase {
 
     private final DocumentRepository documentRepository;
-    private final FileStorage fileStorage;
+    private final String cdnBaseUrl;
 
-    public ViewDocumentUseCase(DocumentRepository documentRepository, FileStorage fileStorage) {
+    public ViewDocumentUseCase(DocumentRepository documentRepository,
+                               @Value("${app.cdn.base-url}") String cdnBaseUrl) {
         this.documentRepository = documentRepository;
-        this.fileStorage = fileStorage;
+        this.cdnBaseUrl = cdnBaseUrl;
     }
 
     public DocumentViewResponse execute(String slug) {
@@ -44,9 +44,6 @@ public class ViewDocumentUseCase {
             throw new DocumentExpiredException(slug);
         }
 
-        byte[] contentBytes = fileStorage.download(document.getR2Key());
-        String content = new String(contentBytes, StandardCharsets.UTF_8);
-
-        return DocumentViewResponse.from(document, content);
+        return DocumentViewResponse.from(document, cdnBaseUrl);
     }
 }

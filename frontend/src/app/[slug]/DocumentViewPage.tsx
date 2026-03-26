@@ -16,9 +16,9 @@ export default function DocumentViewPage({
       {/* Document Content - 풀스크린 */}
       <div className="h-screen w-full">
         {doc.docType === "html" ? (
-          <HtmlViewer content={doc.content} title={doc.title} />
+          <HtmlViewer contentUrl={doc.contentUrl} title={doc.title} />
         ) : (
-          <MarkdownViewer content={doc.content} title={doc.title} />
+          <MarkdownViewer contentUrl={doc.contentUrl} title={doc.title} />
         )}
       </div>
     </div>

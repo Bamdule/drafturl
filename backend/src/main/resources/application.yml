@@ -29,6 +29,8 @@ sentry:
 
 # R2 스토리지 (Cloudflare R2 / S3 호환)
 app:
+  cdn:
+    base-url: ${CDN_BASE_URL:https://files.drafturl.com}
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   storage:
     endpoint: ${R2_ENDPOINT:http://localhost:9000}

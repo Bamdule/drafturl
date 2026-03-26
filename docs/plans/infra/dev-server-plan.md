@@ -202,6 +202,62 @@ MinIO(로컬)를 거치지 않고 **R2를 처음부터 모든 환경에서 사�
 
 **모든 환경이 동일한 R2 버킷을 사용** (환경별 버킷 분리가 필요하면 `drafturl-dev` / `drafturl-prod`로 나눌 수 있음)
 
+### CDN 구성: Cloudflare R2 + 커스텀 도메인
+
+R2 버킷에 커스텀 도메인 `files.drafturl.com`을 연결하여 Cloudflare CDN으로 문서를 직접 서빙한다.
+
+#### 변경 전 (백엔드 프록시 방식)
+
+```
+사용자 → 프론트엔드 → 백엔드(R2 다운로드) → 파일 내용을 JSON 응답에 담아 전달
+```
+
+- 백엔드가 매 요청마다 R2에서 파일을 읽어 중계
+- 백엔드 메모리/대역폭 부담
+- CDN 캐싱 불가
+
+#### 변경 후 (CDN 직접 서빙)
+
+```
+사용자 → 프론트엔드 → 백엔드(메타데이터 + contentUrl 응답)
+                    → files.drafturl.com에서 파일 직접 로드 (CDN 캐싱)
+```
+
+- 백엔드는 메타데이터(제목, 타입, 상태)만 응답
+- 파일은 `files.drafturl.com/documents/{slug}/content.html`에서 직접 로드
+- Cloudflare CDN이 엣지에서 캐싱 → 글로벌 저지연 서빙
+- 문서 만료/삭제 시 스케줄러가 R2 파일 삭제 → CDN도 자동 404
+
+#### API 응답 변경
+
+```json
+// 변경 전: content 필드에 파일 내용 전체
+{
+  "id": "...",
+  "title": "주간 보고서",
+  "docType": "html",
+  "content": "<!DOCTYPE html><html>...(수십KB)...</html>"
+}
+
+// 변경 후: contentUrl로 CDN 경로 전달
+{
+  "id": "...",
+  "title": "주간 보고서",
+  "docType": "html",
+  "contentUrl": "https://files.drafturl.com/documents/{slug}/content.html"
+}
+```
+
+#### 장점
+
+| 항목 | 설명 |
+|------|------|
+| 성능 | CDN 엣지 캐싱, 글로벌 저지연 |
+| 백엔드 부하 | 파일 중계 없음, 메타데이터만 응답 |
+| 비용 | Cloudflare CDN 무료, R2 이그레스 무료 |
+| 영구 문서 | URL 고정, 북마크 가능 |
+| 만료 문서 | R2 파일 삭제 → CDN 자동 404 |
+
 ---
 
 ## 6. 배포 전략
