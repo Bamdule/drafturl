@@ -9,11 +9,11 @@ spring:
 
 app:
   storage:
-    endpoint: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
+    endpoint: https://783134ac29443aef7ee53440e14f66e1.r2.cloudflarestorage.com
+    access-key: 2b497c76d30e703460d5572001d4bac5
+    secret-key: f16d948160ddad5211cd5da1657afd6e6850e4f1a6ba91269ab8df97d9b4d58e
     bucket: drafturl-files
-    region: us-east-1
+    region: auto
   jwt:
     secret: local-dev-secret-key-must-be-at-least-256-bits-long-for-hs256
     access-token-expiry: 3600000

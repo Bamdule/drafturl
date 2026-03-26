@@ -49,9 +49,8 @@ public class R2Config {
             client.headBucket(HeadBucketRequest.builder().bucket(bucket).build());
             log.info("Storage bucket '{}' exists", bucket);
         } catch (NoSuchBucketException e) {
-            log.info("Storage bucket '{}' not found, creating...", bucket);
-            client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
-            log.info("Storage bucket '{}' created", bucket);
+            log.error("Storage bucket '{}' not found. Please create it in the Cloudflare R2 dashboard.", bucket);
+            throw new StorageException("Bucket '" + bucket + "' does not exist");
         } catch (Exception e) {
             log.warn("Could not verify bucket '{}': {}", bucket, e.getMessage());
         }
