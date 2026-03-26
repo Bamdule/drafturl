@@ -5,7 +5,7 @@ services:
   dev-backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.local
     container_name: drafturl-dev-backend
     ports:
       - "8050:8080"
@@ -22,7 +22,7 @@ services:
       APP_FRONTEND_URL: https://drafturl.com
     networks:
       - drafturl-net
-    restart: on-failure
+    restart: unless-stopped
 
   dev-frontend:
     build:
@@ -37,6 +37,7 @@ services:
       - drafturl-net
     depends_on:
       - dev-backend
+    restart: unless-stopped
 
 networks:
   drafturl-net:

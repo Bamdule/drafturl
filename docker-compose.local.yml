@@ -5,7 +5,7 @@ services:
   local-backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.local
     container_name: drafturl-local-backend
     ports:
       - "8051:8080"
