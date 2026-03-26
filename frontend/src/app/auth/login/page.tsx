@@ -78,7 +78,7 @@ export default function LoginPage() {
         });
 
         login(result.user);
-        router.replace("/dashboard");
+        window.location.href = "/dashboard";
       } catch (err) {
         if (err instanceof ApiError) {
           setServerError(err.message);

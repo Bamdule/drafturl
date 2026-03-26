@@ -53,7 +53,7 @@ function AuthCallbackContent() {
         });
 
         login(result.user);
-        router.replace("/dashboard");
+        window.location.href = "/dashboard";
       } catch (err) {
         setError(
           err instanceof Error
