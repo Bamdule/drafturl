@@ -12,9 +12,12 @@ export default function MarkdownViewer({
   contentUrl,
   title,
 }: MarkdownViewerProps) {
-  const [html, setHtml] = useState("");
+  const [html, setHtml] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    setHtml(null);
+    setError(false);
     fetch(contentUrl)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch markdown: ${res.status}`);
@@ -24,8 +27,25 @@ export default function MarkdownViewer({
       .then(setHtml)
       .catch((err) => {
         console.error("Failed to load markdown content:", err);
+        setError(true);
       });
   }, [contentUrl]);
+
+  if (error) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-white text-gray-500">
+        문서를 불러올 수 없습니다.
+      </div>
+    );
+  }
+
+  if (html === null) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-white text-gray-400">
+        로딩 중...
+      </div>
+    );
+  }
 
   const wrappedHtml = `<!DOCTYPE html>
 <html><head>
@@ -53,7 +73,7 @@ export default function MarkdownViewer({
       <iframe
         srcDoc={wrappedHtml}
         className="flex-1 w-full bg-white"
-        sandbox="allow-same-origin"
+        sandbox=""
         title={title ?? "문서"}
       />
     </div>
