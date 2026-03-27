@@ -46,7 +46,7 @@ function useByteCount(content: string) {
 }
 
 export default function EditorPanel() {
-  const { content, docType, setContent } = useEditorStore();
+  const { content, docType, isDemo, setContent, setIsDemo } = useEditorStore();
   const byteCount = useByteCount(content);
   const editorRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -89,6 +89,7 @@ export default function EditorPanel() {
           value={content}
           onChange={(e) => {
             document.dispatchEvent(new Event("editor-user-input"));
+            if (isDemo) setIsDemo(false);
             setContent(e.target.value);
           }}
           spellCheck={false}
@@ -103,6 +104,7 @@ export default function EditorPanel() {
             value={content}
             onChange={(value) => {
               document.dispatchEvent(new Event("editor-user-input"));
+              if (isDemo) setIsDemo(false);
               setContent(value ?? "");
             }}
             theme="vs-dark"

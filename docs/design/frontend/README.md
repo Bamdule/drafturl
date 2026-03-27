@@ -8,7 +8,7 @@
 ## 요약
 
 - Next.js 15(App Router) + TypeScript + Tailwind CSS/shadcn/ui 기반이며, UI 렌더링과 Spring Boot API 호출만 담당
-- Server Components에서 직접 DB/R2에 접근하지 않으며, 모든 데이터는 Spring Boot API 경유
+- Server Components에서 직접 DB에 접근하지 않으며, 메타데이터는 Spring Boot API 경유, 문서 콘텐츠는 CDN(files.drafturl.com)에서 직접 로드
 - Zustand로 상태 관리하고, unified(remark + rehype)로 Markdown 클라이언트 렌더링 처리
 - Monaco Editor를 코드 편집에 사용하며, 컴포넌트 기반 디렉토리 구조로 관심사를 분리
 
@@ -37,7 +37,7 @@
 
 ## 2. 역할 정의
 
-Next.js는 UI 렌더링과 Spring Boot API 호출만 담당한다. **Server Components에서 직접 DB/R2에 접근하지 않는다.**
+Next.js는 UI 렌더링과 Spring Boot API 호출을 담당한다. **Server Components에서 직접 DB에 접근하지 않는다.** 문서 콘텐츠는 백엔드가 반환한 CDN URL(`contentUrl`)을 통해 `files.drafturl.com`에서 직접 로드한다.
 
 | 역할 | O/X | 설명 |
 |------|-----|------|
@@ -45,7 +45,7 @@ Next.js는 UI 렌더링과 Spring Boot API 호출만 담당한다. **Server Comp
 | 정적 페이지 | O | 랜딩, 만료 안내 등 |
 | Spring Boot API 호출 | O | 서버/클라이언트 모두에서 |
 | 직접 DB 접근 | X | 모든 데이터는 Spring Boot API 경유 |
-| 직접 R2 접근 | X | 모든 파일 접근은 Spring Boot API 경유 |
+| CDN 파일 로드 | O | 백엔드가 반환한 `contentUrl`(CDN URL)을 통해 `files.drafturl.com`에서 파일 직접 로드 |
 | OAuth2 리다이렉트 처리 | O | 인가 코드를 받아 Spring Boot에 전달 |
 | JWT 토큰 관리 | O | 쿠키 저장, 자동 갱신 |
 

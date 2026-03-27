@@ -8,7 +8,7 @@
 ## 요약
 
 - 입력 검증(5MB 바이트 크기, doc_type 패턴)과 Rate Limiting(비로그인 10회/분, 로그인 30회/분)으로 기본 방어
-- 사용자 HTML은 sandbox iframe(allow-scripts만, allow-same-origin 제거)으로 격리하고 CSP 헤더로 외부 통신 차단
+- 사용자 HTML은 CDN 직접 서빙 + sandbox iframe(`allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox`)으로 격리, Markdown은 완전 샌드박싱(`sandbox=""`)으로 격리
 - JWT는 httpOnly+Secure+SameSite=Lax 쿠키에 저장하며, Refresh Token Rotation으로 탈취 감지/대응
 - 서버 새니타이징(jsoup)으로 iframe/object/embed 태그와 javascript: URL 제거
 
@@ -62,13 +62,13 @@
 
 **핵심 원칙**:
 
-1. **script 실행은 허용하되 격리한다**: LLM 생성 HTML에는 차트(Chart.js), 인터랙티브 데모 등 스크립트가 빈번히 포함된다. 스크립트를 금지하면 서비스 가치가 크게 저하되므로, iframe `sandbox="allow-scripts"` 속성으로 실행을 허용하되 **`allow-same-origin`을 제거**하여 메인 도메인과 완전히 격리한다.
+1. **CDN 직접 서빙으로 origin 분리**: 문서 콘텐츠는 `files.drafturl.com`(Cloudflare R2 CDN)에서 직접 서빙되므로, 메인 도메인(`drafturl.com`)과 origin이 자동으로 분리된다. 이를 통해 쿠키 탈취 등의 위협이 원천 차단된다.
 
-2. **서버 새니타이징으로 위험 태그 제거**: `<iframe>`, `<object>`, `<embed>` 태그와 `javascript:` URL 스킴은 서버에서 제거한다.
+2. **HTML 문서 -- 기능성과 보안의 균형**: LLM 생성 HTML에는 차트(Chart.js), 인터랙티브 데모 등 스크립트가 빈번히 포함된다. iframe `sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"` 속성으로 스크립트 실행과 폼/팝업을 허용하되, CDN origin 분리로 메인 도메인 쿠키에는 접근 불가하다. HTML은 CDN URL을 iframe `src`로 직접 로드한다.
 
-3. **CSP 헤더로 외부 통신 차단**: `default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:` -- iframe 내에서 외부 서버로의 네트워크 요청을 원천 차단한다.
+3. **Markdown 문서 -- 완전 샌드박싱**: Markdown은 서버에서 원본 텍스트를 CDN에 저장하고, 프론트엔드가 `fetch(contentUrl)`로 로드한 뒤 unified(remark+rehype)로 HTML 변환하여 iframe `srcDoc`에 주입한다. `sandbox=""`(빈 값)로 완전 샌드박싱되어 스크립트 실행이 차단된다.
 
-4. **Phase 2에서 서빙 도메인 분리**: 문서 서빙을 별도 도메인(예: `view.{서비스도메인}`)에서 처리하여 쿠키 탈취 등 추가 격리를 확보한다.
+4. **서버 새니타이징으로 위험 태그 제거**: `<iframe>`, `<object>`, `<embed>` 태그와 `javascript:` URL 스킴은 서버에서 제거한다.
 
 ---
 
@@ -79,7 +79,7 @@
 | **AI API 비용 급증** | 높음 | 플랜별 사용량 제한 + 캐싱 + 경량 모델(Haiku)을 간단한 수정에 라우팅. [서비스 기능 정의](../../product.md) 섹션 6의 비용 추정 참조 |
 | **정적 파일 저장 비용** | 중간 | 비활성 문서 자동 아카이브, Free 플랜 7일 만료 정책으로 스토리지 증가 억제 |
 | **악성 콘텐츠 호스팅** | 높음 | 콘텐츠 스캐닝, 신고 시스템, 이용약관 명시 |
-| **XSS 등 보안 이슈** | 높음 | 사용자 HTML을 `sandbox="allow-scripts"` iframe으로 격리 (allow-same-origin 제거). CSP 헤더 적용. 상세 정책은 위 "HTML 처리 정책" 참조 |
+| **XSS 등 보안 이슈** | 높음 | CDN origin 분리(`files.drafturl.com`) + sandbox iframe으로 격리. HTML은 `sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"`, Markdown은 `sandbox=""`. 상세 정책은 위 "HTML 처리 정책" 참조 |
 | **Rate Limiting 우회/DDoS** | 중간 | 상세는 [api.md](api.md) 참조 |
 
 ---

@@ -133,7 +133,7 @@ export default function DocumentCard({
   return (
     <div
       onClick={handleRowClick}
-      className="bg-bg-secondary border border-border-dark rounded-xl px-5 py-4 grid grid-cols-[1fr_auto] gap-4 items-center hover:border-accent/40 hover:bg-bg-tertiary/50 transition-all cursor-pointer group"
+      className="bg-bg-secondary border border-border-dark rounded-xl px-4 sm:px-5 py-3 sm:py-4 grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center hover:border-accent/40 hover:bg-bg-tertiary/50 transition-all cursor-pointer group"
     >
       <div className="flex flex-col gap-1.5 min-w-0">
         {/* Title row */}
@@ -246,7 +246,7 @@ function ActionButton({
       }`}
     >
       {iconMap[icon]}
-      {children}
+      <span className="hidden sm:inline">{children}</span>
     </button>
   );
 }

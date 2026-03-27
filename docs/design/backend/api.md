@@ -7,8 +7,8 @@
 
 ## 요약
 
-- REST API 공통 규격(Base URL, 응답 포맷, CORS, Rate Limiting)을 정의하고, 12개 엔드포인트 명세를 포함
-- 문서 CRUD(생성/목록/상세/수정/삭제/서빙)와 인증 API(OAuth2 콜백/토큰 갱신/사용자 정보/로그아웃) 상세 명세 제공
+- REST API 공통 규격(Base URL, 응답 포맷, CORS, Rate Limiting)을 정의하고, 14개 엔드포인트 명세를 포함
+- 문서 CRUD(생성/목록/상세/수정/삭제/서빙)와 인증 API(이메일 회원가입/로그인, OAuth2 콜백/토큰 갱신/사용자 정보/로그아웃) 상세 명세 제공
 - 18종 에러 코드를 HTTP 상태 코드별로 정의하여 프론트엔드 에러 처리의 기반 제공
 
 ---
@@ -87,6 +87,9 @@ Rate limit 초과 시 `429 Too Many Requests` 응답과 함께 `Retry-After` 헤
 | `PUT` | `/api/v1/documents/{slug}` | 필수 | 문서 수정 |
 | `DELETE` | `/api/v1/documents/{slug}` | 필수 | 문서 삭제 |
 | `GET` | `/api/v1/documents/{slug}/view` | 없음 | 문서 서빙용 (공유 URL 접근 시 프론트엔드가 호출) |
+| `POST` | `/api/v1/auth/signup` | 없음 | 이메일 회원가입, JWT 발급 |
+| `POST` | `/api/v1/auth/login` | 없음 | 이메일 로그인, JWT 발급 |
+| `GET` | `/api/v1/auth/oauth2/state` | 없음 | OAuth2 CSRF 방어용 state 생성 |
 | `POST` | `/api/v1/auth/oauth2/callback/{provider}` | 없음 | OAuth2 인증 콜백 처리, JWT 발급 |
 | `POST` | `/api/v1/auth/refresh` | 없음 | JWT 리프레시 토큰으로 액세스 토큰 갱신 |
 | `GET` | `/api/v1/auth/me` | 필수 | 현재 로그인 사용자 정보 |
@@ -212,16 +215,19 @@ Rate limit 초과 시 `429 Too Many Requests` 응답과 함께 `Retry-After` 헤
 | `url` | O | - |
 | `title` | O | O |
 | `docType` | O | O |
-| `content` | O | O |
+| `content` | O | - |
+| `contentUrl` | - | O |
 | `contentSize` | O | - |
 | `status` | O | - |
 | `expiresAt` | O | - |
 | `createdAt` | O | O |
-| `updatedAt` | O | - |
+| `updatedAt` | O | O |
 
 ### GET /api/v1/documents/{slug}/view -- 문서 서빙용 (공개)
 
 인증 불필요. 공유 URL 접근 시 프론트엔드가 호출한다. 만료/삭제/PENDING 상태의 문서는 에러를 반환한다.
+
+백엔드는 메타데이터와 CDN URL(`contentUrl`)만 반환하며, 파일 콘텐츠는 프론트엔드가 `contentUrl`을 통해 Cloudflare R2 CDN(`files.drafturl.com`)에서 직접 로드한다.
 
 **성공 응답 (200 OK)**
 
@@ -232,11 +238,14 @@ Rate limit 초과 시 `429 Too Many Requests` 응답과 함께 `Retry-After` 헤
     "id": "xK9mP2nQ",
     "title": "My Document",
     "docType": "html",
-    "content": "<html>...</html>",
-    "createdAt": "2026-03-21T12:00:00Z"
+    "contentUrl": "https://files.drafturl.com/documents/xK9mP2nQ/content.html",
+    "createdAt": "2026-03-21T12:00:00Z",
+    "updatedAt": "2026-03-21T12:00:00Z"
   }
 }
 ```
+
+`contentUrl`은 CDN 기본 URL + `/documents/{slug}/content.{ext}` 형식으로 생성된다. `ext`는 HTML이면 `html`, Markdown이면 `md`.
 
 응답 헤더에 캐싱 지시를 포함한다:
 
@@ -314,6 +323,84 @@ ETag: "{updatedAt의 해시}"
 ---
 
 ## 4. 인증 API
+
+### POST /api/v1/auth/signup -- 이메일 회원가입
+
+이메일/비밀번호/이름으로 회원가입하고 JWT를 즉시 발급한다.
+
+**요청**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "User Name"
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `email` | String | O | 유효한 이메일 형식 |
+| `password` | String | O | 최소 8자, 영문+숫자 포함 필수 |
+| `name` | String | O | 사용자 이름 |
+
+**성공 응답 (200 OK)**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "dGhpcyBpcyBhIHJlZnJlc2g...",
+    "expiresIn": 3600,
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "name": "User Name",
+      "profileImage": null,
+      "plan": "free"
+    }
+  }
+}
+```
+
+### POST /api/v1/auth/login -- 이메일 로그인
+
+이메일/비밀번호로 로그인하고 JWT를 발급한다.
+
+**요청**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `email` | String | O | 유효한 이메일 형식 |
+| `password` | String | O | 비밀번호 |
+
+**성공 응답 (200 OK)**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "dGhpcyBpcyBhIHJlZnJlc2g...",
+    "expiresIn": 3600,
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "name": "User Name",
+      "profileImage": null,
+      "plan": "free"
+    }
+  }
+}
+```
 
 ### POST /api/v1/auth/oauth2/callback/{provider} -- OAuth2 콜백
 

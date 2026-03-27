@@ -90,9 +90,11 @@ interface EditorState {
   content: string;
   docType: DocType;
   title: string;
+  isDemo: boolean;
   setContent: (content: string) => void;
   setDocType: (docType: DocType) => void;
   setTitle: (title: string) => void;
+  setIsDemo: (isDemo: boolean) => void;
   reset: () => void;
   loadDocument: (content: string, docType: DocType, title: string) => void;
 }
@@ -101,6 +103,7 @@ const initialState = {
   content: "",
   docType: "html" as DocType,
   title: "",
+  isDemo: false,
 };
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -109,9 +112,10 @@ export const useEditorStore = create<EditorState>((set) => ({
   setContent: (content) => set({ content }),
   setDocType: (docType) => set({ docType }),
   setTitle: (title) => set({ title }),
+  setIsDemo: (isDemo) => set({ isDemo }),
   reset: () => set({ ...initialState }),
   loadDocument: (content, docType, title) =>
-    set({ content, docType, title }),
+    set({ content, docType, title, isDemo: false }),
 }));
 
 export { SAMPLE_HTML, SAMPLE_MARKDOWN };

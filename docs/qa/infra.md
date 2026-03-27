@@ -62,7 +62,7 @@
 **테스트 단계**:
 1. 프론트엔드 접근: `http://localhost:3000`
 2. 백엔드 API 접근: `http://localhost:8080/api/v1/documents` (GET)
-3. MinIO 콘솔: `http://localhost:9001`
+3. R2 CDN 접근: `https://files.drafturl.com` (Cloudflare R2 커스텀 도메인)
 **기대 결과**: 각 서비스가 정상 응답
 **자동화**: 가능
 
@@ -109,7 +109,7 @@
    ```
 **기대 결과**:
 - `drafturl-db` (PostgreSQL): healthy
-- `drafturl-storage` (MinIO): healthy
+- 파일 저장소(Cloudflare R2)는 외부 서비스이므로 Docker 컨테이너에 포함되지 않음
 **자동화**: 가능
 
 ---

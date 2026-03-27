@@ -18,7 +18,7 @@
 | 서비스 구성 | Docker Compose (6 컨테이너) |
 | 외부 노출 | Cloudflare Tunnel → drafturl.com |
 | DB | PostgreSQL 15 (Docker) |
-| 파일 저장소 | MinIO (Docker, S3 호환) |
+| 파일 저장소 | Cloudflare R2 (외부 서비스) |
 | 문제점 | Mac 절전/재부팅 시 서비스 중단, 개발 작업과 서비스가 같은 머신 |
 
 ### 목표 환경
@@ -37,7 +37,7 @@
 ### Galaxy Book 3 Pro 스펙 확인 필요
 
 - [ ] RAM 용량 (Docker 6 컨테이너 기준 최소 8GB 권장)
-- [ ] SSD 잔여 공간 (Docker 이미지 + DB + MinIO 데이터 고려, 최소 50GB 여유)
+- [ ] SSD 잔여 공간 (Docker 이미지 + DB 데이터 고려, 최소 50GB 여유)
 - [ ] WiFi 칩셋 확인 (Intel AX201 계열이면 Ubuntu 24.04 기본 지원)
 
 ### Ubuntu 24.04 LTS 설치
@@ -127,7 +127,7 @@ scp ~/.cloudflared/config.yml user@galaxy-book:~/.cloudflared/
 ### Docker Compose 구조 (현재와 동일)
 
 ```
-docker-compose.yml          ← 인프라 (DB + MinIO), 항상 가동
+docker-compose.yml          ← 인프라 (DB), 항상 가동
 docker-compose.local.yml    ← 로컬 개발용 (필요 시)
 docker-compose.dev.yml      ← 개발서버 (drafturl.com 서비스)
 ```
@@ -410,9 +410,9 @@ GitHub repo Settings → Environments
 |--------|------|-----|------------|------|
 | `POSTGRES_PASSWORD` | drafturl (하드코딩) | GitHub Secret | GitHub Secret | |
 | `JWT_SECRET` | local-dev-secret... (하드코딩) | GitHub Secret | GitHub Secret | 환경별 다른 값 필수 |
-| `R2_ACCESS_KEY` | minioadmin (하드코딩) | GitHub Secret | GitHub Secret | dev=MinIO, prod=R2 |
-| `R2_SECRET_KEY` | minioadmin (하드코딩) | GitHub Secret | GitHub Secret | |
-| `R2_ENDPOINT` | http://localhost:9000 | GitHub Secret | GitHub Secret | dev=MinIO, prod=R2 URL |
+| `R2_ACCESS_KEY` | R2 Access Key | GitHub Secret | GitHub Secret | Cloudflare R2 API 토큰 |
+| `R2_SECRET_KEY` | R2 Secret Key | GitHub Secret | GitHub Secret | |
+| `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` | GitHub Secret | GitHub Secret | Cloudflare R2 |
 | `GITHUB_CLIENT_ID` | - | GitHub Secret | GitHub Secret | OAuth용 |
 | `GITHUB_CLIENT_SECRET` | - | GitHub Secret | GitHub Secret | |
 | `GOOGLE_CLIENT_ID` | - | GitHub Secret | GitHub Secret | |
@@ -717,6 +717,6 @@ DraftURL 스택(Spring Boot + Next.js + PostgreSQL + S3 호환 스토리지) 기
 | # | 항목 | 상태 |
 |---|------|------|
 | 1 | Galaxy Book 3 Pro 정확한 스펙 (RAM, SSD, WiFi 칩셋) | 확인 필요 |
-| 2 | 데이터 백업 전략 (DB 덤프 주기, MinIO 데이터) | 결정 필요 |
+| 2 | 데이터 백업 전략 (DB 덤프 주기, R2 데이터) | 결정 필요 |
 | 3 | 모니터링/알림 (서비스 다운 시 알림) | 결정 필요 |
 | 4 | 도메인 구조 (dev.drafturl.com 분리 여부) | 결정 필요 |

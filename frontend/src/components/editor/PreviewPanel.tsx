@@ -65,11 +65,11 @@ export default function PreviewPanel() {
       </div>
 
       {/* Preview iframe */}
-      <div className="flex-1 min-h-[560px]">
+      <div className="flex-1 min-h-[350px] md:min-h-[560px]">
         <iframe
           ref={iframeRef}
           srcDoc={wrappedHtml}
-          className="w-full h-full min-h-[560px] border-none bg-white"
+          className="w-full h-full min-h-[350px] md:min-h-[560px] border-none bg-white"
           sandbox="allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"
           title="미리보기"
         />

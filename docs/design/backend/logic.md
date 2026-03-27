@@ -8,7 +8,7 @@
 ## 요약
 
 - 문서 생성은 2단계 커밋(DB INSERT PENDING -> R2 업로드 -> DB UPDATE ACTIVE) 패턴으로 정합성 확보
-- 문서 서빙은 Spring Boot API를 통해 상태/만료 검증 후 R2에서 콘텐츠를 로드하며, sandbox iframe으로 격리 렌더링
+- 문서 서빙은 Spring Boot API가 메타데이터와 CDN URL(contentUrl)을 반환하고, 프론트엔드가 CDN(files.drafturl.com)에서 파일을 직접 로드하여 sandbox iframe으로 격리 렌더링
 - 만료 문서 정리 스케줄러(@Scheduled)가 PENDING 5분 초과, 만료 ACTIVE, 30일 경과 EXPIRED/DELETED를 처리
 - 비로그인 문서 소유권 이전은 MVP에서 미지원하며, 상태 전이는 pending->active->expired/deleted 흐름
 
@@ -52,13 +52,16 @@ sequenceDiagram
 
 ---
 
-## 2. 문서 서빙 (프론트엔드 -> 백엔드)
+## 2. 문서 서빙 (CDN 직접 서빙 방식)
+
+백엔드는 메타데이터와 CDN URL(`contentUrl`)만 반환하고, 프론트엔드가 CDN에서 파일을 직접 로드한다.
 
 ```mermaid
 sequenceDiagram
     actor Browser
-    participant NextJS as Next.js (서버)
+    participant NextJS as Next.js
     participant Spring as Spring Boot
+    participant CDN as Cloudflare CDN<br/>(files.drafturl.com)
 
     Browser->>NextJS: GET /{slug}
 
@@ -67,15 +70,22 @@ sequenceDiagram
     Note over Spring: 1. slug로 문서 조회
     Note over Spring: 2. 상태 확인 (ACTIVE만 서빙)
     Note over Spring: 3. 만료 시간 확인<br/>expiresAt != null && expiresAt < now<br/>-> 410 DOCUMENT_EXPIRED 반환<br/>(DB UPDATE 없음, status 변경은 스케줄러에 위임)
-    Note over Spring: 4. R2에서 파일 로드
-    Note over Spring: 5. 응답 반환 (content + metadata)
+    Note over Spring: 4. CDN URL 생성<br/>contentUrl = CDN_BASE_URL +<br/>/documents/{slug}/content.{ext}
 
-    Spring-->>NextJS: { docType, content, ... }
+    Spring-->>NextJS: { docType, contentUrl, title, ... }
 
-    Note over NextJS: HTML인 경우:<br/>sandbox iframe 래퍼 페이지 렌더링<br/>MD인 경우:<br/>unified로 HTML 변환 + 테마 적용
+    NextJS-->>Browser: 뷰어 페이지 렌더링
 
-    NextJS-->>Browser: 렌더링된 HTML
+    Note over Browser: HTML인 경우:<br/>iframe src=contentUrl<br/>(CDN에서 직접 로드)<br/><br/>MD인 경우:<br/>fetch(contentUrl)로 원본 로드<br/>→ unified로 HTML 변환<br/>→ iframe srcDoc으로 렌더링
+
+    Browser->>CDN: GET /documents/{slug}/content.html
+    CDN-->>Browser: HTML 파일 (엣지 캐싱)
 ```
+
+**CDN 직접 서빙의 장점**:
+- 백엔드가 파일 콘텐츠를 중계하지 않아 메모리/대역폭 부담 제거
+- Cloudflare CDN 엣지 캐싱으로 글로벌 저지연 서빙
+- 문서 만료/삭제 시 R2 파일 삭제 -> CDN도 자동 404
 
 HTML 서빙 보안 정책(sandbox iframe, CSP 헤더)은 [security.md](security.md) 섹션 5를 참조한다.
 

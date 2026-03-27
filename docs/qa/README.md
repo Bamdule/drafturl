@@ -24,7 +24,7 @@
 ### 로컬 환경
 
 ```bash
-# 1. 인프라 (DB + MinIO) 실행
+# 1. 인프라 (DB) 실행
 docker compose up -d
 
 # 2. 백엔드 실행
@@ -36,7 +36,7 @@ cd frontend && npm run dev
 
 - 프론트엔드: `http://localhost:3000`
 - 백엔드 API: `http://localhost:8080`
-- MinIO 콘솔: `http://localhost:9001` (minioadmin / minioadmin)
+- 파일 저장소: Cloudflare R2 (외부 서비스, Cloudflare 대시보드에서 관리)
 
 ### 개발 서버
 

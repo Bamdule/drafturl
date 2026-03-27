@@ -12,7 +12,7 @@ interface TypewriterOverlayProps {
 }
 
 export default function TypewriterOverlay({ active, onDismiss }: TypewriterOverlayProps) {
-  const { docType, setContent } = useEditorStore();
+  const { docType, setContent, setIsDemo } = useEditorStore();
   const codeRef = useRef<HTMLPreElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const indexRef = useRef(0);
@@ -28,9 +28,10 @@ export default function TypewriterOverlay({ active, onDismiss }: TypewriterOverl
     if (timerRef.current) clearTimeout(timerRef.current);
     if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
     setContent("");
+    setIsDemo(false);
     setVisible(false);
     onDismiss();
-  }, [setContent, onDismiss]);
+  }, [setContent, setIsDemo, onDismiss]);
 
   useEffect(() => {
     if (!active) {
@@ -48,7 +49,8 @@ export default function TypewriterOverlay({ active, onDismiss }: TypewriterOverl
 
     const tick = () => {
       if (indexRef.current >= sample.length) {
-        // 완료 — 에디터에 전체 내용 세팅
+        // 완료 — 에디터에 전체 내용 세팅 (데모 플래그 on)
+        setIsDemo(true);
         setContent(sample);
         setTimeout(() => {
           setVisible(false);
@@ -114,7 +116,7 @@ th { background: #f5f5ff; font-weight: 600; }
       if (timerRef.current) clearTimeout(timerRef.current);
       if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
     };
-  }, [active, docType, setContent, onDismiss]);
+  }, [active, docType, setContent, setIsDemo, onDismiss]);
 
   if (!visible) return null;
 

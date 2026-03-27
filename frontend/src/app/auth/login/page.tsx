@@ -9,6 +9,7 @@ import { setCookie } from "@/lib/utils/cookie";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ApiError } from "@/lib/api/types";
 import type { OAuthProvider } from "@/lib/constants";
+import Header from "@/components/layout/Header";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -96,18 +97,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg-primary">
-      {/* Header - centered logo */}
-      <header className="flex items-center justify-center px-6 h-14 border-b border-border-dark">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-bold text-text-primary no-underline"
-        >
-          <div className="w-7 h-7 bg-gradient-to-br from-accent to-[#a78bfa] rounded-lg flex items-center justify-center text-sm text-white font-bold">
-            D
-          </div>
-          DraftURL
-        </Link>
-      </header>
+      <Header />
 
       {/* Main */}
       <main className="flex-1 flex items-center justify-center px-6">

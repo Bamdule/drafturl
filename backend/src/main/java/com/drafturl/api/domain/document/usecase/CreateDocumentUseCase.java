@@ -69,7 +69,9 @@ public class CreateDocumentUseCase {
         String r2Key = "documents/" + slug + "/content." + ext;
         long contentSize = contentBytes.length;
         LocalDateTime expiresAt = (userId == null) ? LocalDateTime.now().plusHours(24) : null;
-        String title = (request.title() != null && !request.title().isBlank()) ? request.title().strip() : null;
+        String title = (request.title() != null && !request.title().isBlank())
+                ? request.title().strip()
+                : LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " 문서";
 
         // DB INSERT (PENDING)
         Document document = txService.insertPendingDocument(id, slug, userId, title, docType, r2Key, contentSize, expiresAt);

@@ -7,14 +7,49 @@
 
 ## 요약
 
-- OAuth2 소셜 로그인(Google/GitHub)으로 인증하고, Spring Boot가 자체 JWT를 발급하는 구조
+- 이메일 회원가입/로그인과 OAuth2 소셜 로그인(Google/GitHub)을 지원하며, Spring Boot가 자체 JWT를 발급하는 구조
 - State 파라미터 기반 CSRF 방어와 Refresh Token Rotation으로 토큰 탈취 감지/대응
 - JWT(HS256)는 Access Token 1시간, Refresh Token 7일 만료이며, httpOnly 쿠키에 저장
 - Spring Security 필터 체인(CORS -> Rate Limit -> JWT -> SecurityFilterChain)으로 요청 처리
 
 ---
 
-## 1. 인증 플로우 (OAuth2 + JWT)
+## 1. 인증 플로우
+
+### 1-1. 이메일 회원가입/로그인
+
+OAuth2 외에 이메일 기반 인증을 지원한다. 회원가입 시 이메일/비밀번호/이름을 받아 사용자를 생성하고 JWT를 즉시 발급한다. 로그인 시 이메일/비밀번호를 검증하고 JWT를 발급한다.
+
+```mermaid
+sequenceDiagram
+    actor Browser
+    participant NextJS as Next.js
+    participant Spring as Spring Boot
+    participant DB as PostgreSQL
+
+    Browser->>NextJS: 회원가입 폼 제출
+
+    NextJS->>Spring: POST /api/v1/auth/signup<br/>{email, password, name}
+
+    Note over Spring: 1. 입력 검증<br/>- 이메일 형식<br/>- 비밀번호 8자 이상, 영문+숫자<br/>- 이름 필수
+    Note over Spring: 2. 이메일 중복 확인
+
+    Spring->>DB: 사용자 생성 (비밀번호 해싱)
+    DB-->>Spring: OK
+
+    Note over Spring: 3. JWT 발급 (Access + Refresh)
+
+    Spring-->>NextJS: {accessToken, refreshToken, expiresIn, user}
+    NextJS-->>Browser: Set cookie + redirect /dashboard
+```
+
+로그인은 동일한 흐름이나 `POST /api/v1/auth/login`에 `{email, password}`만 전달한다. 비밀번호 검증 후 JWT를 발급한다.
+
+**비밀번호 정책**:
+- 최소 8자 이상
+- 영문과 숫자를 모두 포함 (`^(?=.*[a-zA-Z])(?=.*\d).+$`)
+
+### 1-2. OAuth2 소셜 로그인
 
 ### OAuth2 State (CSRF 방어) 흐름
 
@@ -146,7 +181,7 @@ flowchart TD
 
     JWT -.- JWT_DESC["- Authorization 헤더에서 JWT 추출\n- 서명 검증 + 만료 확인\n- 유효하면 SecurityContext에 Authentication 설정\n- 유효하지 않으면 필터 체인 계속 (익명 요청)"]
 
-    SEC -.- SEC_DESC["- /api/v1/documents POST: permitAll (비로그인 문서 생성)\n- /api/v1/documents GET, PUT, DELETE: authenticated\n- /api/v1/documents/{slug}/view: permitAll\n- /api/v1/auth/**: permitAll\n- 그 외: denyAll"]
+    SEC -.- SEC_DESC["- /api/v1/documents POST: permitAll (비로그인 문서 생성)\n- /api/v1/documents GET, PUT, DELETE: authenticated\n- /api/v1/documents/{slug}/view: permitAll\n- /api/v1/auth/signup, /login, /oauth2/**, /refresh: permitAll\n- /api/v1/auth/me, /logout: authenticated\n- 그 외: denyAll"]
 ```
 
 ---

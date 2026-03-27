@@ -7,16 +7,16 @@
 
 ## 요약
 
-- Docker Compose로 Next.js, Spring Boot, PostgreSQL, MinIO(R2 대체)를 로컬에서 통합 실행
+- Docker Compose로 Next.js, Spring Boot, PostgreSQL을 로컬에서 통합 실행하고, 파일 저장소는 Cloudflare R2를 직접 사용
 - Flyway 마이그레이션이 로컬에도 동일하게 적용되어 프로덕션과 스키마 일치
 - Cloudflare Tunnel로 로컬 환경을 외부에 노출하여 모바일 테스트, OAuth 콜백 테스트 가능
-- 로컬 환경변수(.env.local)로 MinIO, 개발용 JWT 비밀키 등을 설정
+- 로컬 환경변수(.env.local)로 R2 접속 정보, 개발용 JWT 비밀키 등을 설정
 
 ---
 
 ## 1. 구성
 
-로컬 PC에서 프론트엔드, 백엔드, DB 등 전체 스택을 Docker Compose로 통합 실행한다. 도메인 접근은 Cloudflare Tunnel을 통해 외부에서도 가능하게 한다.
+로컬 PC에서 프론트엔드, 백엔드, DB를 Docker Compose로 통합 실행한다. 파일 저장소는 Cloudflare R2를 직접 사용하며, 도메인 접근은 Cloudflare Tunnel을 통해 외부에서도 가능하게 한다.
 
 ```mermaid
 flowchart LR
@@ -24,15 +24,15 @@ flowchart LR
         FE["Next.js\n:3000"]
         BE["Spring Boot\n:8080"]
         DB[(PostgreSQL\n:5432)]
-        R2S["MinIO (R2 대체)\n:9000"]
     end
 
+    R2["Cloudflare R2\n(파일 저장소)"]
     CF["Cloudflare Tunnel"]
     Browser["브라우저"]
 
     FE --> BE
     BE --> DB
-    BE --> R2S
+    BE --> R2
     Browser --> CF
     CF --> FE
 ```
@@ -46,13 +46,11 @@ flowchart LR
 | `frontend` | Node.js (Next.js dev) | 3000 | 프론트엔드 개발 서버 |
 | `backend` | Eclipse Temurin 21-jre (Spring Boot) | 8050→8080 | 백엔드 API 서버 |
 | `db` | PostgreSQL 15 | 5432 | 로컬 데이터베이스 |
-| `storage` | MinIO | 9000, 9001 | R2 대체 (S3 호환 로컬 스토리지) |
 
-- **MinIO**를 Cloudflare R2 대체로 사용. S3 호환 API이므로 코드 변경 없이 동일한 AWS SDK로 접근 가능.
-- Spring Boot의 `application-local.yml`에서 MinIO 엔드포인트(`http://storage:9000`)를 사용.
+- 파일 저장소는 **Cloudflare R2**를 모든 환경(로컬/개발/운영)에서 직접 사용한다. S3 호환 API이므로 AWS SDK로 접근한다.
+- Spring Boot의 `application.yml`에서 R2 엔드포인트(`https://<account-id>.r2.cloudflarestorage.com`)를 사용.
 - Flyway 마이그레이션이 로컬 PostgreSQL에도 동일하게 적용되어 프로덕션과 스키마가 일치.
 - PostgreSQL 데이터는 Docker 볼륨(`pgdata`)에 영속화하여 컨테이너 재시작 시에도 유지한다.
-- MinIO 데이터는 Docker 볼륨(`miniodata`)에 영속화한다.
 
 ---
 
@@ -65,7 +63,7 @@ docker compose up -d
 # 로그 확인
 docker compose logs -f backend
 
-# MinIO 버킷은 백엔드 기동 시 자동 생성됨 (R2Config.ensureBucketExists)
+# R2 버킷은 Cloudflare 대시보드에서 사전 생성 필요 (drafturl-files)
 ```
 
 ---
@@ -200,10 +198,11 @@ cloudflared tunnel run drafturl &
 | 변수 | 값 | 비고 |
 |------|-----|------|
 | `DATABASE_URL` | `jdbc:postgresql://localhost:5432/drafturl` | 로컬 PostgreSQL |
-| `R2_ENDPOINT` | `http://localhost:9000` | MinIO |
-| `R2_ACCESS_KEY` | `minioadmin` | MinIO 기본값 |
-| `R2_SECRET_KEY` | `minioadmin` | MinIO 기본값 |
-| `R2_BUCKET_NAME` | `drafturl-files` | 로컬 버킷 |
+| `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` | Cloudflare R2 |
+| `R2_ACCESS_KEY` | R2 API 토큰의 Access Key | Cloudflare 대시보드에서 발급 |
+| `R2_SECRET_KEY` | R2 API 토큰의 Secret Key | Cloudflare 대시보드에서 발급 |
+| `R2_BUCKET_NAME` | `drafturl-files` | R2 버킷 |
+| `CDN_BASE_URL` | `https://files.drafturl.com` | R2 커스텀 도메인 (CDN) |
 | `JWT_SECRET` | `local-dev-secret-key-at-least-32-bytes!!` | 개발용 |
 | `FRONTEND_URL` | `http://localhost:3000` | CORS |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8050` | 로컬 API (터널 시 `https://api.drafturl.com`) |

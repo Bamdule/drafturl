@@ -9,7 +9,7 @@ import PublishResultModal from "./PublishResultModal";
 import type { DocumentSummary } from "@/lib/api/types";
 
 export default function PublishButton({ onNewDocument }: { onNewDocument?: () => void } = {}) {
-  const { content, docType, title, reset } = useEditorStore();
+  const { content, docType, title, isDemo, reset } = useEditorStore();
   const { isAuthenticated } = useAuthStore();
   const [isPublishing, setIsPublishing] = useState(false);
   const [result, setResult] = useState<DocumentSummary | null>(null);
@@ -128,7 +128,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
             </button>
             <button
               onClick={handlePublish}
-              disabled={isPublishing || !content.trim()}
+              disabled={isPublishing || !content.trim() || isDemo}
               className="px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isPublishing ? "배포 중..." : "\u26A1 공유하기"}
