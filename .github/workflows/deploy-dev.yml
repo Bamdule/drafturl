@@ -1,0 +1,66 @@
+name: Deploy to Dev Server
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: self-hosted
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build backend jar
+        working-directory: backend
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+
+      - name: Create env file
+        run: |
+          cat > .env << 'ENVEOF'
+          R2_ENDPOINT=${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY=${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY=${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET=${{ secrets.R2_BUCKET }}
+          ENVEOF
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker network inspect drafturl-net >/dev/null 2>&1 || docker network create drafturl-net
+          docker compose -f docker-compose.yml --env-file .env up -d
+          docker compose -f docker-compose.dev.yml --env-file .env up -d --build
+
+      - name: Wait for backend startup
+        run: sleep 20
+
+      - name: Health check
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8050/api/v1/health)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Health check failed (HTTP $STATUS)"
+            docker logs drafturl-dev-backend --tail 30
+            exit 1
+          fi
+          echo "✅ Health check passed"
+          curl -s http://localhost:8050/api/v1/health
+
+      - name: Cleanup env file
+        if: always()
+        run: rm -f .env
+
+      - name: Deploy summary
+        run: echo "✅ 배포 완료 — $(date '+%Y-%m-%d %H:%M:%S')"

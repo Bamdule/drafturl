@@ -85,7 +85,7 @@ public class SecurityConfig {
                         .requestMatchers("/docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // 헬스체크
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/v1/health").permitAll()
 
                         // 그 외 - denyAll
                         .anyRequest().denyAll()
