@@ -17,7 +17,6 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 /** Free plan limits */
 const FREE_PLAN_MAX_BYTES = 5 * 1024 * 1024;
 const FREE_PLAN_MAX_DOCUMENTS = 30;
-const FREE_PLAN_EXPIRY_HOURS = 24;
 
 export default function DashboardPage() {
   const { user, setUser } = useAuthStore();

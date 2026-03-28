@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { oauthCallback } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
@@ -71,12 +72,12 @@ function AuthCallbackContent() {
       <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-bg-primary">
         <h1 className="text-xl font-bold text-danger">인증 오류</h1>
         <p className="mt-2 text-sm text-text-secondary">{error}</p>
-        <a
+        <Link
           href="/auth/login"
           className="mt-4 text-sm font-medium text-accent hover:underline"
         >
           다시 로그인하기
-        </a>
+        </Link>
       </div>
     );
   }

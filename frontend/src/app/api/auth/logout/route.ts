@@ -4,7 +4,7 @@ import { getAuthTokensFromCookies, clearAuthCookies } from "@/lib/auth/cookies";
 const BACKEND_URL =
   process.env.INTERNAL_API_URL ?? "http://localhost:8080";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const { accessToken, refreshToken } = await getAuthTokensFromCookies();
 

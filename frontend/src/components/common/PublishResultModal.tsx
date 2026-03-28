@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import type { DocumentSummary } from "@/lib/api/types";
 
 interface PublishResultModalProps {

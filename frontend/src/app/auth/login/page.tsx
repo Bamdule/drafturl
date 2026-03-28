@@ -2,19 +2,14 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { generateOAuthState, emailLogin } from "@/lib/api/auth";
-import { OAUTH_PROVIDERS, COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER } from "@/lib/constants";
-import { setCookie } from "@/lib/utils/cookie";
+import { emailLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ApiError } from "@/lib/api/types";
-import type { OAuthProvider } from "@/lib/constants";
+
 import Header from "@/components/layout/Header";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { login } = useAuthStore();
-  const [isOAuthLoading, setIsOAuthLoading] = useState(false);
 
   // Email login state
   const [email, setEmail] = useState("");
@@ -23,36 +18,6 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
-
-  const handleOAuthLogin = useCallback(async (provider: OAuthProvider) => {
-    if (isOAuthLoading) return;
-    setIsOAuthLoading(true);
-
-    try {
-      const { state } = await generateOAuthState();
-      setCookie(COOKIE_OAUTH_STATE, state, { maxAge: 300, sameSite: "Lax" });
-      setCookie(COOKIE_OAUTH_PROVIDER, provider, { maxAge: 300, sameSite: "Lax" });
-
-      const config = OAUTH_PROVIDERS[provider];
-      const clientId =
-        provider === "google"
-          ? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-          : process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-      const redirectUri = `${window.location.origin}/auth/callback`;
-
-      const params = new URLSearchParams({
-        client_id: clientId ?? "",
-        redirect_uri: redirectUri,
-        response_type: "code",
-        scope: config.scope,
-        state,
-      });
-
-      window.location.href = `${config.authUrl}?${params.toString()}`;
-    } catch {
-      setIsOAuthLoading(false);
-    }
-  }, [isOAuthLoading]);
 
   const handleEmailLogin = useCallback(
     async (e: React.FormEvent) => {
@@ -90,10 +55,10 @@ export default function LoginPage() {
         setIsLoginLoading(false);
       }
     },
-    [email, password, isLoginLoading, login, router],
+    [email, password, isLoginLoading, login],
   );
 
-  const isLoading = isOAuthLoading || isLoginLoading;
+  const isLoading = isLoginLoading;
 
   return (
     <div className="flex min-h-screen flex-col bg-bg-primary">

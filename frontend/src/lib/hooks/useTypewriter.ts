@@ -14,7 +14,7 @@ export function useTypewriter() {
   const { content, docType, setContent } = useEditorStore();
   const animatingRef = useRef(false);
   const cancelRef = useRef(false);
-  const hasPlayedRef = useRef(false);
+
   const initializedRef = useRef(false);
 
   const startTyping = useCallback(() => {
