@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 export const metadata: Metadata = {
   title: "내 문서 - DraftURL",
   description: "내가 만든 문서를 관리하고 편집하세요.",
+  robots: "noindex, nofollow",
 };
 
 export default function DashboardLayout({

@@ -10,6 +10,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ),
   title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
   description:
     "HTML이나 Markdown 문서를 붙여넣고 공유 URL을 즉시 생성하세요. AI로 계속 수정할 수 있는 살아있는 문서 플랫폼.",
@@ -23,6 +26,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "DraftURL",
     locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary",
+    title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
+    description:
+      "HTML이나 Markdown 문서를 붙여넣고 공유 URL을 즉시 생성하세요.",
   },
 };
 

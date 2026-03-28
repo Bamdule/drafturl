@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "문서 만료 - DraftURL",
   description: "이 문서는 만료 기간이 지나 더 이상 볼 수 없습니다.",
+  robots: "noindex, nofollow",
 };
 
 interface ExpiredPageProps {

@@ -28,12 +28,23 @@ export async function generateMetadata({
         description,
         type: "article",
         siteName: "DraftURL",
+        locale: "ko_KR",
+      },
+      twitter: {
+        card: "summary",
+        title,
+        description,
       },
     };
   } catch {
     return {
       title: "문서를 찾을 수 없습니다",
       description: "요청한 문서가 존재하지 않거나 만료되었습니다.",
+      twitter: {
+        card: "summary",
+        title: "문서를 찾을 수 없습니다",
+        description: "요청한 문서가 존재하지 않거나 만료되었습니다.",
+      },
     };
   }
 }
