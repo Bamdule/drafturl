@@ -61,6 +61,17 @@ export function getDocumentViewServer(slug: string): Promise<DocumentView> {
   return serverFetch<DocumentView>(`/api/v1/documents/${slug}/view`);
 }
 
+/** 비밀번호 보호 문서 검증 */
+export function verifyDocumentPassword(
+  slug: string,
+  password: string,
+): Promise<DocumentView> {
+  return apiFetch<DocumentView>(`/api/v1/documents/${slug}/verify-password`, {
+    method: "POST",
+    body: { password },
+  });
+}
+
 /** 문서 수정 */
 export function updateDocument(
   slug: string,

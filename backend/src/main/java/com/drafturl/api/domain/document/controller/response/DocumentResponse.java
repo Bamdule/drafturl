@@ -12,6 +12,7 @@ public record DocumentResponse(
         String docType,
         long contentSize,
         String status,
+        boolean isPasswordProtected,
         LocalDateTime expiresAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -26,6 +27,7 @@ public record DocumentResponse(
                 document.getDocType().name().toLowerCase(),
                 document.getContentSize(),
                 document.getStatus().name().toLowerCase(),
+                document.isPasswordProtected(),
                 document.getExpiresAt(),
                 document.getCreatedAt(),
                 document.getUpdatedAt()

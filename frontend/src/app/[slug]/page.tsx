@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getDocumentViewServer } from "@/lib/api/documents";
 import { ApiError } from "@/lib/api/types";
 import DocumentViewPage from "./DocumentViewPage";
+import PasswordGatePage from "./PasswordGatePage";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
@@ -61,6 +62,11 @@ export default async function SlugPage({ params }: SlugPageProps) {
 
   try {
     const doc = await getDocumentViewServer(slug);
+
+    if (doc.isPasswordProtected && !doc.contentUrl) {
+      return <PasswordGatePage slug={slug} document={doc} />;
+    }
+
     return <DocumentViewPage document={doc} />;
   } catch (err) {
     if (err instanceof ApiError) {

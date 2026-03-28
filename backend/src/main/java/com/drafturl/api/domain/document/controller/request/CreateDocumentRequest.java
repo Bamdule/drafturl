@@ -12,6 +12,9 @@ public record CreateDocumentRequest(
         String type,
 
         @Size(max = 200, message = "제목은 200자를 초과할 수 없습니다")
-        String title
+        String title,
+
+        @Size(min = 4, max = 100, message = "비밀번호는 4~100자입니다")
+        String password
 ) {
 }

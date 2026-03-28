@@ -9,6 +9,7 @@ public record DocumentViewResponse(
         String title,
         String docType,
         String contentUrl,
+        boolean isPasswordProtected,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -21,6 +22,19 @@ public record DocumentViewResponse(
                 document.getTitle(),
                 document.getDocType().name().toLowerCase(),
                 contentUrl,
+                document.isPasswordProtected(),
+                document.getCreatedAt(),
+                document.getUpdatedAt()
+        );
+    }
+
+    public static DocumentViewResponse protectedMetadata(Document document) {
+        return new DocumentViewResponse(
+                document.getId(),
+                document.getTitle(),
+                document.getDocType().name().toLowerCase(),
+                null,
+                true,
                 document.getCreatedAt(),
                 document.getUpdatedAt()
         );

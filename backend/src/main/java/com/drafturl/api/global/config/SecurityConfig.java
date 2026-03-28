@@ -79,6 +79,9 @@ public class SecurityConfig {
                         // 문서 공개 서빙 - permitAll
                         .requestMatchers(HttpMethod.GET, "/api/v1/documents/*/view").permitAll()
 
+                        // 문서 비밀번호 검증 - permitAll
+                        .requestMatchers(HttpMethod.POST, "/api/v1/documents/*/verify-password").permitAll()
+
                         // 비로그인 문서 생성 - permitAll
                         .requestMatchers(HttpMethod.POST, "/api/v1/documents").permitAll()
 

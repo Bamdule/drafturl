@@ -13,6 +13,7 @@ public record DocumentEditResponse(
         String content,
         long contentSize,
         String status,
+        boolean isPasswordProtected,
         LocalDateTime expiresAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -28,6 +29,7 @@ public record DocumentEditResponse(
                 content,
                 document.getContentSize(),
                 document.getStatus().name().toLowerCase(),
+                document.isPasswordProtected(),
                 document.getExpiresAt(),
                 document.getCreatedAt(),
                 document.getUpdatedAt()

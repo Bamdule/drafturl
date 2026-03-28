@@ -40,6 +40,7 @@ export interface DocumentSummary {
   docType: DocType;
   contentSize: number;
   status: "active" | "expired" | "deleted";
+  isPasswordProtected: boolean;
   expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -53,7 +54,8 @@ export interface DocumentView {
   id: string;
   title: string | null;
   docType: DocType;
-  contentUrl: string;
+  contentUrl: string | null;
+  isPasswordProtected: boolean;
   createdAt: string;
 }
 
@@ -79,11 +81,13 @@ export interface CreateDocumentRequest {
   content: string;
   type: DocType;
   title?: string;
+  password?: string;
 }
 
 export interface UpdateDocumentRequest {
   content?: string;
   title?: string;
+  password?: string | null;
 }
 
 // ─── 인증 관련 타입 ─────────────────────────────────

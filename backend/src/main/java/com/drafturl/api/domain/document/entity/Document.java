@@ -48,12 +48,16 @@ public class Document extends BaseEntity {
     @Column
     private LocalDateTime expiresAt;
 
+    @Column(name = "password_hash")
+    private String passwordHash;
+
     protected Document() {
     }
 
     public Document(String id, String slug, UUID userId, String title,
                     DocType docType, String r2Key, long contentSize,
-                    DocumentStatus status, LocalDateTime expiresAt) {
+                    DocumentStatus status, LocalDateTime expiresAt,
+                    String passwordHash) {
         this.id = id;
         this.slug = slug;
         this.userId = userId;
@@ -63,6 +67,7 @@ public class Document extends BaseEntity {
         this.contentSize = contentSize;
         this.status = status;
         this.expiresAt = expiresAt;
+        this.passwordHash = passwordHash;
     }
 
     public String getId() {
@@ -132,5 +137,17 @@ public class Document extends BaseEntity {
 
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public boolean isPasswordProtected() {
+        return passwordHash != null;
+    }
+
+    public void updatePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 }

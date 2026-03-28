@@ -15,6 +15,8 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
   const [result, setResult] = useState<DocumentSummary | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordEnabled, setPasswordEnabled] = useState(false);
+  const [docPassword, setDocPassword] = useState("");
 
   // 공유 완료 상태에서 에디터 내용이 변경되면 자동으로 새 문서 모드로 전환
   const publishedContentRef = useRef<string | null>(null);
@@ -41,6 +43,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
           content,
           type: docType,
           title: title || undefined,
+          password: passwordEnabled && docPassword.trim() ? docPassword.trim() : undefined,
         },
         isAuthenticated,
       );
@@ -117,8 +120,34 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
             </button>
           </div>
         ) : (
-          // 공유 전: 미리보기 + 공유하기 버튼
-          <div className="flex items-center gap-3">
+          <>
+            {/* 비밀번호 설정 */}
+            <div className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-1.5 text-text-secondary cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={passwordEnabled}
+                  onChange={(e) => {
+                    setPasswordEnabled(e.target.checked);
+                    if (!e.target.checked) setDocPassword("");
+                  }}
+                  className="accent-accent"
+                />
+                비밀번호 설정
+              </label>
+              {passwordEnabled && (
+                <input
+                  type="password"
+                  value={docPassword}
+                  onChange={(e) => setDocPassword(e.target.value)}
+                  placeholder="4자 이상"
+                  className="h-8 w-36 rounded border border-border-dark bg-bg-secondary px-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/50"
+                />
+              )}
+            </div>
+
+            {/* 공유 전: 미리보기 + 공유하기 버튼 */}
+            <div className="flex items-center gap-3">
             <button
               onClick={handlePreview}
               disabled={!content.trim()}
@@ -133,7 +162,8 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
             >
               {isPublishing ? "배포 중..." : "\u26A1 공유하기"}
             </button>
-          </div>
+            </div>
+          </>
         )}
 
         {!isAuthenticated && !result && (

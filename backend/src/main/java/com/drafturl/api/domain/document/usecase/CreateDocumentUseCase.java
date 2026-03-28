@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -35,17 +36,20 @@ public class CreateDocumentUseCase {
     private final ContentSanitizer contentSanitizer;
     private final FileStorage fileStorage;
     private final DocumentTransactionService txService;
+    private final PasswordEncoder passwordEncoder;
     private final String frontendUrl;
 
     public CreateDocumentUseCase(SlugGenerator slugGenerator,
                                   ContentSanitizer contentSanitizer,
                                   FileStorage fileStorage,
                                   DocumentTransactionService txService,
+                                  PasswordEncoder passwordEncoder,
                                   @Value("${app.frontend-url}") String frontendUrl) {
         this.slugGenerator = slugGenerator;
         this.contentSanitizer = contentSanitizer;
         this.fileStorage = fileStorage;
         this.txService = txService;
+        this.passwordEncoder = passwordEncoder;
         this.frontendUrl = frontendUrl;
     }
 
@@ -73,8 +77,12 @@ public class CreateDocumentUseCase {
                 ? request.title().strip()
                 : java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Seoul")).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " 문서";
 
+        String passwordHash = (request.password() != null && !request.password().isBlank())
+                ? passwordEncoder.encode(request.password())
+                : null;
+
         // DB INSERT (PENDING)
-        Document document = txService.insertPendingDocument(id, slug, userId, title, docType, r2Key, contentSize, expiresAt);
+        Document document = txService.insertPendingDocument(id, slug, userId, title, docType, r2Key, contentSize, expiresAt, passwordHash);
 
         // R2 업로드
         String contentType = docType == DocType.HTML ? "text/html" : "text/markdown";

@@ -2,6 +2,7 @@ package com.drafturl.api.domain.document.controller;
 
 import com.drafturl.api.domain.document.controller.request.CreateDocumentRequest;
 import com.drafturl.api.domain.document.controller.request.UpdateDocumentRequest;
+import com.drafturl.api.domain.document.controller.request.VerifyPasswordRequest;
 import com.drafturl.api.domain.document.controller.response.DocumentDeleteResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentEditResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentListResponse;
@@ -59,12 +60,33 @@ public class DocumentController {
     }
 
     @GetMapping("/{slug}/view")
-    public ResponseEntity<ApiResponse<DocumentViewResponse>> viewDocument(@PathVariable String slug) {
-        DocumentViewResponse response = viewDocumentUseCase.execute(slug);
+    public ResponseEntity<ApiResponse<DocumentViewResponse>> viewDocument(
+            @PathVariable String slug,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UUID viewerUserId = (userPrincipal != null) ? userPrincipal.userId() : null;
+        DocumentViewResponse response = viewDocumentUseCase.execute(slug, viewerUserId);
+
+        // 비밀번호 보호 문서는 캐싱하지 않음
+        if (response.contentUrl() == null) {
+            return ResponseEntity.ok()
+                    .header("Cache-Control", "no-store")
+                    .body(ApiResponse.success(response));
+        }
+
         String etag = Integer.toHexString(response.updatedAt().hashCode());
         return ResponseEntity.ok()
                 .header("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400")
                 .header("ETag", "\"" + etag + "\"")
+                .body(ApiResponse.success(response));
+    }
+
+    @PostMapping("/{slug}/verify-password")
+    public ResponseEntity<ApiResponse<DocumentViewResponse>> verifyDocumentPassword(
+            @PathVariable String slug,
+            @Valid @RequestBody VerifyPasswordRequest request) {
+        DocumentViewResponse response = viewDocumentUseCase.verifyAndView(slug, request.password());
+        return ResponseEntity.ok()
+                .header("Cache-Control", "no-store")
                 .body(ApiResponse.success(response));
     }
 

@@ -159,6 +159,9 @@ export default function DocumentCard({
               {doc.title || "제목 없음"}
             </span>
           )}
+          {doc.isPasswordProtected && (
+            <span className="text-[11px] text-text-muted shrink-0" title="비밀번호 보호">&#128274;</span>
+          )}
           <span
             className={`inline-flex px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wide shrink-0 ${
               isHtml
