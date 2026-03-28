@@ -8,11 +8,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @param google Google OAuth2 설정
  * @param github GitHub OAuth2 설정
+ * @param naver  Naver OAuth2 설정
+ * @param kakao  Kakao OAuth2 설정
  */
 @ConfigurationProperties(prefix = "app.oauth2")
 public record OAuth2Properties(
         ProviderProperties google,
-        ProviderProperties github
+        ProviderProperties github,
+        ProviderProperties naver,
+        ProviderProperties kakao
 ) {
 
     /**

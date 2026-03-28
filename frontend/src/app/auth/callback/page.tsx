@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { oauthCallback } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
-import { COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER } from "@/lib/constants";
+import { COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER, OAUTH_PROVIDERS } from "@/lib/constants";
+import type { OAuthProvider } from "@/lib/constants";
 import { getCookie, deleteCookie } from "@/lib/utils/cookie";
 
 function AuthCallbackContent() {
@@ -42,12 +43,13 @@ function AuthCallbackContent() {
         const provider = getCookie(COOKIE_OAUTH_PROVIDER);
         deleteCookie(COOKIE_OAUTH_PROVIDER);
 
-        if (provider !== "google" && provider !== "github") {
+        const validProviders = Object.keys(OAUTH_PROVIDERS);
+        if (!provider || !validProviders.includes(provider)) {
           setError("OAuth provider 정보를 확인할 수 없습니다.");
           return;
         }
 
-        const result = await oauthCallback(provider, {
+        const result = await oauthCallback(provider as OAuthProvider, {
           code,
           redirectUri: `${window.location.origin}/auth/callback`,
           state,

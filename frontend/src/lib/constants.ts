@@ -31,11 +31,25 @@ export const OAUTH_PROVIDERS = {
     name: "Google",
     authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
     scope: "openid email profile",
+    clientIdEnv: "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
   },
   github: {
     name: "GitHub",
     authUrl: "https://github.com/login/oauth/authorize",
     scope: "read:user user:email",
+    clientIdEnv: "NEXT_PUBLIC_GITHUB_CLIENT_ID",
+  },
+  naver: {
+    name: "네이버",
+    authUrl: "https://nid.naver.com/oauth2.0/authorize",
+    scope: "",
+    clientIdEnv: "NEXT_PUBLIC_NAVER_CLIENT_ID",
+  },
+  kakao: {
+    name: "카카오",
+    authUrl: "https://kauth.kakao.com/oauth/authorize",
+    scope: "account_email profile_nickname",
+    clientIdEnv: "NEXT_PUBLIC_KAKAO_CLIENT_ID",
   },
 } as const;
 

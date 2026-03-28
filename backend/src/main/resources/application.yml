@@ -51,3 +51,9 @@ app:
     github:
       client-id: ${GITHUB_CLIENT_ID:placeholder}
       client-secret: ${GITHUB_CLIENT_SECRET:placeholder}
+    naver:
+      client-id: ${NAVER_CLIENT_ID:placeholder}
+      client-secret: ${NAVER_CLIENT_SECRET:placeholder}
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:placeholder}
+      client-secret: ${KAKAO_CLIENT_SECRET:placeholder}
