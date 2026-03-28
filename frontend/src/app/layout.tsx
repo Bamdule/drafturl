@@ -1,6 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
