@@ -11,7 +11,7 @@ export default function HtmlViewer({ contentUrl, title }: HtmlViewerProps) {
       <iframe
         src={contentUrl}
         className="flex-1 w-full bg-white"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"
+        sandbox="allow-scripts allow-popups allow-modals"
         title={title ?? "문서"}
       />
     </div>

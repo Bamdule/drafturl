@@ -4,6 +4,15 @@ import { getAuthTokensFromCookies } from "@/lib/auth/cookies";
 const BACKEND_URL =
   process.env.INTERNAL_API_URL ?? "http://localhost:8080";
 
+/** 허용된 API 경로 패턴 */
+const ALLOWED_PATHS = [
+  /^\/api\/v1\/documents(\/.*)?$/,
+  /^\/api\/v1\/auth(\/.*)?$/,
+  /^\/api\/v1\/health$/,
+];
+
+const MAX_BODY_SIZE = 5 * 1024 * 1024; // 5MB
+
 /**
  * 범용 API 프록시.
  * 인증이 필요한 모든 API 호출을 프록시한다.
@@ -16,6 +25,14 @@ async function handler(
   try {
     const { path } = await params;
     const backendPath = `/api/v1/${path.join("/")}`;
+
+    // 경로 화이트리스트 검증
+    if (!ALLOWED_PATHS.some((pattern) => pattern.test(backendPath))) {
+      return NextResponse.json(
+        { success: false, error: { code: "FORBIDDEN_PATH", message: "허용되지 않은 경로입니다." } },
+        { status: 403 },
+      );
+    }
     const url = new URL(backendPath, BACKEND_URL);
 
     // 쿼리 파라미터 전달
@@ -41,9 +58,16 @@ async function handler(
       headers,
     };
 
-    // GET/HEAD가 아닌 경우 body 전달
+    // GET/HEAD가 아닌 경우 body 전달 (크기 제한)
     if (request.method !== "GET" && request.method !== "HEAD") {
-      fetchOptions.body = await request.text();
+      const body = await request.text();
+      if (body.length > MAX_BODY_SIZE) {
+        return NextResponse.json(
+          { success: false, error: { code: "PAYLOAD_TOO_LARGE", message: "요청 본문이 너무 큽니다." } },
+          { status: 413 },
+        );
+      }
+      fetchOptions.body = body;
     }
 
     const res = await fetch(url.toString(), fetchOptions);

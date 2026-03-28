@@ -70,7 +70,7 @@ export default function PreviewPanel() {
           ref={iframeRef}
           srcDoc={wrappedHtml}
           className="w-full h-full min-h-[350px] md:min-h-[560px] border-none bg-white"
-          sandbox="allow-scripts allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"
+          sandbox="allow-scripts allow-popups allow-modals"
           title="미리보기"
         />
       </div>

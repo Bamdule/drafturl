@@ -2,13 +2,24 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 
 const processor = unified()
   .use(remarkParse)
-  .use(remarkGfm)          // GFM: 테이블, 취소선, 자동링크, 체크리스트
+  .use(remarkGfm)
   .use(remarkRehype)
-  .use(rehypeStringify);   // rehype-sanitize 제거: iframe sandbox가 보안 담당
+  .use(rehypeSanitize, {
+    ...defaultSchema,
+    tagNames: [...(defaultSchema.tagNames ?? []), "del", "ins", "details", "summary"],
+    attributes: {
+      ...defaultSchema.attributes,
+      img: ["src", "alt", "title", "width", "height"],
+      a: ["href", "title", "target", "rel"],
+      input: ["type", "checked", "disabled"],
+    },
+  })
+  .use(rehypeStringify);
 
 /**
  * Markdown 텍스트를 sanitize된 HTML 문자열로 변환.
