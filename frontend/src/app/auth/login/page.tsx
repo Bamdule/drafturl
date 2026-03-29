@@ -91,6 +91,7 @@ export default function LoginPage() {
         });
 
         login(result.user);
+        window.umami?.track("login", { provider: "email" });
         window.location.href = "/dashboard";
       } catch (err) {
         if (err instanceof ApiError) {

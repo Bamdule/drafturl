@@ -83,6 +83,7 @@ export default function SignupPage() {
         });
 
         login(result.user);
+        window.umami?.track("signup", { provider: "email" });
         router.replace("/dashboard");
       } catch (err) {
         if (err instanceof ApiError) {

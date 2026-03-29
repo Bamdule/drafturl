@@ -56,6 +56,7 @@ function AuthCallbackContent() {
         });
 
         login(result.user);
+        window.umami?.track("login", { provider: provider as string });
         window.location.href = "/dashboard";
       } catch (err) {
         setError(

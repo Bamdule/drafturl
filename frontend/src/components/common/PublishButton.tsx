@@ -49,6 +49,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
       );
       setResult(doc);
       setModalOpen(true);
+      window.umami?.track("document_create", { type: docType });
       publishedContentRef.current = content;
     } catch (err) {
       setError(
