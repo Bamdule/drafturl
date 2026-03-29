@@ -30,5 +30,7 @@ app:
   cors:
     allowed-origins: ${FRONTEND_URL}
   frontend-url: ${FRONTEND_URL}
+  mcp-oauth2:
+    issuer: ${MCP_OAUTH2_ISSUER:${FRONTEND_URL}}
   slug-length: 8
   anonymous-expiry-hours: 24
