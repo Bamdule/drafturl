@@ -37,6 +37,7 @@ public class OAuthMetadataController {
                 Map.entry("grant_types_supported", List.of("authorization_code", "refresh_token")),
                 Map.entry("code_challenge_methods_supported", List.of("S256")),
                 Map.entry("token_endpoint_auth_methods_supported", List.of("none")),
+                Map.entry("registration_endpoint", issuer + "/oauth2/register"),
                 Map.entry("scopes_supported", List.of("document:read", "document:write"))
         );
     }
