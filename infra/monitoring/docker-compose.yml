@@ -1,0 +1,56 @@
+services:
+  # ─── Uptime Kuma: 서비스 상태 모니터링 ───
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: drafturl-uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - monitoring
+
+  # ─── Umami: 사용자 분석 ───
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: drafturl-umami
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+    environment:
+      DATABASE_URL: postgresql://umami:umami@umami-db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:-replace-with-random-string}
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    networks:
+      - monitoring
+
+  # ─── Umami 전용 PostgreSQL ───
+  umami-db:
+    image: postgres:15-alpine
+    container_name: drafturl-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: umami
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - monitoring
+
+volumes:
+  uptime-kuma-data:
+  umami-db-data:
+
+networks:
+  monitoring:
+    driver: bridge
