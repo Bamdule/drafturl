@@ -65,9 +65,12 @@ public class CreateDocumentUseCase {
         String slug = slugGenerator.generate();
         String id = slug;
 
-        // HTML 새니타이징은 뷰어의 iframe sandbox="allow-scripts"가 담당.
-        // allow-same-origin이 없으므로 iframe 내 스크립트가 부모 페이지에 접근 불가.
-        // 원본 HTML을 그대로 저장하여 로컬 렌더링과 동일한 결과를 보장한다.
+        // HTML 새니타이징: iframe sandbox에 더해 서버 측 다층 방어 적용.
+        // form/input 등 피싱 요소를 제거하여 Google Safe Browsing 경고를 방지한다.
+        if (docType == DocType.HTML) {
+            content = contentSanitizer.sanitize(content);
+            contentBytes = content.getBytes(StandardCharsets.UTF_8);
+        }
 
         String ext = docType == DocType.HTML ? "html" : "md";
         String r2Key = "documents/" + slug + "/content." + ext;

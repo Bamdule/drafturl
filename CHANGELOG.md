@@ -5,6 +5,53 @@
 
 ---
 
+## [v0.3.0] - 2026-03-30
+
+사용자 접근성 확대, 보안 강화, MCP 서버 구현, SEO/모니터링 추가.
+
+### Added
+- 네이버/카카오 OAuth2 소셜 로그인 추가
+- MCP 서버 + OAuth2 인증 (Claude Desktop 등 AI 클라이언트 연동)
+- 공유 문서 비밀번호 보호 기능
+- SEO 다국어 라우팅 (i18n: `/ko`, `/en`)
+- Google Search Console 연동 및 소유권 확인
+- Umami 트래킹 + 커스텀 이벤트 추적
+- Uptime Kuma 모니터링 구성
+- 백엔드 단위 테스트 보강 (101개)
+- Sanitizer 피싱 방지 테스트 5개 추가
+- VERSION 파일 기반 버전 관리 체계 도입
+
+### Fixed
+- HTML Sanitizer 피싱 방지 강화: form/input/password 등 폼 관련 태그 12종 제거
+- 문서 생성(CREATE) 경로에 sanitizer 미적용 문제 수정
+- Google Search Console 피싱 경고 원인 해결
+- 보안 점검: XSS, 헤더, 프록시 검증, 인증 미들웨어 수정
+
+### Changed
+- 전체 UI/UX 개선 (로그인/회원가입/홈/404/대시보드)
+- 배포 트리거를 release 브랜치로 변경
+
+---
+
+## [v0.2.0] - 2026-03-28
+
+개발 인프라 자동화, 사용성 개선, 모바일 대응, SEO 기본 설정.
+
+### Added
+- GitHub Actions Self-hosted Runner 기반 자동 배포
+- 서비스 소개 및 사용 가이드
+- SEO 기본 설정 (robots, sitemap, OG/Twitter Card)
+
+### Fixed
+- 프론트엔드 lint 에러 전량 수정
+
+### Changed
+- 메인 페이지 데모 데이터 미리보기만 허용
+- 모바일 레이아웃 지원
+- 문서 기본 제목 형식 변경
+
+---
+
 ## [v0.1.0] - 2026-03-27
 
 MVP 최초 배포.

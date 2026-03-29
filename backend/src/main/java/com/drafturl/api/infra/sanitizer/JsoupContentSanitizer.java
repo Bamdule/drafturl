@@ -18,6 +18,7 @@ import java.util.List;
  *   <li>서버 측 새니타이징은 다층 방어(defense in depth)를 위해 적용한다.</li>
  *   <li>script/style 태그는 허용한다 (LLM 생성 HTML의 Chart.js 등 인터랙티브 요소 지원).</li>
  *   <li>iframe/object/embed 태그와 javascript: URL 스킴은 제거한다.</li>
+ *   <li>form/input/textarea/select/button 태그는 제거한다 (피싱 방지).</li>
  * </ul>
  *
  * <p>구현 전략: head/body 분리 처리
@@ -36,8 +37,18 @@ public class JsoupContentSanitizer implements ContentSanitizer {
      *
      * relaxed() 기반으로 script/style을 추가 허용하되,
      * iframe/object/embed는 제거한다 (relaxed에 포함되지 않으므로 별도 처리 불필요).
+     * form/input/textarea/select/button은 피싱 방지를 위해 제거한다.
      */
     private static final Safelist BODY_SAFELIST = createBodySafelist();
+
+    /**
+     * 피싱 방지를 위해 body에서 제거하는 폼 관련 태그 목록.
+     * Safelist.relaxed()에 포함되지 않지만, 명시적 제거로 방어를 강화한다.
+     */
+    private static final List<String> FORM_TAGS = List.of(
+            "form", "input", "textarea", "select", "option", "optgroup",
+            "button", "fieldset", "legend", "label", "datalist", "output"
+    );
 
     /**
      * head 영역에서 허용하는 태그 목록.
@@ -103,13 +114,29 @@ public class JsoupContentSanitizer implements ContentSanitizer {
         // 1. head 영역 새니타이징: 허용 태그 외 제거 (특히 script 제거)
         String sanitizedHead = sanitizeHead(document);
 
-        // 2. body 영역 새니타이징: Safelist 기반 clean() 적용
-        String bodyHtml = document.body() != null ? document.body().html() : "";
+        // 2. body 영역: 폼 관련 태그 선제거 후 Safelist 기반 clean() 적용
+        Element body = document.body();
+        if (body != null) {
+            removeFormTags(body);
+        }
+        String bodyHtml = body != null ? body.html() : "";
         String sanitizedBody = Jsoup.clean(bodyHtml, "", BODY_SAFELIST,
                 new Document.OutputSettings().prettyPrint(false));
 
         // 3. 완전한 HTML 문서로 재조립
         return assembleDocument(document, sanitizedHead, sanitizedBody);
+    }
+
+    /**
+     * 피싱 방지를 위해 폼 관련 태그를 제거한다.
+     * form 내부의 텍스트 콘텐츠는 보존하고 태그만 unwrap한다.
+     */
+    private void removeFormTags(Element parent) {
+        String selector = String.join(", ", FORM_TAGS);
+        List<Element> formElements = parent.select(selector);
+        for (Element el : formElements) {
+            el.remove();
+        }
     }
 
     /**

@@ -49,6 +49,7 @@ class CreateDocumentUseCaseTest {
                 slugGenerator, contentSanitizer, fileStorage,
                 txService, passwordEncoder, FRONTEND_URL);
         lenient().when(slugGenerator.generate()).thenReturn(TEST_SLUG);
+        lenient().when(contentSanitizer.sanitize(anyString())).thenAnswer(inv -> inv.getArgument(0));
     }
 
     private Document buildDocument(UUID userId, String title, DocType docType,
