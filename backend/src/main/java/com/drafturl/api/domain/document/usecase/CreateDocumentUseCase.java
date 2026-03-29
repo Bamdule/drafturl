@@ -5,10 +5,12 @@ import com.drafturl.api.domain.document.controller.request.CreateDocumentRequest
 import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.ContentTooLargeException;
+import com.drafturl.api.domain.document.exception.DocumentLimitExceededException;
 import com.drafturl.api.domain.document.port.ContentSanitizer;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
 import com.drafturl.api.domain.document.service.SlugGenerator;
+import com.drafturl.api.domain.storage.service.StorageUsageService;
 import com.drafturl.api.global.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,14 @@ public class CreateDocumentUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(CreateDocumentUseCase.class);
     private static final long MAX_CONTENT_SIZE = 5L * 1024 * 1024;
+    private static final int FREE_PLAN_MAX_DOCUMENTS = 30;
 
     private final SlugGenerator slugGenerator;
     private final ContentSanitizer contentSanitizer;
     private final FileStorage fileStorage;
     private final DocumentTransactionService txService;
     private final PasswordEncoder passwordEncoder;
+    private final StorageUsageService storageUsageService;
     private final String frontendUrl;
 
     public CreateDocumentUseCase(SlugGenerator slugGenerator,
@@ -44,16 +48,26 @@ public class CreateDocumentUseCase {
                                   FileStorage fileStorage,
                                   DocumentTransactionService txService,
                                   PasswordEncoder passwordEncoder,
+                                  StorageUsageService storageUsageService,
                                   @Value("${app.frontend-url}") String frontendUrl) {
         this.slugGenerator = slugGenerator;
         this.contentSanitizer = contentSanitizer;
         this.fileStorage = fileStorage;
         this.txService = txService;
         this.passwordEncoder = passwordEncoder;
+        this.storageUsageService = storageUsageService;
         this.frontendUrl = frontendUrl;
     }
 
     public DocumentResponse execute(CreateDocumentRequest request, UUID userId) {
+        // 문서 생성 제한 검사 (로그인 사용자만)
+        if (userId != null) {
+            var usageInfo = storageUsageService.getUsageInfo(userId);
+            if (usageInfo.documentCount() >= FREE_PLAN_MAX_DOCUMENTS) {
+                throw new DocumentLimitExceededException(usageInfo.documentCount(), FREE_PLAN_MAX_DOCUMENTS);
+            }
+        }
+
         DocType docType = parseDocType(request.type());
 
         String content = request.content();

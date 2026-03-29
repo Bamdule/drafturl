@@ -54,6 +54,19 @@ export async function logout(): Promise<void> {
   });
 }
 
+/** 회원탈퇴 (Next.js Route Handler 경유) */
+export async function deleteAccount(): Promise<void> {
+  const res = await fetch("/api/auth/delete-account", {
+    method: "DELETE",
+  });
+
+  const json = (await res.json()) as ApiResponse<null>;
+
+  if (!json.success) {
+    throw new ApiError(json.error.code, json.error.message, res.status);
+  }
+}
+
 /** 이메일 회원가입 (Next.js Route Handler 경유) */
 export async function emailSignup(
   data: EmailSignupRequest,

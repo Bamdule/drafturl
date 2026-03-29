@@ -47,14 +47,17 @@ export default function Header() {
             >
               {dict.header.myDocuments}
             </Link>
-            <div className="flex items-center gap-2 px-3 py-1 pl-1 rounded-full bg-bg-tertiary border border-border-dark">
+            <Link
+              href="/account"
+              className="flex items-center gap-2 px-3 py-1 pl-1 rounded-full bg-bg-tertiary border border-border-dark hover:border-border-dark-hover transition-colors"
+            >
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-[#60a5fa] flex items-center justify-center text-xs font-bold text-white">
                 {user?.name?.[0] ?? "U"}
               </div>
               <span className="text-sm font-medium text-text-primary">
                 {user?.name}
               </span>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors cursor-pointer"
@@ -88,14 +91,18 @@ export default function Header() {
         <div className="sm:hidden absolute top-14 left-0 right-0 bg-bg-primary border-b border-border-dark px-4 py-3 flex flex-col gap-1">
           {isAuthenticated ? (
             <>
-              <div className="flex items-center gap-2 px-3 py-2">
+              <Link
+                href="/account"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-bg-tertiary transition-colors"
+              >
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-[#60a5fa] flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {user?.name?.[0] ?? "U"}
                 </div>
                 <span className="text-sm font-medium text-text-primary">
                   {user?.name}
                 </span>
-              </div>
+              </Link>
               <Link
                 href="/dashboard"
                 onClick={() => setMenuOpen(false)}

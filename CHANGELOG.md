@@ -5,6 +5,21 @@
 
 ---
 
+## [v0.4.0] - 2026-03-30
+
+회원탈퇴(Hard Delete) 기능과 문서 생성 제한 서버 사이드 강화, 내 정보 페이지 신설.
+
+### Added
+- 회원탈퇴 기능 (DELETE /api/v1/auth/me, Hard Delete + FK cascade)
+- 문서 생성 제한 백엔드 강제 (Free 플랜 30개, DOCUMENT_LIMIT_EXCEEDED 에러)
+- 내 정보 페이지 (/account) — 계정 정보 확인 및 회원탈퇴
+
+### Changed
+- Header 아바타를 /account 페이지 링크로 변경
+- SecurityConfig: DELETE /api/v1/auth/me authenticated 규칙 추가
+
+---
+
 ## [v0.3.0] - 2026-03-30
 
 사용자 접근성 확대, 보안 강화, MCP 서버 구현, SEO/모니터링 추가.

@@ -9,6 +9,7 @@ import com.drafturl.api.domain.user.controller.response.OAuthStateResponse;
 import com.drafturl.api.domain.user.controller.response.UserResponse;
 import com.drafturl.api.domain.user.usecase.EmailLoginUseCase;
 import com.drafturl.api.domain.user.usecase.EmailSignupUseCase;
+import com.drafturl.api.domain.user.usecase.DeleteAccountUseCase;
 import com.drafturl.api.domain.user.usecase.GetCurrentUserUseCase;
 import com.drafturl.api.domain.user.usecase.LogoutUseCase;
 import com.drafturl.api.domain.user.usecase.OAuthLoginUseCase;
@@ -31,6 +32,7 @@ public class AuthController {
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final LogoutUseCase logoutUseCase;
     private final GetCurrentUserUseCase getCurrentUserUseCase;
+    private final DeleteAccountUseCase deleteAccountUseCase;
     private final OAuthStateProvider oAuthStateProvider;
 
     public AuthController(OAuthLoginUseCase oAuthLoginUseCase,
@@ -39,6 +41,7 @@ public class AuthController {
                            RefreshTokenUseCase refreshTokenUseCase,
                            LogoutUseCase logoutUseCase,
                            GetCurrentUserUseCase getCurrentUserUseCase,
+                           DeleteAccountUseCase deleteAccountUseCase,
                            OAuthStateProvider oAuthStateProvider) {
         this.oAuthLoginUseCase = oAuthLoginUseCase;
         this.emailSignupUseCase = emailSignupUseCase;
@@ -46,6 +49,7 @@ public class AuthController {
         this.refreshTokenUseCase = refreshTokenUseCase;
         this.logoutUseCase = logoutUseCase;
         this.getCurrentUserUseCase = getCurrentUserUseCase;
+        this.deleteAccountUseCase = deleteAccountUseCase;
         this.oAuthStateProvider = oAuthStateProvider;
     }
 
@@ -96,5 +100,12 @@ public class AuthController {
             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(ApiResponse.success(
                 getCurrentUserUseCase.execute(principal.userId())));
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        deleteAccountUseCase.execute(principal.userId());
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

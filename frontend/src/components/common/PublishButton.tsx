@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEditorStore } from "@/lib/store/useEditorStore";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { createDocument } from "@/lib/api/documents";
+import { ApiError } from "@/lib/api/types";
 import { useDict } from "@/components/i18n/DictProvider";
 import PublishResultModal from "./PublishResultModal";
 import type { DocumentSummary } from "@/lib/api/types";
@@ -58,11 +59,15 @@ export default function PublishButton({ onNewDocument }: PublishButtonProps) {
       window.umami?.track("document_create", { type: docType });
       publishedContentRef.current = content;
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : dict.publish.genericError,
-      );
+      if (err instanceof ApiError && err.code === "DOCUMENT_LIMIT_EXCEEDED") {
+        setError(dict.publish.limitExceeded);
+      } else {
+        setError(
+          err instanceof Error
+            ? err.message
+            : dict.publish.genericError,
+        );
+      }
     } finally {
       setIsPublishing(false);
     }

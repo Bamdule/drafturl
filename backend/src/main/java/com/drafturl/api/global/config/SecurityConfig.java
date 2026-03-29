@@ -73,6 +73,9 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 회원탈퇴 - authenticated (auth/** permitAll보다 먼저 매칭)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/me").authenticated()
+
                         // 인증 API - permitAll
                         .requestMatchers("/api/v1/auth/**").permitAll()
 

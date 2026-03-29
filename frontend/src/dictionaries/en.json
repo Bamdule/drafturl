@@ -62,7 +62,8 @@
     "viewDetail": "View Detail",
     "newDocument": "+ New Doc",
     "expiryNotice": "Expires in 24 hours without login.",
-    "loginKeep": "Login to keep permanently!"
+    "loginKeep": "Login to keep permanently!",
+    "limitExceeded": "Document limit (30) reached. Please delete existing documents and try again."
   },
   "publishModal": {
     "title": "Share URL created!",
@@ -184,6 +185,13 @@
     "prev": "Previous",
     "next": "Next"
   },
+  "account": {
+    "title": "My Account",
+    "info": "Account Info",
+    "plan": "Plan",
+    "dangerZone": "Delete Account",
+    "deleteHint": "Your account and all data will be permanently deleted"
+  },
   "deleteDialog": {
     "title": "Delete Document",
     "description": "Are you sure you want to delete this document? This action cannot be undone and the shared URL will no longer be accessible.",
@@ -219,6 +227,13 @@
     "loginHint": "Login to keep your documents permanently.",
     "newDocument": "Create New Document",
     "login": "Login"
+  },
+  "deleteAccount": {
+    "title": "Delete your account?",
+    "description": "Your account will be permanently deleted. Your shared documents will remain accessible but author information will be removed. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete Account",
+    "deleting": "Processing..."
   },
   "slug": {
     "docExpired": "Document Expired",

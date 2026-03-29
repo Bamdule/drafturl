@@ -62,7 +62,8 @@
     "viewDetail": "상세 보기",
     "newDocument": "+ 새 문서",
     "expiryNotice": "비로그인 시 24시간 후 만료됩니다.",
-    "loginKeep": "로그인하면 영구 보관!"
+    "loginKeep": "로그인하면 영구 보관!",
+    "limitExceeded": "문서 생성 한도(30개)에 도달했습니다. 기존 문서를 삭제한 후 다시 시도해주세요."
   },
   "publishModal": {
     "title": "공유 URL이 생성되었습니다!",
@@ -184,6 +185,13 @@
     "prev": "이전",
     "next": "다음"
   },
+  "account": {
+    "title": "내 정보",
+    "info": "계정 정보",
+    "plan": "플랜",
+    "dangerZone": "계정 삭제",
+    "deleteHint": "계정과 모든 데이터가 영구 삭제됩니다"
+  },
   "deleteDialog": {
     "title": "문서 삭제",
     "description": "이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없으며, 공유 URL도 더 이상 접근할 수 없게 됩니다.",
@@ -219,6 +227,13 @@
     "loginHint": "로그인하면 문서를 영구 보관할 수 있습니다.",
     "newDocument": "새 문서 만들기",
     "login": "로그인"
+  },
+  "deleteAccount": {
+    "title": "정말 탈퇴하시겠습니까?",
+    "description": "회원탈퇴 시 계정이 영구 삭제됩니다. 기존에 공유한 문서는 유지되지만 작성자 정보가 제거됩니다. 이 작업은 취소할 수 없습니다.",
+    "cancel": "취소",
+    "confirm": "탈퇴하기",
+    "deleting": "처리 중..."
   },
   "slug": {
     "docExpired": "문서가 만료되었습니다",
