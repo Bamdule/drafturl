@@ -5,10 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import EditorPanel from "@/components/editor/EditorPanel";
 import PreviewPanel from "@/components/editor/PreviewPanel";
 import { useEditorStore } from "@/lib/store/useEditorStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import { getDocument, updateDocument } from "@/lib/api/documents";
 import type { DocType } from "@/lib/constants";
 
 export default function EditDocumentPage() {
+  const { dict } = useDict();
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   const { content, title, docType, loadDocument, setTitle, reset } =
@@ -36,7 +38,7 @@ export default function EditDocumentPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "문서를 불러오는데 실패했습니다.",
+            : dict.editor.loadError,
         );
       } finally {
         setLoading(false);
@@ -86,7 +88,7 @@ export default function EditDocumentPage() {
       setError(
         err instanceof Error
           ? err.message
-          : "문서 수정 중 오류가 발생했습니다.",
+          : dict.editor.saveError,
       );
     } finally {
       setSaving(false);
@@ -96,7 +98,7 @@ export default function EditDocumentPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg-primary">
-        <p className="text-text-muted">문서 로딩 중...</p>
+        <p className="text-text-muted">{dict.editor.loading}</p>
       </div>
     );
   }
@@ -109,7 +111,7 @@ export default function EditDocumentPage() {
           onClick={() => router.push("/dashboard")}
           className="px-4 py-2 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:bg-bg-tertiary transition-colors cursor-pointer"
         >
-          대시보드로 돌아가기
+          {dict.editor.backToDashboard}
         </button>
       </div>
     );
@@ -125,10 +127,10 @@ export default function EditDocumentPage() {
               onClick={() => router.push("/dashboard")}
               className="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors cursor-pointer bg-transparent border-none"
             >
-              &larr; 대시보드
+              &larr; {dict.editor.back}
             </button>
             <input
-              placeholder="제목"
+              placeholder={dict.editor.titlePlaceholder}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-40 sm:w-64 h-9 rounded-md border border-border-dark bg-bg-primary px-3 py-1.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-accent"
@@ -150,14 +152,14 @@ export default function EditDocumentPage() {
               </span>
             )}
             {saveSuccess && (
-              <span className="text-sm text-success">저장 완료!</span>
+              <span className="text-sm text-success">{dict.editor.saved}</span>
             )}
             <button
               onClick={handleSave}
               disabled={saving}
               className="px-4 py-2 rounded-md text-sm font-semibold text-white bg-accent hover:bg-accent-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? "저장 중..." : "저장"}
+              {saving ? dict.editor.saving : dict.editor.save}
             </button>
           </div>
         </div>

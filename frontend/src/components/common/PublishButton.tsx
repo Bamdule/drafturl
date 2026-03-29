@@ -5,10 +5,16 @@ import Link from "next/link";
 import { useEditorStore } from "@/lib/store/useEditorStore";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { createDocument } from "@/lib/api/documents";
+import { useDict } from "@/components/i18n/DictProvider";
 import PublishResultModal from "./PublishResultModal";
 import type { DocumentSummary } from "@/lib/api/types";
 
-export default function PublishButton({ onNewDocument }: { onNewDocument?: () => void } = {}) {
+interface PublishButtonProps {
+  onNewDocument?: () => void;
+}
+
+export default function PublishButton({ onNewDocument }: PublishButtonProps) {
+  const { dict } = useDict();
   const { content, docType, title, isDemo, reset } = useEditorStore();
   const { isAuthenticated } = useAuthStore();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -30,7 +36,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
 
   const handlePublish = async () => {
     if (!content.trim()) {
-      setError("문서 내용을 입력해주세요.");
+      setError(dict.publish.emptyError);
       return;
     }
 
@@ -55,7 +61,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
       setError(
         err instanceof Error
           ? err.message
-          : "문서 생성 중 오류가 발생했습니다.",
+          : dict.publish.genericError,
       );
     } finally {
       setIsPublishing(false);
@@ -72,7 +78,7 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
     } else {
       // Markdown: 간단한 HTML 래퍼로 표시 (서버 렌더링 없이 클라이언트에서 처리)
       previewWindow.document.write(`<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>미리보기</title>
+<html><head><meta charset="UTF-8"><title>${dict.publish.previewTitle}</title>
 <style>
   body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #1a1a2e; }
   h1, h2, h3 { margin-top: 1.5em; } h1 { font-size: 28px; border-bottom: 2px solid #e8e8f0; padding-bottom: 8px; }
@@ -111,13 +117,13 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
               rel="noopener noreferrer"
               className="px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all no-underline"
             >
-              &#128064; 상세 보기
+              &#128064; {dict.publish.viewDetail}
             </a>
             <button
               onClick={handleNewDocument}
               className="px-6 py-3.5 text-base font-medium text-text-secondary border border-border-dark rounded-lg hover:bg-bg-tertiary hover:text-text-primary transition-all cursor-pointer"
             >
-              + 새 문서
+              {dict.publish.newDocument}
             </button>
           </div>
         ) : (
@@ -134,14 +140,14 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
                   }}
                   className="accent-accent"
                 />
-                비밀번호 설정
+                {dict.publish.passwordLabel}
               </label>
               {passwordEnabled && (
                 <input
                   type="password"
                   value={docPassword}
                   onChange={(e) => setDocPassword(e.target.value)}
-                  placeholder="4자 이상"
+                  placeholder={dict.publish.passwordPlaceholder}
                   className="h-8 w-36 rounded border border-border-dark bg-bg-secondary px-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/50"
                 />
               )}
@@ -154,14 +160,14 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
               disabled={!content.trim()}
               className="px-6 py-3.5 text-base font-medium text-text-secondary border border-border-dark rounded-lg hover:bg-bg-tertiary hover:text-text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              &#128064; 미리보기
+              &#128064; {dict.publish.preview}
             </button>
             <button
               onClick={handlePublish}
               disabled={isPublishing || !content.trim() || isDemo}
               className="px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isPublishing ? "배포 중..." : "\u26A1 공유하기"}
+              {isPublishing ? dict.publish.publishing : `\u26A1 ${dict.publish.share}`}
             </button>
             </div>
           </>
@@ -169,12 +175,12 @@ export default function PublishButton({ onNewDocument }: { onNewDocument?: () =>
 
         {!isAuthenticated && !result && (
           <p className="text-sm text-text-muted">
-            비로그인 시 24시간 후 만료됩니다.{" "}
+            {dict.publish.expiryNotice}{" "}
             <Link
               href="/auth/login"
               className="text-accent hover:underline"
             >
-              로그인하면 영구 보관!
+              {dict.publish.loginKeep}
             </Link>
           </p>
         )}

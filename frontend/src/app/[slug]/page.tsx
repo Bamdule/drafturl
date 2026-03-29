@@ -1,51 +1,56 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDocumentViewServer } from "@/lib/api/documents";
 import { ApiError } from "@/lib/api/types";
 import DocumentViewPage from "./DocumentViewPage";
 import PasswordGatePage from "./PasswordGatePage";
+import GoneContent from "./GoneContent";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
 }
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 /** 동적 메타데이터: 문서 제목/설명을 Open Graph 태그로 노출 */
 export async function generateMetadata({
   params,
 }: SlugPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const pageUrl = `${siteUrl}/${slug}`;
 
   try {
     const doc = await getDocumentViewServer(slug);
-    const title = doc.title || "공유 문서";
-    const description = `DraftURL로 공유된 ${doc.docType === "html" ? "HTML" : "Markdown"} 문서`;
+    const title = doc.title || "Shared Document";
+    const docTypeName = doc.docType === "html" ? "HTML" : "Markdown";
+    const description = `${docTypeName} document shared via DraftURL — ${title}`;
 
     return {
       title,
       description,
+      alternates: {
+        canonical: pageUrl,
+      },
       openGraph: {
         title,
         description,
         type: "article",
         siteName: "DraftURL",
-        locale: "ko_KR",
+        locale: "en_US",
+        alternateLocale: "ko_KR",
+        url: pageUrl,
       },
       twitter: {
-        card: "summary",
+        card: "summary_large_image",
         title,
         description,
       },
     };
   } catch {
     return {
-      title: "문서를 찾을 수 없습니다",
-      description: "요청한 문서가 존재하지 않거나 만료되었습니다.",
-      twitter: {
-        card: "summary",
-        title: "문서를 찾을 수 없습니다",
-        description: "요청한 문서가 존재하지 않거나 만료되었습니다.",
-      },
+      title: "Document Not Found",
+      description: "The requested document does not exist or has expired.",
+      robots: { index: false, follow: false },
     };
   }
 }
@@ -67,7 +72,30 @@ export default async function SlugPage({ params }: SlugPageProps) {
       return <PasswordGatePage slug={slug} document={doc} />;
     }
 
-    return <DocumentViewPage document={doc} />;
+    const articleJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: doc.title || "Shared Document",
+      url: `${siteUrl}/${slug}`,
+      datePublished: doc.createdAt,
+      dateModified: doc.createdAt,
+      publisher: {
+        "@type": "Organization",
+        name: "DraftURL",
+        url: siteUrl,
+      },
+      description: `${doc.docType === "html" ? "HTML" : "Markdown"} document shared via DraftURL`,
+    };
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
+        <DocumentViewPage document={doc} />
+      </>
+    );
   } catch (err) {
     if (err instanceof ApiError) {
       if (err.status === 404) {
@@ -76,42 +104,7 @@ export default async function SlugPage({ params }: SlugPageProps) {
 
       if (err.status === 410) {
         const isExpired = err.code === "DOCUMENT_EXPIRED";
-        return (
-          <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-bg-primary">
-            <div className="max-w-md text-center">
-              <div className="text-5xl mb-4">{isExpired ? "\u23F3" : "\uD83D\uDDD1\uFE0F"}</div>
-              <h1 className="text-3xl font-bold text-text-primary">
-                {isExpired ? "문서가 만료되었습니다" : "문서가 삭제되었습니다"}
-              </h1>
-              <p className="mt-4 text-text-secondary leading-relaxed">
-                {isExpired
-                  ? "비로그인으로 생성된 문서는 24시간 후 자동 만료됩니다."
-                  : "이 문서는 소유자에 의해 삭제되었습니다."}
-              </p>
-              {isExpired && (
-                <p className="mt-2 text-sm text-text-muted">
-                  로그인하면 문서를 영구 보관할 수 있습니다.
-                </p>
-              )}
-              <div className="mt-6 flex items-center justify-center gap-3">
-                <Link
-                  href="/"
-                  className="inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover transition-colors"
-                >
-                  새 문서 만들기
-                </Link>
-                {isExpired && (
-                  <Link
-                    href="/auth/login"
-                    className="inline-block rounded-md border border-border-dark px-4 py-2 text-sm font-medium text-text-secondary hover:bg-bg-tertiary transition-colors"
-                  >
-                    로그인
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        );
+        return <GoneContent isExpired={isExpired} />;
       }
     }
 

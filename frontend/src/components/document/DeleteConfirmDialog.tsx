@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useDict } from "@/components/i18n/DictProvider";
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -23,14 +24,15 @@ export default function DeleteConfirmDialog({
   onConfirm,
   isDeleting,
 }: DeleteConfirmDialogProps) {
+  const { dict } = useDict();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>문서 삭제</DialogTitle>
+          <DialogTitle>{dict.deleteDialog.title}</DialogTitle>
           <DialogDescription>
-            이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없으며,
-            공유 URL도 더 이상 접근할 수 없게 됩니다.
+            {dict.deleteDialog.description}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
@@ -39,14 +41,14 @@ export default function DeleteConfirmDialog({
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
-            취소
+            {dict.deleteDialog.cancel}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isDeleting}
           >
-            {isDeleting ? "삭제 중..." : "삭제"}
+            {isDeleting ? dict.deleteDialog.deleting : dict.deleteDialog.delete}
           </Button>
         </DialogFooter>
       </DialogContent>

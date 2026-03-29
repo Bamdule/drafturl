@@ -1,5 +1,6 @@
 "use client";
 
+import { useDict } from "@/components/i18n/DictProvider";
 import type { StorageUsage } from "@/lib/api/types";
 
 interface StorageUsageBarProps {
@@ -18,6 +19,7 @@ export default function StorageUsageBar({
   usage,
   maxBytes,
 }: StorageUsageBarProps) {
+  const { dict } = useDict();
   const percentage = Math.min(
     (usage.totalBytes / maxBytes) * 100,
     100,
@@ -32,7 +34,7 @@ export default function StorageUsageBar({
         </span>
       </div>
       <div className="text-xs text-text-muted mt-1">
-        {usage.documentCount}개 문서
+        {usage.documentCount}{dict.storageUsage.docs}
       </div>
       <div className="w-full h-1.5 bg-bg-tertiary rounded-full mt-2 overflow-hidden">
         <div

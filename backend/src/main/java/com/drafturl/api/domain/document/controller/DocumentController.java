@@ -8,10 +8,12 @@ import com.drafturl.api.domain.document.controller.response.DocumentEditResponse
 import com.drafturl.api.domain.document.controller.response.DocumentListResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentViewResponse;
+import com.drafturl.api.domain.document.controller.response.SitemapEntry;
 import com.drafturl.api.domain.document.usecase.CreateDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.DeleteDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.GetDocumentForEditUseCase;
 import com.drafturl.api.domain.document.usecase.GetDocumentListUseCase;
+import com.drafturl.api.domain.document.usecase.GetSitemapUseCase;
 import com.drafturl.api.domain.document.usecase.UpdateDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.ViewDocumentUseCase;
 import com.drafturl.api.global.auth.UserPrincipal;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,19 +38,22 @@ public class DocumentController {
     private final GetDocumentForEditUseCase getDocumentForEditUseCase;
     private final UpdateDocumentUseCase updateDocumentUseCase;
     private final DeleteDocumentUseCase deleteDocumentUseCase;
+    private final GetSitemapUseCase getSitemapUseCase;
 
     public DocumentController(CreateDocumentUseCase createDocumentUseCase,
                                ViewDocumentUseCase viewDocumentUseCase,
                                GetDocumentListUseCase getDocumentListUseCase,
                                GetDocumentForEditUseCase getDocumentForEditUseCase,
                                UpdateDocumentUseCase updateDocumentUseCase,
-                               DeleteDocumentUseCase deleteDocumentUseCase) {
+                               DeleteDocumentUseCase deleteDocumentUseCase,
+                               GetSitemapUseCase getSitemapUseCase) {
         this.createDocumentUseCase = createDocumentUseCase;
         this.viewDocumentUseCase = viewDocumentUseCase;
         this.getDocumentListUseCase = getDocumentListUseCase;
         this.getDocumentForEditUseCase = getDocumentForEditUseCase;
         this.updateDocumentUseCase = updateDocumentUseCase;
         this.deleteDocumentUseCase = deleteDocumentUseCase;
+        this.getSitemapUseCase = getSitemapUseCase;
     }
 
     @PostMapping
@@ -88,6 +94,13 @@ public class DocumentController {
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-store")
                 .body(ApiResponse.success(response));
+    }
+
+    @GetMapping("/sitemap")
+    public ResponseEntity<ApiResponse<List<SitemapEntry>>> getSitemapEntries() {
+        return ResponseEntity.ok()
+                .header("Cache-Control", "public, max-age=3600, s-maxage=86400")
+                .body(ApiResponse.success(getSitemapUseCase.execute()));
     }
 
     @GetMapping

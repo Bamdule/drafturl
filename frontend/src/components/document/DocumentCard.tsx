@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { updateDocument } from "@/lib/api/documents";
+import { useDict } from "@/components/i18n/DictProvider";
 import type { DocumentSummary } from "@/lib/api/types";
 
 interface DocumentCardProps {
@@ -21,21 +22,6 @@ function formatDateTime(dateString: string): string {
   });
 }
 
-function formatRemaining(expiresAt: string): string {
-  const now = new Date();
-  const expiry = new Date(expiresAt);
-  const diffMs = expiry.getTime() - now.getTime();
-
-  if (diffMs <= 0) return "만료됨";
-
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMin / 60);
-  const remainMin = diffMin % 60;
-
-  if (diffHour > 0) return `${diffHour}시간 ${remainMin}분 남음`;
-  return `${diffMin}분 남음`;
-}
-
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes}B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -47,6 +33,7 @@ export default function DocumentCard({
   onDelete,
   onUpdate,
 }: DocumentCardProps) {
+  const { dict } = useDict();
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(doc.title || "");
@@ -56,6 +43,24 @@ export default function DocumentCard({
   const inputRef = useRef<HTMLInputElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
+
+  const formatRemaining = useCallback(
+    (expiresAt: string): string => {
+      const now = new Date();
+      const expiry = new Date(expiresAt);
+      const diffMs = expiry.getTime() - now.getTime();
+
+      if (diffMs <= 0) return dict.document.expired;
+
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHour = Math.floor(diffMin / 60);
+      const remainMin = diffMin % 60;
+
+      if (diffHour > 0) return `${diffHour}${dict.document.hoursLeft} ${remainMin}${dict.document.minutesLeft}`;
+      return `${diffMin}${dict.document.minutesLeft}`;
+    },
+    [dict],
+  );
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -120,7 +125,7 @@ export default function DocumentCard({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: doc.title || "DraftURL 문서",
+          title: doc.title || "DraftURL",
           url: doc.url,
         });
         return;
@@ -145,7 +150,7 @@ export default function DocumentCard({
     e.stopPropagation();
     setShareOpen(false);
     window.open(
-      `https://twitter.com/intent/tweet?url=${encodeURIComponent(doc.url)}&text=${encodeURIComponent(doc.title || "DraftURL 문서")}`,
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(doc.url)}&text=${encodeURIComponent(doc.title || "DraftURL")}`,
       "_blank", "noopener,noreferrer,width=600,height=400"
     );
   };
@@ -211,17 +216,17 @@ export default function DocumentCard({
               onKeyDown={handleTitleKeyDown}
               onClick={(e) => e.stopPropagation()}
               disabled={saving}
-              placeholder="제목을 입력하세요"
+              placeholder={dict.document.titlePlaceholder}
               className="text-[15px] font-semibold text-text-primary bg-bg-tertiary border border-accent/50 rounded px-2 py-0.5 outline-none focus:border-accent w-48"
             />
           ) : (
             <>
               <span className="text-[15px] font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
-                {doc.title || "제목 없음"}
+                {doc.title || dict.document.noTitle}
               </span>
               <button
                 onClick={handleEditClick}
-                title="제목 수정"
+                title={dict.document.editTitle}
                 className="shrink-0 p-0.5 rounded text-text-muted hover:text-accent opacity-0 group-hover:opacity-100 transition-all cursor-pointer bg-transparent border-none"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -231,7 +236,7 @@ export default function DocumentCard({
             </>
           )}
           {doc.isPasswordProtected && (
-            <span className="text-[11px] text-text-muted shrink-0" title="비밀번호 보호">&#128274;</span>
+            <span className="text-[11px] text-text-muted shrink-0" title={dict.document.passwordProtected}>&#128274;</span>
           )}
           <span
             className={`inline-flex px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wide shrink-0 ${
@@ -257,23 +262,23 @@ export default function DocumentCard({
 
       {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
-        <IconButton onClick={handleCopyUrl} title={copied ? "복사됨" : "URL 복사"} active={copied}>
+        <IconButton onClick={handleCopyUrl} title={copied ? dict.document.copied : dict.document.copyUrl} active={copied}>
           {copied ? <CheckIcon /> : <LinkIcon />}
         </IconButton>
         <div className="relative" ref={shareRef}>
-          <IconButton onClick={handleShare} title="공유">
+          <IconButton onClick={handleShare} title={dict.document.share}>
             <ShareIcon />
           </IconButton>
           {shareOpen && (
             <div className="absolute right-0 top-full mt-1 z-50 bg-bg-secondary border border-border-dark rounded-lg shadow-lg shadow-black/30 py-1 min-w-[140px]">
-              <ShareMenuItem onClick={shareToKakao} icon="kakao">카카오톡</ShareMenuItem>
-              <ShareMenuItem onClick={shareToTwitter} icon="twitter">X (Twitter)</ShareMenuItem>
-              <ShareMenuItem onClick={shareToFacebook} icon="facebook">Facebook</ShareMenuItem>
+              <ShareMenuItem onClick={shareToKakao} icon="kakao">{dict.document.kakao}</ShareMenuItem>
+              <ShareMenuItem onClick={shareToTwitter} icon="twitter">{dict.document.twitter}</ShareMenuItem>
+              <ShareMenuItem onClick={shareToFacebook} icon="facebook">{dict.document.facebook}</ShareMenuItem>
             </div>
           )}
         </div>
         <div className="relative" ref={moreRef}>
-          <IconButton onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }} title="더보기">
+          <IconButton onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }} title={dict.document.more}>
             <MoreIcon />
           </IconButton>
           {moreOpen && (
@@ -283,7 +288,7 @@ export default function DocumentCard({
                 className="w-full flex items-center gap-2 px-3 py-2 text-xs text-danger hover:bg-danger/10 transition-colors cursor-pointer bg-transparent border-none text-left"
               >
                 <TrashIcon />
-                삭제
+                {dict.document.delete}
               </button>
             </div>
           )}

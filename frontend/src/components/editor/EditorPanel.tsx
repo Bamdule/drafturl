@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useEditorStore } from "@/lib/store/useEditorStore";
+import { useDict } from "@/components/i18n/DictProvider";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -46,6 +47,7 @@ function useByteCount(content: string) {
 }
 
 export default function EditorPanel() {
+  const { dict } = useDict();
   const { content, docType, isDemo, setContent, setIsDemo } = useEditorStore();
   const byteCount = useByteCount(content);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -79,7 +81,7 @@ export default function EditorPanel() {
     <div className="relative bg-bg-secondary flex flex-col">
       {/* Pane Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-bg-tertiary border-b border-border-dark text-xs font-medium text-text-muted uppercase tracking-wider">
-        <span>편집기</span>
+        <span>{dict.editor.editorLabel}</span>
         <span className="normal-case tracking-normal">{byteCount}</span>
       </div>
 
@@ -94,7 +96,7 @@ export default function EditorPanel() {
           }}
           spellCheck={false}
           className="flex-1 min-h-[260px] w-full resize-none border-none bg-[#1e1e1e] p-4 pt-3 text-[13px] leading-[1.7] text-[#d4d4d4] outline-none font-mono placeholder:text-text-muted"
-          placeholder={docType === "html" ? "HTML을 입력하세요..." : "Markdown을 입력하세요..."}
+          placeholder={docType === "html" ? dict.editor.htmlPlaceholder : dict.editor.mdPlaceholder}
         />
       ) : (
         <div ref={editorRef} className="flex-1 min-h-[380px]">

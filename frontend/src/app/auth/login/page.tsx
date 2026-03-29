@@ -6,6 +6,7 @@ import { generateOAuthState, emailLogin } from "@/lib/api/auth";
 import { OAUTH_PROVIDERS, COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER } from "@/lib/constants";
 import { setCookie } from "@/lib/utils/cookie";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import { ApiError } from "@/lib/api/types";
 import type { OAuthProvider } from "@/lib/constants";
 import Header from "@/components/layout/Header";
@@ -19,6 +20,7 @@ const OAUTH_CLIENT_IDS: Record<OAuthProvider, string | undefined> = {
 };
 
 export default function LoginPage() {
+  const { dict } = useDict();
   const { login } = useAuthStore();
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
 
@@ -73,11 +75,11 @@ export default function LoginPage() {
       setEmailError(null);
 
       if (!email.trim()) {
-        setEmailError("이메일을 입력해주세요.");
+        setEmailError(dict.auth.login.emailRequired);
         return;
       }
       if (!password) {
-        setEmailError("비밀번호를 입력해주세요.");
+        setEmailError(dict.auth.login.passwordRequired);
         return;
       }
 
@@ -97,13 +99,13 @@ export default function LoginPage() {
         if (err instanceof ApiError) {
           setServerError(err.message);
         } else {
-          setServerError("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+          setServerError(dict.auth.login.error);
         }
       } finally {
         setIsLoginLoading(false);
       }
     },
-    [email, password, isLoginLoading, login],
+    [email, password, isLoginLoading, login, dict],
   );
 
   const isLoading = isOAuthLoading || isLoginLoading;
@@ -122,7 +124,7 @@ export default function LoginPage() {
                 D
               </div>
               <h1 className="text-xl font-bold text-text-primary">
-                로그인
+                {dict.auth.login.title}
               </h1>
             </div>
 
@@ -136,7 +138,7 @@ export default function LoginPage() {
                   htmlFor="email"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  이메일
+                  {dict.auth.login.email}
                 </label>
                 <input
                   id="email"
@@ -156,7 +158,7 @@ export default function LoginPage() {
                   htmlFor="password"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  비밀번호
+                  {dict.auth.login.password}
                 </label>
                 <div className="relative">
                   <input
@@ -167,7 +169,7 @@ export default function LoginPage() {
                       setPassword(e.target.value);
                       setEmailError(null);
                     }}
-                    placeholder="비밀번호를 입력하세요"
+                    placeholder={dict.auth.login.password}
                     className="flex h-10 w-full rounded-lg border border-border-dark bg-bg-primary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
                   />
                   <button
@@ -195,14 +197,14 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="h-10 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer mt-1"
               >
-                {isLoginLoading ? "로그인 중..." : "로그인"}
+                {isLoginLoading ? dict.auth.login.submitting : dict.auth.login.submit}
               </button>
             </form>
 
             {/* Divider */}
             <div className="flex items-center gap-3 my-5 text-text-muted text-xs">
               <span className="flex-1 h-px bg-border-dark" />
-              또는
+              {dict.auth.login.or}
               <span className="flex-1 h-px bg-border-dark" />
             </div>
 
@@ -214,6 +216,7 @@ export default function LoginPage() {
                 onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
                 unavailable={!OAUTH_CLIENT_IDS.google}
+                preparingLabel={dict.auth.login.preparing}
               >
                 <GoogleIcon />
               </OAuthButton>
@@ -223,6 +226,7 @@ export default function LoginPage() {
                 onClick={() => handleOAuthLogin("github")}
                 disabled={isLoading}
                 unavailable={!OAUTH_CLIENT_IDS.github}
+                preparingLabel={dict.auth.login.preparing}
               >
                 <GitHubIcon />
               </OAuthButton>
@@ -232,6 +236,7 @@ export default function LoginPage() {
                 onClick={() => handleOAuthLogin("naver")}
                 disabled={isLoading}
                 unavailable={!OAUTH_CLIENT_IDS.naver}
+                preparingLabel={dict.auth.login.preparing}
               >
                 <NaverIcon />
               </OAuthButton>
@@ -241,6 +246,7 @@ export default function LoginPage() {
                 onClick={() => handleOAuthLogin("kakao")}
                 disabled={isLoading}
                 unavailable={!OAUTH_CLIENT_IDS.kakao}
+                preparingLabel={dict.auth.login.preparing}
               >
                 <KakaoIcon />
               </OAuthButton>
@@ -250,33 +256,33 @@ export default function LoginPage() {
           {/* Below card links */}
           <div className="text-center mt-5 space-y-3">
             <p className="text-sm text-text-muted">
-              계정이 없으신가요?{" "}
+              {dict.auth.login.noAccount}{" "}
               <Link
                 href="/auth/signup"
                 className="text-accent hover:underline font-medium"
               >
-                회원가입
+                {dict.auth.login.signup}
               </Link>
             </p>
             <Link
               href="/"
               className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary transition-colors"
             >
-              &larr; 로그인 없이 사용하기
+              &larr; {dict.auth.login.skipLogin}
             </Link>
           </div>
 
           {/* Footer */}
           <div className="text-center mt-6 text-xs text-text-muted/60">
-            계속 진행하면{" "}
+            {dict.auth.login.agreement}{" "}
             <a href="#" className="hover:text-text-muted transition-colors">
-              이용약관
+              {dict.auth.login.terms}
             </a>{" "}
-            및{" "}
+            &amp;{" "}
             <a href="#" className="hover:text-text-muted transition-colors">
-              개인정보 처리방침
+              {dict.auth.login.privacy}
             </a>
-            에 동의하게 됩니다.
+            {dict.auth.login.agreementSuffix}
           </div>
         </div>
       </main>
@@ -314,6 +320,7 @@ function OAuthButton({
   onClick,
   disabled,
   unavailable,
+  preparingLabel,
   children,
 }: {
   provider: OAuthProvider;
@@ -321,6 +328,7 @@ function OAuthButton({
   onClick: () => void;
   disabled: boolean;
   unavailable?: boolean;
+  preparingLabel: string;
   children: React.ReactNode;
 }) {
   const style = PROVIDER_STYLES[provider];
@@ -330,8 +338,8 @@ function OAuthButton({
         type="button"
         onClick={onClick}
         disabled={disabled || unavailable}
-        aria-label={unavailable ? `${label} (준비 중)` : `${label}로 로그인`}
-        title={unavailable ? "준비 중" : undefined}
+        aria-label={unavailable ? `${label} (${preparingLabel})` : `${label}`}
+        title={unavailable ? preparingLabel : undefined}
         className={`w-12 h-12 rounded-full border ${style.border} ${unavailable ? "" : style.hoverBg} bg-bg-secondary flex items-center justify-center transition-colors disabled:pointer-events-none cursor-pointer`}
       >
         {children}

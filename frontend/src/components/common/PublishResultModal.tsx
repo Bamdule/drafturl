@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDict } from "@/components/i18n/DictProvider";
 import type { DocumentSummary } from "@/lib/api/types";
 
 interface PublishResultModalProps {
@@ -16,6 +17,7 @@ export default function PublishResultModal({
   document: doc,
   isAuthenticated,
 }: PublishResultModalProps) {
+  const { dict } = useDict();
   const [copied, setCopied] = useState(false);
 
   if (!doc || !open) return null;
@@ -59,11 +61,11 @@ export default function PublishResultModal({
         </div>
 
         <h2 className="text-xl font-bold text-text-primary mb-2">
-          공유 URL이 생성되었습니다!
+          {dict.publishModal.title}
         </h2>
         <p className="text-sm text-text-secondary mb-5">
-          아래 URL을 복사해서 공유하세요.
-          {!isAuthenticated && " 비로그인 문서는 24시간 후 만료됩니다."}
+          {dict.publishModal.description}
+          {!isAuthenticated && dict.publishModal.expiryNotice}
         </p>
 
         {/* URL display */}
@@ -77,7 +79,7 @@ export default function PublishResultModal({
             onClick={handleCopy}
             className="px-3 py-1.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer"
           >
-            {copied ? "복사됨!" : "복사"}
+            {copied ? dict.publishModal.copied : dict.publishModal.copy}
           </button>
         </div>
 
@@ -89,13 +91,13 @@ export default function PublishResultModal({
             rel="noopener noreferrer"
             className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:border-border-dark-hover hover:bg-bg-tertiary transition-colors"
           >
-            상세 보기
+            {dict.publishModal.viewDetail}
           </a>
           <button
             onClick={() => onOpenChange(false)}
             className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors cursor-pointer"
           >
-            닫기
+            {dict.publishModal.close}
           </button>
         </div>
       </div>

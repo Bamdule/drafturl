@@ -7,6 +7,7 @@ import StorageUsageBar from "@/components/common/StorageUsageBar";
 import { getMyDocuments } from "@/lib/api/documents";
 import { getMe } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import type {
   DocumentSummary,
   PaginationInfo,
@@ -19,6 +20,7 @@ const FREE_PLAN_MAX_BYTES = 5 * 1024 * 1024;
 const FREE_PLAN_MAX_DOCUMENTS = 30;
 
 export default function DashboardPage() {
+  const { dict } = useDict();
   const { user, setUser } = useAuthStore();
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
@@ -90,21 +92,21 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
             <div className="bg-bg-secondary border border-border-dark rounded-xl p-5">
               <div className="text-xs font-medium text-text-muted uppercase tracking-wider mb-1">
-                공유 문서
+                {dict.dashboard.sharedDocs}
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-text-primary">
                   {pagination.totalElements}
                 </span>
-                <span className="text-sm text-text-muted">/ {FREE_PLAN_MAX_DOCUMENTS}개</span>
+                <span className="text-sm text-text-muted">/ {FREE_PLAN_MAX_DOCUMENTS}</span>
               </div>
               {pagination.totalElements >= FREE_PLAN_MAX_DOCUMENTS && (
-                <div className="text-xs text-warning mt-1">문서 한도에 도달했습니다</div>
+                <div className="text-xs text-warning mt-1">{dict.dashboard.limitReached}</div>
               )}
             </div>
             <div className="bg-bg-secondary border border-border-dark rounded-xl p-5">
               <div className="text-xs font-medium text-text-muted uppercase tracking-wider mb-1">
-                저장 용량
+                {dict.dashboard.storage}
               </div>
               <StorageUsageBar
                 usage={storageUsage}
@@ -113,13 +115,13 @@ export default function DashboardPage() {
             </div>
             <div className="bg-bg-secondary border border-border-dark rounded-xl p-5">
               <div className="text-xs font-medium text-text-muted uppercase tracking-wider mb-1">
-                플랜
+                {dict.dashboard.plan}
               </div>
-              <div className="text-xl font-bold text-text-primary">Free</div>
+              <div className="text-xl font-bold text-text-primary">{dict.dashboard.planFree}</div>
               <div className="text-xs text-text-muted mt-1 space-y-0.5">
-                <div>문서 최대 {FREE_PLAN_MAX_DOCUMENTS}개</div>
-                <div>로그인 시 영구 보관</div>
-                <div>용량 제한: 5MB</div>
+                <div>{dict.dashboard.planMaxDocs}</div>
+                <div>{dict.dashboard.permanentStorage}</div>
+                <div>{dict.dashboard.sizeLimit}</div>
               </div>
             </div>
           </div>
@@ -129,10 +131,10 @@ export default function DashboardPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-[22px] font-bold text-text-primary">
-          내 문서{" "}
+          {dict.dashboard.title}{" "}
           {!loading && (
             <span className="text-base font-normal text-text-muted ml-2">
-              {pagination.totalElements}개
+              {pagination.totalElements}
             </span>
           )}
         </h1>
@@ -140,7 +142,7 @@ export default function DashboardPage() {
           href="/"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold text-white bg-accent hover:bg-accent-hover transition-colors no-underline"
         >
-          + 새 문서 만들기
+          {dict.dashboard.newDocument}
         </Link>
       </div>
 

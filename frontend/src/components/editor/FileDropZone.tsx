@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useEditorStore } from "@/lib/store/useEditorStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import {
   FILE_EXTENSION_MAP,
   ALLOWED_EXTENSIONS,
@@ -9,7 +10,12 @@ import {
 } from "@/lib/constants";
 import type { DocType } from "@/lib/constants";
 
-export default function FileDropZone({ onFileDrop }: { onFileDrop?: () => void } = {}) {
+interface FileDropZoneProps {
+  onFileDrop?: () => void;
+}
+
+export default function FileDropZone({ onFileDrop }: FileDropZoneProps) {
+  const { dict } = useDict();
   const { setContent, setDocType } = useEditorStore();
   const [isDragOver, setIsDragOver] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -17,7 +23,7 @@ export default function FileDropZone({ onFileDrop }: { onFileDrop?: () => void }
   const processFile = useCallback(
     (file: File) => {
       if (file.size > MAX_CONTENT_SIZE) {
-        setToast({ message: "파일 크기가 5MB를 초과합니다.", type: "error" });
+        setToast({ message: dict.fileDrop.fileSizeError, type: "error" });
         return;
       }
 
@@ -28,7 +34,7 @@ export default function FileDropZone({ onFileDrop }: { onFileDrop?: () => void }
 
       if (!docType) {
         setToast({
-          message: `지원하지 않는 파일 형식입니다. (${ALLOWED_EXTENSIONS.join(", ")})`,
+          message: `${dict.fileDrop.unsupportedError} (${ALLOWED_EXTENSIONS.join(", ")})`,
           type: "error",
         });
         return;
@@ -39,15 +45,15 @@ export default function FileDropZone({ onFileDrop }: { onFileDrop?: () => void }
         const text = e.target?.result as string;
         setContent(text);
         setDocType(docType);
-        setToast({ message: `${file.name} 파일을 불러왔습니다.`, type: "success" });
+        setToast({ message: `${file.name} ${dict.fileDrop.loadSuccess}`, type: "success" });
         onFileDrop?.();
       };
       reader.onerror = () => {
-        setToast({ message: "파일을 읽는 중 오류가 발생했습니다.", type: "error" });
+        setToast({ message: dict.fileDrop.loadError, type: "error" });
       };
       reader.readAsText(file, "utf-8");
     },
-    [setContent, setDocType, onFileDrop],
+    [setContent, setDocType, onFileDrop, dict],
   );
 
   // 전체 페이지 드래그앤드롭 이벤트
@@ -111,10 +117,10 @@ export default function FileDropZone({ onFileDrop }: { onFileDrop?: () => void }
           <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-accent bg-bg-secondary/90 px-16 py-12">
             <span className="text-5xl">📄</span>
             <p className="text-lg font-semibold text-text-primary">
-              여기에 파일을 놓으세요
+              {dict.fileDrop.dropHere}
             </p>
             <p className="text-sm text-text-secondary">
-              .html, .htm, .md, .markdown 파일을 지원합니다
+              {dict.fileDrop.supportedFormats}
             </p>
           </div>
         </div>

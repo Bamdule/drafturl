@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useEditorStore, SAMPLE_HTML, SAMPLE_MARKDOWN } from "@/lib/store/useEditorStore";
+import { useDict } from "@/components/i18n/DictProvider";
 
 const CHARS_PER_TICK = 2;
 const TICK_MS = 12;
@@ -12,6 +13,7 @@ interface TypewriterOverlayProps {
 }
 
 export default function TypewriterOverlay({ active, onDismiss }: TypewriterOverlayProps) {
+  const { dict } = useDict();
   const { docType, setContent, setIsDemo } = useEditorStore();
   const codeRef = useRef<HTMLPreElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -133,8 +135,8 @@ th { background: #f5f5ff; font-weight: 600; }
         {/* 코드 영역 */}
         <div className="bg-[#1e1e1e] overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-4 py-2 bg-bg-tertiary border-b border-border-dark text-xs font-medium text-text-muted uppercase tracking-wider">
-            <span>편집기</span>
-            <span className="normal-case tracking-normal animate-pulse text-accent">타이핑 중...</span>
+            <span>{dict.typewriter.editor}</span>
+            <span className="normal-case tracking-normal animate-pulse text-accent">{dict.typewriter.typing}</span>
           </div>
           <pre
             ref={codeRef}
@@ -146,8 +148,8 @@ th { background: #f5f5ff; font-weight: 600; }
         {/* 미리보기 영역 */}
         <div className="bg-white overflow-hidden flex flex-col border-l border-border-dark hidden md:flex">
           <div className="flex items-center justify-between px-4 py-2 bg-[#f0f0f4] border-b border-[#ddd] text-xs font-medium text-[#666] uppercase tracking-wider">
-            <span>미리보기</span>
-            <span className="text-[#34d399] normal-case tracking-normal">실시간</span>
+            <span>{dict.typewriter.preview}</span>
+            <span className="text-[#34d399] normal-case tracking-normal">{dict.typewriter.live}</span>
           </div>
           <iframe
             ref={iframeRef}

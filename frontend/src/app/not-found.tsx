@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "페이지를 찾을 수 없습니다 - DraftURL",
-  description: "요청하신 페이지가 존재하지 않거나 URL이 잘못되었습니다.",
+  title: "Page Not Found - DraftURL",
+  description: "The page you requested does not exist or the URL is incorrect.",
 };
 
 export default function NotFound() {
@@ -31,16 +31,19 @@ export default function NotFound() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-text-primary mb-2">
-            페이지를 찾을 수 없습니다
+            Page Not Found
           </h1>
-          <p className="text-sm text-text-secondary mb-6">
+          <p className="text-sm text-text-secondary mb-1">
+            The page you requested does not exist or the URL is incorrect.
+          </p>
+          <p className="text-sm text-text-muted mb-6">
             요청하신 페이지가 존재하지 않거나, URL이 잘못되었을 수 있습니다.
           </p>
           <Link
             href="/"
             className="inline-block rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-hover transition-colors"
           >
-            홈으로 돌아가기
+            Go Home / 홈으로
           </Link>
         </div>
       </main>

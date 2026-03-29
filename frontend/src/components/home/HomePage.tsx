@@ -8,9 +8,11 @@ import FileDropZone from "@/components/editor/FileDropZone";
 import PublishButton from "@/components/common/PublishButton";
 import TypewriterOverlay from "@/components/editor/TypewriterOverlay";
 import { useEditorStore } from "@/lib/store/useEditorStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import type { DocType } from "@/lib/constants";
 
 export default function HomePage() {
+  const { dict, locale } = useDict();
   const { docType, setDocType, setContent } = useEditorStore();
   const [typewriterActive, setTypewriterActive] = useState(true);
   const [mobilePanel, setMobilePanel] = useState<"editor" | "preview">("editor");
@@ -30,7 +32,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-primary">
+    <div className="flex min-h-screen flex-col bg-bg-primary" lang={locale}>
       {/* 전체 페이지 드래그앤드롭 오버레이 */}
       <FileDropZone onFileDrop={() => setTypewriterActive(false)} />
 
@@ -41,11 +43,12 @@ export default function HomePage() {
         {/* Glow effect */}
         <div className="pointer-events-none absolute top-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,var(--color-accent-glow),transparent_70%)]" />
         <h1 className="relative text-[clamp(24px,4vw,36px)] font-extrabold tracking-tight mb-3">
-          LLM이 만든 문서를{" "}
-          <span className="gradient-text">3초 만에</span> 공유하세요
+          {dict.home.title}{" "}
+          <span className="gradient-text">{dict.home.titleHighlight}</span>
+          {dict.home.titleSuffix ? ` ${dict.home.titleSuffix}` : ""}
         </h1>
         <p className="text-text-secondary text-[clamp(14px,2vw,16px)] max-w-[500px] mx-auto">
-          HTML이나 Markdown을 붙여넣거나 파일을 드래그앤드롭하면 즉시 공유 URL이 생성됩니다. 가입도 필요 없어요.
+          {dict.home.subtitle}
         </p>
       </section>
 
@@ -77,7 +80,7 @@ export default function HomePage() {
                 : "text-text-muted hover:text-text-secondary"
             }`}
           >
-            편집기
+            {dict.home.mobileEditor}
           </button>
           <button
             onClick={() => setMobilePanel("preview")}
@@ -87,7 +90,7 @@ export default function HomePage() {
                 : "text-text-muted hover:text-text-secondary"
             }`}
           >
-            미리보기
+            {dict.home.mobilePreview}
           </button>
         </div>
 
@@ -126,10 +129,9 @@ export default function HomePage() {
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
             }
-            title="3초 배포"
+            title={dict.home.features.deploy.title}
           >
-            붙여넣고 버튼 하나면 끝. 가입, 설정, 빌드 없이 즉시 URL이
-            생성됩니다.
+            {dict.home.features.deploy.description}
           </FeatureCard>
           <FeatureCard
             icon={
@@ -138,10 +140,9 @@ export default function HomePage() {
                 <circle cx="12" cy="12" r="3" />
               </svg>
             }
-            title="실시간 미리보기"
+            title={dict.home.features.preview.title}
           >
-            코드를 편집하면 즉시 결과를 확인할 수 있습니다. HTML과 Markdown 모두
-            지원합니다.
+            {dict.home.features.preview.description}
           </FeatureCard>
           <FeatureCard
             icon={
@@ -150,10 +151,9 @@ export default function HomePage() {
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
               </svg>
             }
-            title="깔끔한 URL"
+            title={dict.home.features.url.title}
           >
-            drafturl.com/xK9mP2nQ 형태의 간결하고 공유하기 쉬운 URL을
-            발급합니다.
+            {dict.home.features.url.description}
           </FeatureCard>
           <FeatureCard
             icon={
@@ -164,29 +164,26 @@ export default function HomePage() {
                 <circle cx="15" cy="6" r="0.5" fill="currentColor" />
               </svg>
             }
-            title="AI 수정 (Coming Soon)"
+            title={dict.home.features.ai.title}
           >
-            곧 AI에게 &quot;표를 보기 좋게 정리해줘&quot; 같은 수정 요청이
-            가능해집니다.
+            {dict.home.features.ai.description}
           </FeatureCard>
         </div>
 
         {/* How to Use Section */}
         <section className="mt-16 mb-4">
           <h2 className="text-xl font-bold text-text-primary text-center mb-8">
-            이렇게 사용하세요
+            {dict.home.howToUse}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StepCard step={1} title="붙여넣기 또는 드래그앤드롭">
-              ChatGPT, Claude 등 LLM이 생성한 HTML이나 Markdown을 에디터에
-              붙여넣거나, .html/.md 파일을 화면에 드래그앤드롭하세요.
+            <StepCard step={1} title={dict.home.steps.paste.title}>
+              {dict.home.steps.paste.description}
             </StepCard>
-            <StepCard step={2} title="미리보기 확인">
-              오른쪽 미리보기에서 결과를 실시간으로 확인하고, 필요하면 바로
-              수정하세요.
+            <StepCard step={2} title={dict.home.steps.check.title}>
+              {dict.home.steps.check.description}
             </StepCard>
-            <StepCard step={3} title="공유 URL 발급">
-              공유하기 버튼 한 번이면 끝. 받은 URL을 누구에게나 보낼 수 있습니다.
+            <StepCard step={3} title={dict.home.steps.share.title}>
+              {dict.home.steps.share.description}
             </StepCard>
           </div>
         </section>
@@ -197,8 +194,8 @@ export default function HomePage() {
         <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted/60">
           <span>&copy; 2026 DraftURL</span>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-text-muted transition-colors">이용약관</a>
-            <a href="#" className="hover:text-text-muted transition-colors">개인정보 처리방침</a>
+            <a href="#" className="hover:text-text-muted transition-colors">{dict.home.footer.terms}</a>
+            <a href="#" className="hover:text-text-muted transition-colors">{dict.home.footer.privacy}</a>
           </div>
         </div>
       </footer>

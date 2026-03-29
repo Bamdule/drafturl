@@ -82,6 +82,9 @@ public class SecurityConfig {
                         // 문서 비밀번호 검증 - permitAll
                         .requestMatchers(HttpMethod.POST, "/api/v1/documents/*/verify-password").permitAll()
 
+                        // Sitemap용 공개 문서 목록 - permitAll
+                        .requestMatchers(HttpMethod.GET, "/api/v1/documents/sitemap").permitAll()
+
                         // 비로그인 문서 생성 - permitAll
                         .requestMatchers(HttpMethod.POST, "/api/v1/documents").permitAll()
 
@@ -93,6 +96,9 @@ public class SecurityConfig {
 
                         // API 문서 (ReDoc) + Swagger UI - permitAll
                         .requestMatchers("/docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // MCP 엔드포인트 - 도구 내부에서 개별 인증 검증
+                        .requestMatchers("/mcp/**").permitAll()
 
                         // 헬스체크
                         .requestMatchers("/api/v1/health").permitAll()
@@ -116,8 +122,15 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
+        CorsConfiguration mcpCors = new CorsConfiguration();
+        mcpCors.setAllowedOrigins(List.of("*"));
+        mcpCors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        mcpCors.setAllowedHeaders(List.of("*"));
+        mcpCors.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/mcp/**", mcpCors);
         return source;
     }
 }

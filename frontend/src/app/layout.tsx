@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
 import AuthInitializer from "@/components/auth/AuthInitializer";
+import { DictProvider } from "@/components/i18n/DictProvider";
+import { getDictionary } from "@/dictionaries";
+import type { Locale } from "@/dictionaries/types";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -10,50 +14,105 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ),
-  title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "DraftURL — Share HTML & Markdown Instantly via URL",
+    template: "%s | DraftURL",
+  },
   description:
-    "HTML이나 Markdown 문서를 붙여넣고 공유 URL을 즉시 생성하세요. AI로 계속 수정할 수 있는 살아있는 문서 플랫폼.",
+    "Paste HTML or Markdown and get a shareable URL in seconds. No signup required. A living document platform you can keep editing with AI.",
+  keywords: [
+    "HTML sharing",
+    "Markdown sharing",
+    "document sharing",
+    "share URL",
+    "paste and share",
+    "HTML to URL",
+    "Markdown to URL",
+    "HTML 공유",
+    "마크다운 공유",
+    "문서 공유",
+    "URL 공유",
+  ],
   icons: {
     icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  alternates: {
+    languages: {
+      en: `${siteUrl}/en`,
+      ko: `${siteUrl}/ko`,
+      "x-default": `${siteUrl}/en`,
+    },
   },
   openGraph: {
-    title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
+    title: "DraftURL — Share HTML & Markdown Instantly via URL",
     description:
-      "HTML이나 Markdown 문서를 붙여넣고 공유 URL을 즉시 생성하세요.",
+      "Paste HTML or Markdown and get a shareable URL in seconds. No signup, no build step.",
     type: "website",
     siteName: "DraftURL",
-    locale: "ko_KR",
+    locale: "en_US",
+    alternateLocale: "ko_KR",
+    url: siteUrl,
   },
   twitter: {
-    card: "summary",
-    title: "DraftURL - HTML/MD 문서를 URL로 즉시 공유",
+    card: "summary_large_image",
+    title: "DraftURL — Share HTML & Markdown Instantly via URL",
     description:
-      "HTML이나 Markdown 문서를 붙여넣고 공유 URL을 즉시 생성하세요.",
+      "Paste HTML or Markdown and get a shareable URL in seconds. No signup, no build step.",
   },
 };
 
-export default function RootLayout({
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "DraftURL",
+  url: siteUrl,
+  description:
+    "Paste HTML or Markdown and get a shareable URL in seconds. No signup required.",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "All",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  inLanguage: ["en", "ko"],
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const locale = (headersList.get("x-locale") ?? "ko") as Locale;
+  const dict = await getDictionary(locale === "en" ? "en" : "ko");
+
   return (
     <html
-      lang="ko"
+      lang={locale}
       className="h-full antialiased dark"
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
         <Script
           defer
           src="https://stats.drafturl.com/script.js"
           data-website-id="7e336802-2478-4f28-9e4b-06f849b031a3"
         />
-        <AuthInitializer />
-        {children}
+        <DictProvider dict={dict} locale={locale}>
+          <AuthInitializer />
+          {children}
+        </DictProvider>
       </body>
     </html>
   );

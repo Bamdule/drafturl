@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { emailSignup } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useDict } from "@/components/i18n/DictProvider";
 import { ApiError } from "@/lib/api/types";
 import Header from "@/components/layout/Header";
 
@@ -24,6 +25,7 @@ function validatePassword(password: string): boolean {
 }
 
 export default function SignupPage() {
+  const { dict } = useDict();
   const router = useRouter();
   const { login } = useAuthStore();
 
@@ -41,30 +43,30 @@ export default function SignupPage() {
     const newErrors: FormErrors = {};
 
     if (!name.trim()) {
-      newErrors.name = "이름을 입력해주세요.";
+      newErrors.name = dict.auth.signup.nameRequired;
     }
 
     if (!email.trim()) {
-      newErrors.email = "이메일을 입력해주세요.";
+      newErrors.email = dict.auth.signup.emailRequired;
     } else if (!validateEmail(email)) {
-      newErrors.email = "올바른 이메일 형식이 아닙니다.";
+      newErrors.email = dict.auth.signup.emailInvalid;
     }
 
     if (!password) {
-      newErrors.password = "비밀번호를 입력해주세요.";
+      newErrors.password = dict.auth.signup.passwordRequired;
     } else if (!validatePassword(password)) {
-      newErrors.password = "비밀번호는 최소 8자, 영문과 숫자를 포함해야 합니다.";
+      newErrors.password = dict.auth.signup.passwordInvalid;
     }
 
     if (!passwordConfirm) {
-      newErrors.passwordConfirm = "비밀번호 확인을 입력해주세요.";
+      newErrors.passwordConfirm = dict.auth.signup.confirmRequired;
     } else if (password !== passwordConfirm) {
-      newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
+      newErrors.passwordConfirm = dict.auth.signup.confirmMismatch;
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [name, email, password, passwordConfirm]);
+  }, [name, email, password, passwordConfirm, dict]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -89,13 +91,13 @@ export default function SignupPage() {
         if (err instanceof ApiError) {
           setServerError(err.message);
         } else {
-          setServerError("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+          setServerError(dict.auth.signup.error);
         }
       } finally {
         setIsLoading(false);
       }
     },
-    [validate, isLoading, email, password, name, login, router],
+    [validate, isLoading, email, password, name, login, router, dict],
   );
 
   const inputClass =
@@ -115,7 +117,7 @@ export default function SignupPage() {
                 D
               </div>
               <h1 className="text-xl font-bold text-text-primary">
-                회원가입
+                {dict.auth.signup.title}
               </h1>
             </div>
 
@@ -126,7 +128,7 @@ export default function SignupPage() {
                   htmlFor="name"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  이름
+                  {dict.auth.signup.name}
                 </label>
                 <input
                   id="name"
@@ -136,7 +138,7 @@ export default function SignupPage() {
                     setName(e.target.value);
                     if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
                   }}
-                  placeholder="홍길동"
+                  placeholder={dict.auth.signup.namePlaceholder}
                   className={inputClass}
                 />
                 {errors.name && (
@@ -149,7 +151,7 @@ export default function SignupPage() {
                   htmlFor="email"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  이메일
+                  {dict.auth.signup.email}
                 </label>
                 <input
                   id="email"
@@ -172,7 +174,7 @@ export default function SignupPage() {
                   htmlFor="password"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  비밀번호
+                  {dict.auth.signup.password}
                 </label>
                 <div className="relative">
                   <input
@@ -184,7 +186,7 @@ export default function SignupPage() {
                       if (errors.password)
                         setErrors((prev) => ({ ...prev, password: undefined }));
                     }}
-                    placeholder="영문 + 숫자 포함 8자 이상"
+                    placeholder={dict.auth.signup.passwordPlaceholder}
                     className={`${inputClass} pr-10`}
                   />
                   <button
@@ -206,7 +208,7 @@ export default function SignupPage() {
                   htmlFor="passwordConfirm"
                   className="block text-sm font-medium text-text-secondary mb-1.5"
                 >
-                  비밀번호 확인
+                  {dict.auth.signup.passwordConfirm}
                 </label>
                 <div className="relative">
                   <input
@@ -221,7 +223,7 @@ export default function SignupPage() {
                           passwordConfirm: undefined,
                         }));
                     }}
-                    placeholder="비밀번호를 다시 입력해주세요"
+                    placeholder={dict.auth.signup.passwordConfirmPlaceholder}
                     className={`${inputClass} pr-10`}
                   />
                   <button
@@ -251,7 +253,7 @@ export default function SignupPage() {
                 disabled={isLoading}
                 className="h-10 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer mt-1"
               >
-                {isLoading ? "가입 중..." : "회원가입"}
+                {isLoading ? dict.auth.signup.submitting : dict.auth.signup.submit}
               </button>
             </form>
           </div>
@@ -259,27 +261,27 @@ export default function SignupPage() {
           {/* Below card links */}
           <div className="text-center mt-5">
             <p className="text-sm text-text-muted">
-              이미 계정이 있으신가요?{" "}
+              {dict.auth.signup.hasAccount}{" "}
               <Link
                 href="/auth/login"
                 className="text-accent hover:underline font-medium"
               >
-                로그인
+                {dict.auth.signup.login}
               </Link>
             </p>
           </div>
 
           {/* Footer */}
           <div className="text-center mt-6 text-xs text-text-muted/60">
-            계속 진행하면{" "}
+            {dict.auth.signup.agreement}{" "}
             <a href="#" className="hover:text-text-muted transition-colors">
-              이용약관
+              {dict.auth.signup.terms}
             </a>{" "}
-            및{" "}
+            &amp;{" "}
             <a href="#" className="hover:text-text-muted transition-colors">
-              개인정보 처리방침
+              {dict.auth.signup.privacy}
             </a>
-            에 동의하게 됩니다.
+            {dict.auth.signup.agreementSuffix}
           </div>
         </div>
       </main>

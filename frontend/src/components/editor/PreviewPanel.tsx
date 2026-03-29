@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store/useEditorStore";
 import { renderMarkdown } from "@/lib/markdown";
 import { PREVIEW_DEBOUNCE_MS } from "@/lib/constants";
+import { useDict } from "@/components/i18n/DictProvider";
 
 export default function PreviewPanel() {
+  const { dict } = useDict();
   const { content, docType } = useEditorStore();
   const [previewHtml, setPreviewHtml] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -56,12 +58,14 @@ export default function PreviewPanel() {
 </head><body>${previewHtml}</body></html>`
       : previewHtml;
 
+  const previewEmptyLines = dict.editor.previewEmpty.split("\n");
+
   return (
     <div className="border-l border-border-dark bg-white flex flex-col md:border-l md:border-t-0 border-t">
       {/* Pane Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#f0f0f4] border-b border-[#ddd] text-xs font-medium text-[#666] uppercase tracking-wider">
-        <span>미리보기</span>
-        <span className="text-success normal-case tracking-normal">실시간</span>
+        <span>{dict.editor.previewLabel}</span>
+        <span className="text-success normal-case tracking-normal">{dict.editor.previewLive}</span>
       </div>
 
       {/* Preview iframe */}
@@ -74,7 +78,12 @@ export default function PreviewPanel() {
                 <circle cx="12" cy="12" r="3" />
               </svg>
               <p className="text-sm text-[#9090a8]">
-                편집기에 내용을 입력하면<br />여기에 미리보기가 표시됩니다
+                {previewEmptyLines.map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
               </p>
             </div>
           </div>
@@ -84,7 +93,7 @@ export default function PreviewPanel() {
           srcDoc={wrappedHtml}
           className="w-full h-full min-h-[260px] md:min-h-[380px] border-none bg-white"
           sandbox="allow-scripts allow-popups allow-modals"
-          title="미리보기"
+          title={dict.editor.previewLabel}
         />
       </div>
     </div>

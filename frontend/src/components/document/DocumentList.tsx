@@ -5,6 +5,7 @@ import Link from "next/link";
 import DocumentCard from "./DocumentCard";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { deleteDocument } from "@/lib/api/documents";
+import { useDict } from "@/components/i18n/DictProvider";
 import type { DocumentSummary, PaginationInfo } from "@/lib/api/types";
 
 interface DocumentListProps {
@@ -20,6 +21,7 @@ export default function DocumentList({
   onPageChange,
   onDocumentDeleted,
 }: DocumentListProps) {
+  const { dict } = useDict();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -47,16 +49,16 @@ export default function DocumentList({
           <line x1="9" y1="15" x2="15" y2="15" />
         </svg>
         <h3 className="text-lg text-text-secondary mb-2">
-          아직 문서가 없습니다
+          {dict.documentList.empty}
         </h3>
         <p className="text-sm mb-6">
-          HTML이나 Markdown을 붙여넣어 첫 문서를 만들어보세요.
+          {dict.documentList.emptyHint}
         </p>
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold text-white bg-accent hover:bg-accent-hover transition-colors no-underline"
         >
-          + 새 문서 만들기
+          {dict.documentList.newDocument}
         </Link>
       </div>
     );
@@ -83,7 +85,7 @@ export default function DocumentList({
             onClick={() => onPageChange(pagination.page - 1)}
             className="px-4 py-2 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:bg-bg-tertiary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
           >
-            이전
+            {dict.documentList.prev}
           </button>
           <span className="text-sm text-text-muted">
             {pagination.page + 1} / {pagination.totalPages}
@@ -93,7 +95,7 @@ export default function DocumentList({
             onClick={() => onPageChange(pagination.page + 1)}
             className="px-4 py-2 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:bg-bg-tertiary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
           >
-            다음
+            {dict.documentList.next}
           </button>
         </div>
       )}

@@ -1,0 +1,232 @@
+{
+  "header": {
+    "myDocuments": "내 문서",
+    "logout": "로그아웃",
+    "login": "로그인",
+    "menu": "메뉴"
+  },
+  "home": {
+    "title": "LLM이 만든 문서를",
+    "titleHighlight": "3초 만에",
+    "titleSuffix": "공유하세요",
+    "subtitle": "HTML이나 Markdown을 붙여넣거나 파일을 드래그앤드롭하면 즉시 공유 URL이 생성됩니다. 가입도 필요 없어요.",
+    "mobileEditor": "편집기",
+    "mobilePreview": "미리보기",
+    "features": {
+      "deploy": {
+        "title": "3초 배포",
+        "description": "붙여넣고 버튼 하나면 끝. 가입, 설정, 빌드 없이 즉시 URL이 생성됩니다."
+      },
+      "preview": {
+        "title": "실시간 미리보기",
+        "description": "코드를 편집하면 즉시 결과를 확인할 수 있습니다. HTML과 Markdown 모두 지원합니다."
+      },
+      "url": {
+        "title": "깔끔한 URL",
+        "description": "drafturl.com/xK9mP2nQ 형태의 간결하고 공유하기 쉬운 URL을 발급합니다."
+      },
+      "ai": {
+        "title": "AI 수정 (Coming Soon)",
+        "description": "곧 AI에게 \"표를 보기 좋게 정리해줘\" 같은 수정 요청이 가능해집니다."
+      }
+    },
+    "howToUse": "이렇게 사용하세요",
+    "steps": {
+      "paste": {
+        "title": "붙여넣기 또는 드래그앤드롭",
+        "description": "ChatGPT, Claude 등 LLM이 생성한 HTML이나 Markdown을 에디터에 붙여넣거나, .html/.md 파일을 화면에 드래그앤드롭하세요."
+      },
+      "check": {
+        "title": "미리보기 확인",
+        "description": "오른쪽 미리보기에서 결과를 실시간으로 확인하고, 필요하면 바로 수정하세요."
+      },
+      "share": {
+        "title": "공유 URL 발급",
+        "description": "공유하기 버튼 한 번이면 끝. 받은 URL을 누구에게나 보낼 수 있습니다."
+      }
+    },
+    "footer": {
+      "terms": "이용약관",
+      "privacy": "개인정보 처리방침"
+    }
+  },
+  "publish": {
+    "emptyError": "문서 내용을 입력해주세요.",
+    "genericError": "문서 생성 중 오류가 발생했습니다.",
+    "publishing": "배포 중...",
+    "share": "공유하기",
+    "preview": "미리보기",
+    "previewTitle": "미리보기",
+    "passwordLabel": "비밀번호 설정",
+    "passwordPlaceholder": "4자 이상",
+    "viewDetail": "상세 보기",
+    "newDocument": "+ 새 문서",
+    "expiryNotice": "비로그인 시 24시간 후 만료됩니다.",
+    "loginKeep": "로그인하면 영구 보관!"
+  },
+  "publishModal": {
+    "title": "공유 URL이 생성되었습니다!",
+    "description": "아래 URL을 복사해서 공유하세요.",
+    "expiryNotice": " 비로그인 문서는 24시간 후 만료됩니다.",
+    "copy": "복사",
+    "copied": "복사됨!",
+    "viewDetail": "상세 보기",
+    "close": "닫기"
+  },
+  "typewriter": {
+    "editor": "편집기",
+    "typing": "타이핑 중...",
+    "preview": "미리보기",
+    "live": "실시간"
+  },
+  "fileDrop": {
+    "dropHere": "여기에 파일을 놓으세요",
+    "supportedFormats": ".html, .htm, .md, .markdown 파일을 지원합니다",
+    "fileSizeError": "파일 크기가 5MB를 초과합니다.",
+    "unsupportedError": "지원하지 않는 파일 형식입니다.",
+    "loadSuccess": "파일을 불러왔습니다.",
+    "loadError": "파일을 읽는 중 오류가 발생했습니다."
+  },
+  "auth": {
+    "login": {
+      "title": "로그인",
+      "email": "이메일",
+      "password": "비밀번호",
+      "submit": "로그인",
+      "submitting": "로그인 중...",
+      "emailRequired": "이메일을 입력해주세요.",
+      "passwordRequired": "비밀번호를 입력해주세요.",
+      "error": "로그인 중 오류가 발생했습니다. 다시 시도해주세요.",
+      "or": "또는",
+      "preparing": "준비 중",
+      "noAccount": "계정이 없으신가요?",
+      "signup": "회원가입",
+      "skipLogin": "로그인 없이 사용하기",
+      "agreement": "계속 진행하면",
+      "terms": "이용약관",
+      "privacy": "개인정보 처리방침",
+      "agreementSuffix": "에 동의하게 됩니다."
+    },
+    "signup": {
+      "title": "회원가입",
+      "name": "이름",
+      "namePlaceholder": "홍길동",
+      "email": "이메일",
+      "password": "비밀번호",
+      "passwordPlaceholder": "영문 + 숫자 포함 8자 이상",
+      "passwordConfirm": "비밀번호 확인",
+      "passwordConfirmPlaceholder": "비밀번호를 다시 입력해주세요",
+      "submit": "회원가입",
+      "submitting": "가입 중...",
+      "nameRequired": "이름을 입력해주세요.",
+      "emailRequired": "이메일을 입력해주세요.",
+      "emailInvalid": "올바른 이메일 형식이 아닙니다.",
+      "passwordRequired": "비밀번호를 입력해주세요.",
+      "passwordInvalid": "비밀번호는 최소 8자, 영문과 숫자를 포함해야 합니다.",
+      "confirmRequired": "비밀번호 확인을 입력해주세요.",
+      "confirmMismatch": "비밀번호가 일치하지 않습니다.",
+      "error": "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.",
+      "hasAccount": "이미 계정이 있으신가요?",
+      "login": "로그인",
+      "agreement": "계속 진행하면",
+      "terms": "이용약관",
+      "privacy": "개인정보 처리방침",
+      "agreementSuffix": "에 동의하게 됩니다."
+    },
+    "authError": {
+      "title": "인증 오류",
+      "message": "인증 과정에서 문제가 발생했습니다. 보안을 위해 로그인을 다시 시도해주세요.",
+      "hint": "문제가 계속되면 브라우저 쿠키를 삭제한 후 다시 시도하거나, 다른 로그인 방법을 사용해주세요.",
+      "retry": "다시 로그인하기"
+    },
+    "callback": {
+      "invalidRequest": "잘못된 콜백 요청입니다.",
+      "noProvider": "OAuth provider 정보를 확인할 수 없습니다.",
+      "error": "인증 처리 중 오류가 발생했습니다.",
+      "errorTitle": "인증 오류",
+      "retry": "다시 로그인하기",
+      "loading": "로그인 처리 중..."
+    }
+  },
+  "dashboard": {
+    "sharedDocs": "공유 문서",
+    "limitReached": "문서 한도에 도달했습니다",
+    "storage": "저장 용량",
+    "plan": "플랜",
+    "planFree": "Free",
+    "planMaxDocs": "문서 최대 30개",
+    "permanentStorage": "로그인 시 영구 보관",
+    "sizeLimit": "용량 제한: 5MB",
+    "title": "내 문서",
+    "newDocument": "+ 새 문서 만들기"
+  },
+  "document": {
+    "expired": "만료됨",
+    "minutesLeft": "분 남음",
+    "hoursLeft": "시간 남음",
+    "editTitle": "제목 수정",
+    "noTitle": "제목 없음",
+    "passwordProtected": "비밀번호 보호",
+    "copied": "복사됨",
+    "copyUrl": "URL 복사",
+    "share": "공유",
+    "kakao": "카카오톡",
+    "twitter": "X (Twitter)",
+    "facebook": "Facebook",
+    "more": "더보기",
+    "delete": "삭제",
+    "titlePlaceholder": "제목을 입력하세요"
+  },
+  "documentList": {
+    "empty": "아직 문서가 없습니다",
+    "emptyHint": "HTML이나 Markdown을 붙여넣어 첫 문서를 만들어보세요.",
+    "newDocument": "+ 새 문서 만들기",
+    "prev": "이전",
+    "next": "다음"
+  },
+  "deleteDialog": {
+    "title": "문서 삭제",
+    "description": "이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없으며, 공유 URL도 더 이상 접근할 수 없게 됩니다.",
+    "cancel": "취소",
+    "delete": "삭제",
+    "deleting": "삭제 중..."
+  },
+  "storageUsage": {
+    "docs": "개 문서"
+  },
+  "editor": {
+    "loadError": "문서를 불러오는데 실패했습니다.",
+    "loading": "문서 로딩 중...",
+    "backToDashboard": "대시보드로 돌아가기",
+    "back": "대시보드",
+    "titlePlaceholder": "제목",
+    "saved": "저장 완료!",
+    "saving": "저장 중...",
+    "save": "저장",
+    "saveError": "문서 수정 중 오류가 발생했습니다.",
+    "editorLabel": "편집기",
+    "editorLoading": "에디터 로딩 중...",
+    "previewLabel": "미리보기",
+    "previewLive": "실시간",
+    "previewEmpty": "편집기에 내용을 입력하면\n여기에 미리보기가 표시됩니다",
+    "htmlPlaceholder": "HTML을 입력하세요...",
+    "mdPlaceholder": "Markdown을 입력하세요..."
+  },
+  "expired": {
+    "title": "문서가 만료되었습니다",
+    "message": "이 문서는 만료 기간이 지나 더 이상 볼 수 없습니다.",
+    "docId": "문서 ID:",
+    "loginHint": "로그인하면 문서를 영구 보관할 수 있습니다.",
+    "newDocument": "새 문서 만들기",
+    "login": "로그인"
+  },
+  "slug": {
+    "docExpired": "문서가 만료되었습니다",
+    "docDeleted": "문서가 삭제되었습니다",
+    "expiredMessage": "비로그인으로 생성된 문서는 24시간 후 자동 만료됩니다.",
+    "deletedMessage": "이 문서는 소유자에 의해 삭제되었습니다.",
+    "loginHint": "로그인하면 문서를 영구 보관할 수 있습니다.",
+    "newDocument": "새 문서 만들기",
+    "login": "로그인"
+  }
+}

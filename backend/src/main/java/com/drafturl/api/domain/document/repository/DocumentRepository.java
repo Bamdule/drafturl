@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.drafturl.api.domain.document.controller.response.SitemapEntry;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -63,6 +65,16 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
             "WHERE d.id IN :ids")
     int bulkUpdateStatus(@Param("ids") Collection<String> ids,
                          @Param("status") DocumentStatus status);
+
+    /**
+     * Sitemap용 공개 문서 조회: ACTIVE 상태이고, 영구(expiresAt IS NULL)이며,
+     * 비밀번호가 없는(passwordHash IS NULL) 문서의 slug와 updatedAt을 반환한다.
+     */
+    @Query("SELECT new com.drafturl.api.domain.document.controller.response.SitemapEntry(d.slug, d.updatedAt) " +
+            "FROM Document d WHERE d.status = 'ACTIVE' " +
+            "AND d.expiresAt IS NULL AND d.passwordHash IS NULL " +
+            "ORDER BY d.updatedAt DESC")
+    List<SitemapEntry> findSitemapEntries(Pageable pageable);
 
     /**
      * 벌크 만료 시간 설정: 지정된 ID 목록의 문서에 expiresAt을 일괄 설정한다.
