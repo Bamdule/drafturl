@@ -1,8 +1,11 @@
 name: Deploy to Dev Server
 
 on:
+  # 자동 배포: release 브랜치 push 시에만 트리거
+  # main은 CI만 실행하고, 테스트 완료 후 release에 merge하여 배포
   push:
-    branches: [main]
+    branches: [release]
+  # 수동 배포: GitHub Actions UI에서 직접 실행
   workflow_dispatch:
 
 concurrency:
