@@ -18,6 +18,17 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
 - 더 이상 유효하지 않은 메모리(완료된 프로젝트, 변경된 규칙)를 정리한다
 - 코드에서 유추 가능한 내용이 메모리에 중복 저장되어 있으면 제거한다
 
+## 버전 관리 (배포 시 자동 수행)
+- 현재 버전: 루트 `VERSION` 파일 (single source of truth)
+- SemVer 규칙: Major(하위호환 깨짐), Minor(새 기능), Patch(버그/보안 수정)
+- "배포해줘" 요청 시 자동으로 수행할 것:
+  1. 변경 내용 분석 → major/minor/patch 판단 → `VERSION` 업데이트
+  2. `docs/plans/product/vX.X.X-tasks.md` 체크박스 반영
+  3. `CHANGELOG.md` 해당 버전 섹션 추가
+  4. `docs/releases/vX.X.X.md` 릴리즈 노트 작성
+  5. git commit → git tag vX.X.X → push (main + release)
+- 배포 트리거: `release` 브랜치 push 시 GitHub Actions 자동 배포
+
 ## 문서 규칙
 - `docs/archive/`는 완료된 문서 보관소이며, 탐색 대상에서 제외한다
 - `docs/design/` — 설계 문서 (항상 현재 상태 반영)
