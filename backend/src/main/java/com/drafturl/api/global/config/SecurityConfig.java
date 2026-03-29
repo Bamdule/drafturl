@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, McpOAuth2Properties.class})
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -97,6 +97,12 @@ public class SecurityConfig {
                         // API 문서 (ReDoc) + Swagger UI - permitAll
                         .requestMatchers("/docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
+                        // OAuth2 Authorization Server 메타데이터
+                        .requestMatchers("/.well-known/**").permitAll()
+
+                        // OAuth2 인가/토큰 엔드포인트
+                        .requestMatchers("/oauth2/**").permitAll()
+
                         // MCP 엔드포인트 - 도구 내부에서 개별 인증 검증
                         .requestMatchers("/mcp/**").permitAll()
 
@@ -131,6 +137,8 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         source.registerCorsConfiguration("/mcp/**", mcpCors);
+        source.registerCorsConfiguration("/.well-known/**", mcpCors);
+        source.registerCorsConfiguration("/oauth2/**", mcpCors);
         return source;
     }
 }

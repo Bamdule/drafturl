@@ -11,6 +11,7 @@ import com.drafturl.api.domain.document.usecase.CreateDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.DeleteDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.GetDocumentForEditUseCase;
 import com.drafturl.api.domain.document.usecase.GetDocumentListUseCase;
+import com.drafturl.api.domain.document.usecase.GetSitemapUseCase;
 import com.drafturl.api.domain.document.usecase.UpdateDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.ViewDocumentUseCase;
 import com.drafturl.api.global.auth.UserPrincipal;
@@ -52,17 +53,18 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     private final GetDocumentForEditUseCase getDocumentForEditUseCase = mock(GetDocumentForEditUseCase.class);
     private final UpdateDocumentUseCase updateDocumentUseCase = mock(UpdateDocumentUseCase.class);
     private final DeleteDocumentUseCase deleteDocumentUseCase = mock(DeleteDocumentUseCase.class);
+    private final GetSitemapUseCase getSitemapUseCase = mock(GetSitemapUseCase.class);
 
     @Override
     protected Object initController() {
         return new DocumentController(createDocumentUseCase, viewDocumentUseCase,
                 getDocumentListUseCase, getDocumentForEditUseCase,
-                updateDocumentUseCase, deleteDocumentUseCase);
+                updateDocumentUseCase, deleteDocumentUseCase, getSitemapUseCase);
     }
 
     @Override
     protected Object[] initControllerAdvice() {
-        return new Object[]{new GlobalExceptionHandler()};
+        return new Object[]{new GlobalExceptionHandler(new com.drafturl.api.global.config.McpOAuth2Properties("http://localhost:8080", 300))};
     }
 
     @Override

@@ -56,7 +56,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object[] initControllerAdvice() {
-        return new Object[]{new GlobalExceptionHandler()};
+        return new Object[]{new GlobalExceptionHandler(new com.drafturl.api.global.config.McpOAuth2Properties("http://localhost:8080", 300))};
     }
 
     @Override

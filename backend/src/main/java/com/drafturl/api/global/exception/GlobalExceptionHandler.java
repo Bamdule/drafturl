@@ -1,8 +1,11 @@
 package com.drafturl.api.global.exception;
 
 import com.drafturl.api.global.common.ApiResponse;
+import com.drafturl.api.global.config.McpOAuth2Properties;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,12 +18,26 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private final McpOAuth2Properties mcpOAuth2Properties;
+
+    public GlobalExceptionHandler(McpOAuth2Properties mcpOAuth2Properties) {
+        this.mcpOAuth2Properties = mcpOAuth2Properties;
+    }
+
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException ex) {
+    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException ex,
+                                                                    HttpServletRequest request) {
         log.warn("Business exception: code={}, message={}", ex.getCode(), ex.getMessage());
-        return ResponseEntity
-                .status(ex.getStatus())
-                .body(ApiResponse.error(ex.getCode(), ex.getMessage()));
+
+        var builder = ResponseEntity.status(ex.getStatus());
+
+        if (ex.getStatus() == HttpStatus.UNAUTHORIZED && request.getRequestURI().startsWith("/mcp/")) {
+            builder.header(HttpHeaders.WWW_AUTHENTICATE,
+                    "Bearer resource_metadata=\"" + mcpOAuth2Properties.issuer()
+                            + "/.well-known/oauth-protected-resource\"");
+        }
+
+        return builder.body(ApiResponse.error(ex.getCode(), ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
