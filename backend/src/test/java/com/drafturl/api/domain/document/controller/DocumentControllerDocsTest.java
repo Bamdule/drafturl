@@ -7,7 +7,12 @@ import com.drafturl.api.domain.document.controller.response.DocumentEditResponse
 import com.drafturl.api.domain.document.controller.response.DocumentListResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentViewResponse;
-import com.drafturl.api.domain.document.service.DocumentService;
+import com.drafturl.api.domain.document.usecase.CreateDocumentUseCase;
+import com.drafturl.api.domain.document.usecase.DeleteDocumentUseCase;
+import com.drafturl.api.domain.document.usecase.GetDocumentForEditUseCase;
+import com.drafturl.api.domain.document.usecase.GetDocumentListUseCase;
+import com.drafturl.api.domain.document.usecase.UpdateDocumentUseCase;
+import com.drafturl.api.domain.document.usecase.ViewDocumentUseCase;
 import com.drafturl.api.global.auth.UserPrincipal;
 import com.drafturl.api.domain.user.PlanType;
 import com.drafturl.api.global.exception.GlobalExceptionHandler;
@@ -41,11 +46,18 @@ class DocumentControllerDocsTest extends RestDocsSupport {
 
     private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    private final DocumentService documentService = mock(DocumentService.class);
+    private final CreateDocumentUseCase createDocumentUseCase = mock(CreateDocumentUseCase.class);
+    private final ViewDocumentUseCase viewDocumentUseCase = mock(ViewDocumentUseCase.class);
+    private final GetDocumentListUseCase getDocumentListUseCase = mock(GetDocumentListUseCase.class);
+    private final GetDocumentForEditUseCase getDocumentForEditUseCase = mock(GetDocumentForEditUseCase.class);
+    private final UpdateDocumentUseCase updateDocumentUseCase = mock(UpdateDocumentUseCase.class);
+    private final DeleteDocumentUseCase deleteDocumentUseCase = mock(DeleteDocumentUseCase.class);
 
     @Override
     protected Object initController() {
-        return new DocumentController(documentService);
+        return new DocumentController(createDocumentUseCase, viewDocumentUseCase,
+                getDocumentListUseCase, getDocumentForEditUseCase,
+                updateDocumentUseCase, deleteDocumentUseCase);
     }
 
     @Override
@@ -62,23 +74,17 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     @DisplayName("POST /api/v1/documents - 문서 생성")
     void createDocument() throws Exception {
         CreateDocumentRequest request = new CreateDocumentRequest(
-                "<h1>Hello World</h1>", "html", "내 첫 문서"
+                "<h1>Hello World</h1>", "html", "내 첫 문서", null
         );
 
         DocumentResponse response = new DocumentResponse(
-                "abc12345",
-                "abc12345",
-                "http://localhost:3000/abc12345",
-                "내 첫 문서",
-                "html",
-                20L,
-                "active",
-                null,
+                "abc12345", "abc12345", "http://localhost:3000/abc12345",
+                "내 첫 문서", "html", 20L, "active", false, null,
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0),
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0)
         );
 
-        given(documentService.createDocument(any(CreateDocumentRequest.class), any()))
+        given(createDocumentUseCase.execute(any(CreateDocumentRequest.class), any()))
                 .willReturn(response);
 
         mockMvc.perform(post("/api/v1/documents")
@@ -93,7 +99,8 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                 .requestFields(
                                         fieldWithPath("content").type(JsonFieldType.STRING).description("문서 내용 (최대 5MB)"),
                                         fieldWithPath("type").type(JsonFieldType.STRING).description("문서 타입 (html 또는 markdown)"),
-                                        fieldWithPath("title").type(JsonFieldType.STRING).description("문서 제목 (선택)").optional()
+                                        fieldWithPath("title").type(JsonFieldType.STRING).description("문서 제목 (선택)").optional(),
+                                        fieldWithPath("password").type(JsonFieldType.NULL).description("문서 비밀번호 (선택, 4~100자)").optional()
                                 )
                                 .responseFields(
                                         fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
@@ -104,6 +111,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.docType").type(JsonFieldType.STRING).description("문서 타입"),
                                         fieldWithPath("data.contentSize").type(JsonFieldType.NUMBER).description("콘텐츠 크기 (바이트)"),
                                         fieldWithPath("data.status").type(JsonFieldType.STRING).description("문서 상태 (active, expired, deleted)"),
+                                        fieldWithPath("data.isPasswordProtected").type(JsonFieldType.BOOLEAN).description("비밀번호 보호 여부"),
                                         fieldWithPath("data.expiresAt").type(JsonFieldType.NULL).description("만료 시간 (비로그인 시 24시간 후)").optional(),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
                                         fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시"),
@@ -118,15 +126,14 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     @DisplayName("GET /api/v1/documents/{slug}/view - 문서 서빙 (공개 조회)")
     void viewDocument() throws Exception {
         DocumentViewResponse response = new DocumentViewResponse(
-                "abc12345",
-                "내 첫 문서",
-                "html",
-                "<h1>Hello World</h1>",
+                "abc12345", "내 첫 문서", "html",
+                "https://cdn.drafturl.com/documents/abc12345/content.html",
+                false,
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0),
                 LocalDateTime.of(2026, 3, 22, 12, 0, 0)
         );
 
-        given(documentService.getDocumentForView("abc12345")).willReturn(response);
+        given(viewDocumentUseCase.execute(eq("abc12345"), any())).willReturn(response);
 
         mockMvc.perform(get("/api/v1/documents/{slug}/view", "abc12345"))
                 .andExpect(status().isOk())
@@ -134,7 +141,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Document API")
                                 .summary("문서 서빙 (공개 조회)")
-                                .description("공유 URL로 접근 시 문서를 조회합니다. 인증이 필요하지 않습니다. Cache-Control 및 ETag 헤더가 포함됩니다.")
+                                .description("공유 URL로 접근 시 문서를 조회합니다. 인증이 필요하지 않습니다.")
                                 .pathParameters(
                                         parameterWithName("slug").description("문서 슬러그")
                                 )
@@ -143,9 +150,10 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.id").type(JsonFieldType.STRING).description("문서 ID"),
                                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("문서 제목"),
                                         fieldWithPath("data.docType").type(JsonFieldType.STRING).description("문서 타입"),
-                                        fieldWithPath("data.content").type(JsonFieldType.STRING).description("문서 내용"),
+                                        fieldWithPath("data.contentUrl").type(JsonFieldType.STRING).description("CDN 콘텐츠 URL"),
+                                        fieldWithPath("data.isPasswordProtected").type(JsonFieldType.BOOLEAN).description("비밀번호 보호 여부"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                                        fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시 (ETag 생성용)"),
+                                        fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시"),
                                         fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보 (성공 시 null)")
                                 )
                                 .build()
@@ -158,13 +166,13 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     void getMyDocuments() throws Exception {
         DocumentResponse doc1 = new DocumentResponse(
                 "abc12345", "abc12345", "http://localhost:3000/abc12345",
-                "첫 번째 문서", "html", 1024L, "active", null,
+                "첫 번째 문서", "html", 1024L, "active", false, null,
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0),
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0)
         );
         DocumentResponse doc2 = new DocumentResponse(
                 "def67890", "def67890", "http://localhost:3000/def67890",
-                "두 번째 문서", "markdown", 2048L, "active", null,
+                "두 번째 문서", "markdown", 2048L, "active", false, null,
                 LocalDateTime.of(2026, 3, 21, 9, 0, 0),
                 LocalDateTime.of(2026, 3, 21, 15, 30, 0)
         );
@@ -174,7 +182,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                 new DocumentListResponse.PaginationInfo(0, 20, 2, 1)
         );
 
-        given(documentService.getMyDocuments(eq(USER_ID), anyInt(), anyInt()))
+        given(getDocumentListUseCase.execute(eq(USER_ID), anyInt(), anyInt()))
                 .willReturn(response);
 
         mockMvc.perform(get("/api/v1/documents")
@@ -199,6 +207,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.documents[].docType").type(JsonFieldType.STRING).description("문서 타입"),
                                         fieldWithPath("data.documents[].contentSize").type(JsonFieldType.NUMBER).description("콘텐츠 크기 (바이트)"),
                                         fieldWithPath("data.documents[].status").type(JsonFieldType.STRING).description("문서 상태"),
+                                        fieldWithPath("data.documents[].isPasswordProtected").type(JsonFieldType.BOOLEAN).description("비밀번호 보호 여부"),
                                         fieldWithPath("data.documents[].expiresAt").type(JsonFieldType.NULL).description("만료 시간").optional(),
                                         fieldWithPath("data.documents[].createdAt").type(JsonFieldType.STRING).description("생성 일시"),
                                         fieldWithPath("data.documents[].updatedAt").type(JsonFieldType.STRING).description("수정 일시"),
@@ -217,20 +226,14 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     @DisplayName("GET /api/v1/documents/{slug} - 편집용 문서 상세 조회")
     void getDocumentForEdit() throws Exception {
         DocumentEditResponse response = new DocumentEditResponse(
-                "abc12345",
-                "abc12345",
-                "http://localhost:3000/abc12345",
-                "내 첫 문서",
-                "html",
-                "<h1>Hello World</h1>",
-                20L,
-                "active",
-                null,
+                "abc12345", "abc12345", "http://localhost:3000/abc12345",
+                "내 첫 문서", "html", "<h1>Hello World</h1>", 20L, "active",
+                false, null,
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0),
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0)
         );
 
-        given(documentService.getDocumentForEdit(eq("abc12345"), eq(USER_ID)))
+        given(getDocumentForEditUseCase.execute(eq("abc12345"), eq(USER_ID)))
                 .willReturn(response);
 
         mockMvc.perform(get("/api/v1/documents/{slug}", "abc12345"))
@@ -253,6 +256,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.content").type(JsonFieldType.STRING).description("문서 원본 내용"),
                                         fieldWithPath("data.contentSize").type(JsonFieldType.NUMBER).description("콘텐츠 크기 (바이트)"),
                                         fieldWithPath("data.status").type(JsonFieldType.STRING).description("문서 상태"),
+                                        fieldWithPath("data.isPasswordProtected").type(JsonFieldType.BOOLEAN).description("비밀번호 보호 여부"),
                                         fieldWithPath("data.expiresAt").type(JsonFieldType.NULL).description("만료 시간").optional(),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
                                         fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시"),
@@ -267,23 +271,17 @@ class DocumentControllerDocsTest extends RestDocsSupport {
     @DisplayName("PUT /api/v1/documents/{slug} - 문서 수정")
     void updateDocument() throws Exception {
         UpdateDocumentRequest request = new UpdateDocumentRequest(
-                "<h1>Updated Content</h1>", "수정된 제목"
+                "<h1>Updated Content</h1>", "수정된 제목", null
         );
 
         DocumentResponse response = new DocumentResponse(
-                "abc12345",
-                "abc12345",
-                "http://localhost:3000/abc12345",
-                "수정된 제목",
-                "html",
-                25L,
-                "active",
-                null,
+                "abc12345", "abc12345", "http://localhost:3000/abc12345",
+                "수정된 제목", "html", 25L, "active", false, null,
                 LocalDateTime.of(2026, 3, 22, 10, 0, 0),
                 LocalDateTime.of(2026, 3, 22, 11, 30, 0)
         );
 
-        given(documentService.updateDocument(eq("abc12345"), any(UpdateDocumentRequest.class), eq(USER_ID)))
+        given(updateDocumentUseCase.execute(eq("abc12345"), any(UpdateDocumentRequest.class), eq(USER_ID)))
                 .willReturn(response);
 
         mockMvc.perform(put("/api/v1/documents/{slug}", "abc12345")
@@ -294,13 +292,14 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Document API")
                                 .summary("문서 수정")
-                                .description("소유자가 문서를 수정합니다. content 또는 title 중 최소 하나는 포함해야 합니다. 타입 변경은 허용되지 않습니다. 인증이 필요합니다.")
+                                .description("소유자가 문서를 수정합니다. content, title, password 중 최소 하나는 포함해야 합니다. 인증이 필요합니다.")
                                 .pathParameters(
                                         parameterWithName("slug").description("문서 슬러그")
                                 )
                                 .requestFields(
                                         fieldWithPath("content").type(JsonFieldType.STRING).description("수정할 문서 내용 (선택)").optional(),
-                                        fieldWithPath("title").type(JsonFieldType.STRING).description("수정할 문서 제목 (선택)").optional()
+                                        fieldWithPath("title").type(JsonFieldType.STRING).description("수정할 문서 제목 (선택)").optional(),
+                                        fieldWithPath("password").type(JsonFieldType.NULL).description("비밀번호 (null=변경없음, \"\"=제거, 값=설정)").optional()
                                 )
                                 .responseFields(
                                         fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
@@ -311,6 +310,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.docType").type(JsonFieldType.STRING).description("문서 타입"),
                                         fieldWithPath("data.contentSize").type(JsonFieldType.NUMBER).description("콘텐츠 크기 (바이트)"),
                                         fieldWithPath("data.status").type(JsonFieldType.STRING).description("문서 상태"),
+                                        fieldWithPath("data.isPasswordProtected").type(JsonFieldType.BOOLEAN).description("비밀번호 보호 여부"),
                                         fieldWithPath("data.expiresAt").type(JsonFieldType.NULL).description("만료 시간").optional(),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
                                         fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시"),
@@ -328,7 +328,7 @@ class DocumentControllerDocsTest extends RestDocsSupport {
                 "abc12345", "abc12345", LocalDateTime.of(2026, 3, 22, 14, 0, 0)
         );
 
-        given(documentService.deleteDocument(eq("abc12345"), eq(USER_ID)))
+        given(deleteDocumentUseCase.execute(eq("abc12345"), eq(USER_ID)))
                 .willReturn(deleteResponse);
 
         mockMvc.perform(delete("/api/v1/documents/{slug}", "abc12345"))

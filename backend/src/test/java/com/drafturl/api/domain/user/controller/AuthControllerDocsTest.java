@@ -4,7 +4,13 @@ import com.drafturl.api.domain.user.controller.request.OAuthCallbackRequest;
 import com.drafturl.api.domain.user.controller.request.RefreshTokenRequest;
 import com.drafturl.api.domain.user.controller.response.AuthResponse;
 import com.drafturl.api.domain.user.controller.response.UserResponse;
-import com.drafturl.api.domain.user.service.AuthService;
+import com.drafturl.api.domain.user.usecase.EmailLoginUseCase;
+import com.drafturl.api.domain.user.usecase.EmailSignupUseCase;
+import com.drafturl.api.domain.user.usecase.GetCurrentUserUseCase;
+import com.drafturl.api.domain.user.usecase.LogoutUseCase;
+import com.drafturl.api.domain.user.usecase.OAuthLoginUseCase;
+import com.drafturl.api.domain.user.usecase.RefreshTokenUseCase;
+import com.drafturl.api.global.auth.OAuthStateProvider;
 import com.drafturl.api.global.auth.UserPrincipal;
 import com.drafturl.api.domain.user.PlanType;
 import com.drafturl.api.global.exception.GlobalExceptionHandler;
@@ -34,11 +40,18 @@ class AuthControllerDocsTest extends RestDocsSupport {
 
     private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    private final AuthService authService = mock(AuthService.class);
+    private final OAuthLoginUseCase oAuthLoginUseCase = mock(OAuthLoginUseCase.class);
+    private final EmailSignupUseCase emailSignupUseCase = mock(EmailSignupUseCase.class);
+    private final EmailLoginUseCase emailLoginUseCase = mock(EmailLoginUseCase.class);
+    private final RefreshTokenUseCase refreshTokenUseCase = mock(RefreshTokenUseCase.class);
+    private final LogoutUseCase logoutUseCase = mock(LogoutUseCase.class);
+    private final GetCurrentUserUseCase getCurrentUserUseCase = mock(GetCurrentUserUseCase.class);
+    private final OAuthStateProvider oAuthStateProvider = mock(OAuthStateProvider.class);
 
     @Override
     protected Object initController() {
-        return new AuthController(authService);
+        return new AuthController(oAuthLoginUseCase, emailSignupUseCase, emailLoginUseCase,
+                refreshTokenUseCase, logoutUseCase, getCurrentUserUseCase, oAuthStateProvider);
     }
 
     @Override
@@ -65,7 +78,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
                 new AuthResponse.UserInfo(USER_ID, "user@example.com", "홍길동", "https://example.com/avatar.jpg", "free")
         );
 
-        given(authService.oauthLogin(eq("github"), anyString(), anyString(), anyString()))
+        given(oAuthLoginUseCase.execute(eq("github"), anyString(), anyString(), anyString()))
                 .willReturn(response);
 
         mockMvc.perform(post("/api/v1/auth/oauth2/callback/{provider}", "github")
@@ -76,7 +89,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Auth API")
                                 .summary("OAuth2 콜백 처리")
-                                .description("OAuth2 인가 코드를 사용하여 로그인 또는 회원가입을 처리하고 JWT 토큰을 발급합니다. 지원 Provider: github, google")
+                                .description("OAuth2 인가 코드를 사용하여 로그인 또는 회원가입을 처리하고 JWT 토큰을 발급합니다.")
                                 .pathParameters(
                                         parameterWithName("provider").description("OAuth2 Provider (github, google)")
                                 )
@@ -114,7 +127,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
                 new AuthResponse.UserInfo(USER_ID, "user@example.com", "홍길동", "https://example.com/avatar.jpg", "free")
         );
 
-        given(authService.refreshToken("rt_abcdef123456")).willReturn(response);
+        given(refreshTokenUseCase.execute("rt_abcdef123456")).willReturn(response);
 
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +137,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Auth API")
                                 .summary("토큰 갱신")
-                                .description("Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 발급합니다. Refresh Token Rotation이 적용되어 기존 Refresh Token은 무효화됩니다.")
+                                .description("Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 발급합니다.")
                                 .requestFields(
                                         fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
                                 )
@@ -150,7 +163,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
     void logout() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest("rt_abcdef123456");
 
-        willDoNothing().given(authService).logout("rt_abcdef123456");
+        willDoNothing().given(logoutUseCase).execute("rt_abcdef123456");
 
         mockMvc.perform(post("/api/v1/auth/logout")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +199,7 @@ class AuthControllerDocsTest extends RestDocsSupport {
                 new UserResponse.StorageUsageInfo(102400L, 5)
         );
 
-        given(authService.getCurrentUser(eq(USER_ID))).willReturn(response);
+        given(getCurrentUserUseCase.execute(eq(USER_ID))).willReturn(response);
 
         mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isOk())
