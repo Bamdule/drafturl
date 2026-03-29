@@ -97,192 +97,191 @@ export default function SignupPage() {
     [validate, isLoading, email, password, name, login, router],
   );
 
+  const inputClass =
+    "flex h-10 w-full rounded-lg border border-border-dark bg-bg-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors";
+
   return (
     <div className="flex min-h-screen flex-col bg-bg-primary">
       <Header />
 
-      {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-[400px] text-center">
-          {/* Icon */}
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-[#a78bfa] flex items-center justify-center mx-auto mb-6 text-3xl text-white shadow-[0_8px_32px_rgba(124,92,252,0.25)]">
-            D
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-[420px]">
+          {/* Card */}
+          <div className="bg-bg-secondary border border-border-dark rounded-2xl p-8 shadow-lg shadow-black/20">
+            {/* Header */}
+            <div className="text-center mb-5">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-[#a78bfa] flex items-center justify-center mx-auto mb-4 text-xl font-bold text-white">
+                D
+              </div>
+              <h1 className="text-xl font-bold text-text-primary">
+                회원가입
+              </h1>
+            </div>
+
+            {/* Signup Form */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 text-left">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  이름
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+                  }}
+                  placeholder="홍길동"
+                  className={inputClass}
+                />
+                {errors.name && (
+                  <p className="mt-1 text-xs text-danger">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  이메일
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                  }}
+                  placeholder="you@example.com"
+                  className={inputClass}
+                />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-danger">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  비밀번호
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password)
+                        setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
+                    placeholder="영문 + 숫자 포함 8자 이상"
+                    className={`${inputClass} pr-10`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-danger">{errors.password}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="passwordConfirm"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  비밀번호 확인
+                </label>
+                <div className="relative">
+                  <input
+                    id="passwordConfirm"
+                    type={showPasswordConfirm ? "text" : "password"}
+                    value={passwordConfirm}
+                    onChange={(e) => {
+                      setPasswordConfirm(e.target.value);
+                      if (errors.passwordConfirm)
+                        setErrors((prev) => ({
+                          ...prev,
+                          passwordConfirm: undefined,
+                        }));
+                    }}
+                    placeholder="비밀번호를 다시 입력해주세요"
+                    className={`${inputClass} pr-10`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordConfirm((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPasswordConfirm ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                </div>
+                {errors.passwordConfirm && (
+                  <p className="mt-1 text-xs text-danger">
+                    {errors.passwordConfirm}
+                  </p>
+                )}
+              </div>
+
+              {serverError && (
+                <div className="rounded-lg bg-danger/10 border border-danger/20 px-3 py-2.5 text-sm text-danger">
+                  {serverError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="h-10 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer mt-1"
+              >
+                {isLoading ? "가입 중..." : "회원가입"}
+              </button>
+            </form>
           </div>
 
-          <h1 className="text-2xl font-bold text-text-primary mb-2">
-            DraftURL 회원가입
-          </h1>
-          <p className="text-[15px] text-text-secondary mb-8">
-            계정을 만들고 문서를 영구 보관하세요.
-          </p>
-
-          {/* Signup Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-            {/* Name */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
+          {/* Below card links */}
+          <div className="text-center mt-5">
+            <p className="text-sm text-text-muted">
+              이미 계정이 있으신가요?{" "}
+              <Link
+                href="/auth/login"
+                className="text-accent hover:underline font-medium"
               >
-                이름
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
-                }}
-                placeholder="홍길동"
-                className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
-              />
-              {errors.name && (
-                <p className="mt-1 text-xs text-danger">{errors.name}</p>
-              )}
-            </div>
+                로그인
+              </Link>
+            </p>
+          </div>
 
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
-              >
-                이메일
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
-                }}
-                placeholder="you@example.com"
-                className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
-              />
-              {errors.email && (
-                <p className="mt-1 text-xs text-danger">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
-              >
-                비밀번호
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (errors.password)
-                      setErrors((prev) => ({ ...prev, password: undefined }));
-                  }}
-                  placeholder="영문 + 숫자 포함 8자 이상"
-                  className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-danger">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Password Confirm */}
-            <div>
-              <label
-                htmlFor="passwordConfirm"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
-              >
-                비밀번호 확인
-              </label>
-              <div className="relative">
-                <input
-                  id="passwordConfirm"
-                  type={showPasswordConfirm ? "text" : "password"}
-                  value={passwordConfirm}
-                  onChange={(e) => {
-                    setPasswordConfirm(e.target.value);
-                    if (errors.passwordConfirm)
-                      setErrors((prev) => ({
-                        ...prev,
-                        passwordConfirm: undefined,
-                      }));
-                  }}
-                  placeholder="비밀번호를 다시 입력해주세요"
-                  className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordConfirm((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPasswordConfirm ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
-              </div>
-              {errors.passwordConfirm && (
-                <p className="mt-1 text-xs text-danger">
-                  {errors.passwordConfirm}
-                </p>
-              )}
-            </div>
-
-            {/* Server Error */}
-            {serverError && (
-              <div className="rounded-lg bg-danger/10 border border-danger/20 px-4 py-3 text-sm text-danger">
-                {serverError}
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="h-11 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-[15px] font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer"
-            >
-              {isLoading ? "가입 중..." : "회원가입"}
-            </button>
-          </form>
-
-          {/* Login Link */}
-          <p className="mt-6 text-sm text-text-muted">
-            이미 계정이 있으신가요?{" "}
-            <Link
-              href="/auth/login"
-              className="text-accent hover:underline font-medium"
-            >
-              로그인
-            </Link>
-          </p>
+          {/* Footer */}
+          <div className="text-center mt-6 text-xs text-text-muted/60">
+            계속 진행하면{" "}
+            <a href="#" className="hover:text-text-muted transition-colors">
+              이용약관
+            </a>{" "}
+            및{" "}
+            <a href="#" className="hover:text-text-muted transition-colors">
+              개인정보 처리방침
+            </a>
+            에 동의하게 됩니다.
+          </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <div className="text-center py-5 px-6 text-xs text-text-muted">
-        계속 진행하면{" "}
-        <a href="#" className="text-text-muted hover:text-text-secondary">
-          서비스 이용약관
-        </a>{" "}
-        및{" "}
-        <a href="#" className="text-text-muted hover:text-text-secondary">
-          개인정보 처리방침
-        </a>
-        에 동의하게 됩니다.
-      </div>
     </div>
   );
 }

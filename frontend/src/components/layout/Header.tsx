@@ -61,20 +61,12 @@ export default function Header() {
             </button>
           </>
         ) : (
-          <>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
-            >
-              내 문서
-            </Link>
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:border-border-dark-hover hover:bg-bg-tertiary transition-colors"
-            >
-              로그인
-            </Link>
-          </>
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:border-border-dark-hover hover:bg-bg-tertiary transition-colors"
+          >
+            로그인
+          </Link>
         )}
       </nav>
 
@@ -117,22 +109,13 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
-              >
-                내 문서
-              </Link>
-              <Link
-                href="/auth/login"
-                onClick={() => setMenuOpen(false)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-text-primary hover:bg-bg-tertiary transition-colors"
-              >
-                로그인
-              </Link>
-            </>
+            <Link
+              href="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="px-3 py-2 rounded-md text-sm font-medium text-text-primary hover:bg-bg-tertiary transition-colors"
+            >
+              로그인
+            </Link>
           )}
         </div>
       )}

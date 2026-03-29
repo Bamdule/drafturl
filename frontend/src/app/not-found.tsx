@@ -8,29 +8,42 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-bg-primary">
-      <div className="max-w-md text-center">
-        <div className="text-5xl mb-4">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-text-muted">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 15h8M9 9h.01M15 9h.01" />
-          </svg>
+    <div className="flex min-h-screen flex-col bg-bg-primary">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-border-dark bg-bg-primary/80 backdrop-blur-md">
+        <div className="flex items-center h-14 px-4 md:px-6 max-w-screen-xl mx-auto">
+          <Link href="/" className="flex items-center gap-2 text-text-primary font-semibold text-[15px] hover:opacity-80 transition-opacity">
+            <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-[#a78bfa] flex items-center justify-center text-xs font-bold text-white">
+              D
+            </span>
+            DraftURL
+          </Link>
         </div>
-        <h1 className="text-3xl font-bold text-text-primary">
-          페이지를 찾을 수 없습니다
-        </h1>
-        <p className="mt-4 text-text-secondary leading-relaxed">
-          요청하신 페이지가 존재하지 않거나, URL이 잘못되었을 수 있습니다.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-3">
+      </header>
+
+      {/* Content */}
+      <main className="flex-1 flex items-center justify-center px-4">
+        <div className="max-w-sm text-center">
+          <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border-dark flex items-center justify-center mx-auto mb-5">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M8 15h8M9 9h.01M15 9h.01" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">
+            페이지를 찾을 수 없습니다
+          </h1>
+          <p className="text-sm text-text-secondary mb-6">
+            요청하신 페이지가 존재하지 않거나, URL이 잘못되었을 수 있습니다.
+          </p>
           <Link
             href="/"
-            className="inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover transition-colors"
+            className="inline-block rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-hover transition-colors"
           >
             홈으로 돌아가기
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

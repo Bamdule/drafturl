@@ -111,187 +111,174 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col bg-bg-primary">
       <Header />
 
-      {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-[400px] text-center">
-          {/* Login Icon */}
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-[#a78bfa] flex items-center justify-center mx-auto mb-6 text-3xl text-white shadow-[0_8px_32px_rgba(124,92,252,0.25)]">
-            D
-          </div>
-
-          <h1 className="text-2xl font-bold text-text-primary mb-2">
-            DraftURL에 로그인
-          </h1>
-          <p className="text-[15px] text-text-secondary mb-8">
-            문서를 영구 보관하고, 대시보드에서 관리하세요.
-          </p>
-
-          {/* OAuth Buttons */}
-          <div className="flex flex-col gap-3 mb-6">
-            <OAuthButton
-              provider="google"
-              onClick={() => handleOAuthLogin("google")}
-              disabled={isLoading}
-            >
-              <GoogleIcon />
-              Google로 계속
-            </OAuthButton>
-            <OAuthButton
-              provider="github"
-              onClick={() => handleOAuthLogin("github")}
-              disabled={isLoading}
-            >
-              <GitHubIcon />
-              GitHub로 계속
-            </OAuthButton>
-            <OAuthButton
-              provider="naver"
-              onClick={() => handleOAuthLogin("naver")}
-              disabled={isLoading}
-            >
-              <NaverIcon />
-              네이버로 계속
-            </OAuthButton>
-            <OAuthButton
-              provider="kakao"
-              onClick={() => handleOAuthLogin("kakao")}
-              disabled={isLoading}
-            >
-              <KakaoIcon />
-              카카오로 계속
-            </OAuthButton>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 mb-6 text-text-muted text-xs">
-            <span className="flex-1 h-px bg-border-dark" />
-            또는 이메일로 로그인
-            <span className="flex-1 h-px bg-border-dark" />
-          </div>
-
-          {/* Email Login Form */}
-          <form
-            onSubmit={handleEmailLogin}
-            className="flex flex-col gap-4 text-left mb-6"
-          >
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
-              >
-                이메일
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError(null);
-                }}
-                placeholder="you@example.com"
-                className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
-              />
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-[420px]">
+          {/* Card */}
+          <div className="bg-bg-secondary border border-border-dark rounded-2xl p-8 shadow-lg shadow-black/20">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-[#a78bfa] flex items-center justify-center mx-auto mb-4 text-xl font-bold text-white">
+                D
+              </div>
+              <h1 className="text-xl font-bold text-text-primary">
+                로그인
+              </h1>
             </div>
 
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-secondary mb-1.5"
-              >
-                비밀번호
-              </label>
-              <div className="relative">
+            {/* Email Login Form */}
+            <form
+              onSubmit={handleEmailLogin}
+              className="flex flex-col gap-3.5 text-left"
+            >
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  이메일
+                </label>
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
+                  id="email"
+                  type="email"
+                  value={email}
                   onChange={(e) => {
-                    setPassword(e.target.value);
+                    setEmail(e.target.value);
                     setEmailError(null);
                   }}
-                  placeholder="비밀번호를 입력하세요"
-                  className="flex h-11 w-full rounded-lg border border-border-dark bg-bg-secondary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
+                  placeholder="you@example.com"
+                  className="flex h-10 w-full rounded-lg border border-border-dark bg-bg-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
               </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-text-secondary mb-1.5"
+                >
+                  비밀번호
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setEmailError(null);
+                    }}
+                    placeholder="비밀번호를 입력하세요"
+                    className="flex h-10 w-full rounded-lg border border-border-dark bg-bg-primary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                </div>
+              </div>
+
+              {emailError && (
+                <p className="text-xs text-danger">{emailError}</p>
+              )}
+              {serverError && (
+                <div className="rounded-lg bg-danger/10 border border-danger/20 px-3 py-2.5 text-sm text-danger">
+                  {serverError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="h-10 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer mt-1"
+              >
+                {isLoginLoading ? "로그인 중..." : "로그인"}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-5 text-text-muted text-xs">
+              <span className="flex-1 h-px bg-border-dark" />
+              또는
+              <span className="flex-1 h-px bg-border-dark" />
             </div>
 
-            {/* Errors */}
-            {emailError && (
-              <p className="text-xs text-danger">{emailError}</p>
-            )}
-            {serverError && (
-              <div className="rounded-lg bg-danger/10 border border-danger/20 px-4 py-3 text-sm text-danger">
-                {serverError}
-              </div>
-            )}
+            {/* Social OAuth Icons */}
+            <div className="flex items-center justify-center gap-4">
+              <OAuthButton
+                provider="google"
+                label="Google"
+                onClick={() => handleOAuthLogin("google")}
+                disabled={isLoading}
+                unavailable={!OAUTH_CLIENT_IDS.google}
+              >
+                <GoogleIcon />
+              </OAuthButton>
+              <OAuthButton
+                provider="github"
+                label="GitHub"
+                onClick={() => handleOAuthLogin("github")}
+                disabled={isLoading}
+                unavailable={!OAUTH_CLIENT_IDS.github}
+              >
+                <GitHubIcon />
+              </OAuthButton>
+              <OAuthButton
+                provider="naver"
+                label="네이버"
+                onClick={() => handleOAuthLogin("naver")}
+                disabled={isLoading}
+                unavailable={!OAUTH_CLIENT_IDS.naver}
+              >
+                <NaverIcon />
+              </OAuthButton>
+              <OAuthButton
+                provider="kakao"
+                label="카카오"
+                onClick={() => handleOAuthLogin("kakao")}
+                disabled={isLoading}
+                unavailable={!OAUTH_CLIENT_IDS.kakao}
+              >
+                <KakaoIcon />
+              </OAuthButton>
+            </div>
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="h-11 w-full rounded-lg bg-gradient-to-r from-accent to-[#6a48e8] text-white text-[15px] font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:pointer-events-none cursor-pointer"
-            >
-              {isLoginLoading ? "로그인 중..." : "이메일로 로그인"}
-            </button>
-          </form>
-
-          {/* Signup Link */}
-          <p className="text-sm text-text-muted mb-6">
-            계정이 없으신가요?{" "}
+          {/* Below card links */}
+          <div className="text-center mt-5 space-y-3">
+            <p className="text-sm text-text-muted">
+              계정이 없으신가요?{" "}
+              <Link
+                href="/auth/signup"
+                className="text-accent hover:underline font-medium"
+              >
+                회원가입
+              </Link>
+            </p>
             <Link
-              href="/auth/signup"
-              className="text-accent hover:underline font-medium"
+              href="/"
+              className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary transition-colors"
             >
-              회원가입
+              &larr; 로그인 없이 사용하기
             </Link>
-          </p>
-
-          {/* Benefits */}
-          <div className="flex items-center gap-3 mb-6 text-text-muted text-xs">
-            <span className="flex-1 h-px bg-border-dark" />
-            가입하면 이런 기능을 사용할 수 있어요
-            <span className="flex-1 h-px bg-border-dark" />
           </div>
 
-          <div className="bg-bg-secondary border border-border-dark rounded-xl p-5 text-left">
-            <BenefitItem>문서 영구 보관 (만료 없음)</BenefitItem>
-            <BenefitItem>대시보드에서 문서 관리</BenefitItem>
-            <BenefitItem>문서 수정 및 재배포</BenefitItem>
-            <BenefitItem>AI 수정 기능 (Coming Soon)</BenefitItem>
+          {/* Footer */}
+          <div className="text-center mt-6 text-xs text-text-muted/60">
+            계속 진행하면{" "}
+            <a href="#" className="hover:text-text-muted transition-colors">
+              이용약관
+            </a>{" "}
+            및{" "}
+            <a href="#" className="hover:text-text-muted transition-colors">
+              개인정보 처리방침
+            </a>
+            에 동의하게 됩니다.
           </div>
-
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 mt-6 text-sm text-text-muted hover:text-text-secondary transition-colors"
-          >
-            &larr; 로그인 없이 사용하기
-          </Link>
         </div>
       </main>
-
-      {/* Footer */}
-      <div className="text-center py-5 px-6 text-xs text-text-muted">
-        계속 진행하면{" "}
-        <a href="#" className="text-text-muted hover:text-text-secondary">
-          서비스 이용약관
-        </a>{" "}
-        및{" "}
-        <a href="#" className="text-text-muted hover:text-text-secondary">
-          개인정보 처리방침
-        </a>
-        에 동의하게 됩니다.
-      </div>
     </div>
   );
 }
@@ -300,65 +287,55 @@ export default function LoginPage() {
 
 const PROVIDER_STYLES: Record<
   OAuthProvider,
-  { bg: string; text: string; border: string; hover: string }
+  { border: string; hoverBg: string }
 > = {
   google: {
-    bg: "bg-white",
-    text: "text-gray-700",
-    border: "border-gray-300",
-    hover: "hover:bg-gray-50",
+    border: "border-gray-500/30",
+    hoverBg: "hover:bg-white/10",
   },
   github: {
-    bg: "bg-[#24292f]",
-    text: "text-white",
-    border: "border-[#24292f]",
-    hover: "hover:bg-[#2c3137]",
+    border: "border-[#8b949e]/30",
+    hoverBg: "hover:bg-[#8b949e]/15",
   },
   naver: {
-    bg: "bg-[#03C75A]",
-    text: "text-white",
-    border: "border-[#03C75A]",
-    hover: "hover:bg-[#02b351]",
+    border: "border-[#03C75A]/30",
+    hoverBg: "hover:bg-[#03C75A]/15",
   },
   kakao: {
-    bg: "bg-[#FEE500]",
-    text: "text-[#191919]",
-    border: "border-[#FEE500]",
-    hover: "hover:bg-[#fdd800]",
+    border: "border-[#FEE500]/30",
+    hoverBg: "hover:bg-[#FEE500]/15",
   },
 };
 
 function OAuthButton({
   provider,
+  label,
   onClick,
   disabled,
+  unavailable,
   children,
 }: {
   provider: OAuthProvider;
+  label: string;
   onClick: () => void;
   disabled: boolean;
+  unavailable?: boolean;
   children: React.ReactNode;
 }) {
   const style = PROVIDER_STYLES[provider];
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`h-11 w-full rounded-lg border ${style.bg} ${style.text} ${style.border} ${style.hover} text-[15px] font-medium flex items-center justify-center gap-2.5 transition-colors disabled:opacity-70 disabled:pointer-events-none cursor-pointer`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function BenefitItem({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2.5 py-1.5 text-sm text-text-secondary">
-      <span className="w-[18px] h-[18px] rounded-full bg-success/10 flex items-center justify-center text-[10px] text-success shrink-0">
-        &#10003;
-      </span>
-      <span>{children}</span>
+    <div className={`flex flex-col items-center gap-1.5 ${unavailable ? "opacity-30 pointer-events-none" : ""}`}>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled || unavailable}
+        aria-label={unavailable ? `${label} (준비 중)` : `${label}로 로그인`}
+        title={unavailable ? "준비 중" : undefined}
+        className={`w-12 h-12 rounded-full border ${style.border} ${unavailable ? "" : style.hoverBg} bg-bg-secondary flex items-center justify-center transition-colors disabled:pointer-events-none cursor-pointer`}
+      >
+        {children}
+      </button>
+      <span className="text-xs text-text-muted">{label}</span>
     </div>
   );
 }
@@ -390,7 +367,7 @@ function GoogleIcon() {
 
 function GitHubIcon() {
   return (
-    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="#c9d1d9" viewBox="0 0 24 24">
       <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
     </svg>
   );
@@ -398,7 +375,7 @@ function GitHubIcon() {
 
 function NaverIcon() {
   return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#03C75A">
       <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z" />
     </svg>
   );
@@ -406,7 +383,7 @@ function NaverIcon() {
 
 function KakaoIcon() {
   return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#FEE500">
       <path d="M12 3C6.477 3 2 6.463 2 10.691c0 2.726 1.8 5.117 4.508 6.473-.144.522-.926 3.361-.958 3.569 0 0-.02.166.088.229.108.063.234.014.234.014.308-.043 3.574-2.34 4.137-2.738.638.094 1.295.143 1.991.143 5.523 0 10-3.463 10-7.691S17.523 3 12 3z" />
     </svg>
   );

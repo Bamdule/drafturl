@@ -65,11 +65,24 @@ export default function PreviewPanel() {
       </div>
 
       {/* Preview iframe */}
-      <div className="flex-1 min-h-[350px] md:min-h-[560px]">
+      <div className="flex-1 relative min-h-[260px] md:min-h-[380px]">
+        {!content.trim() && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+            <div className="text-center px-6">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9090a8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <p className="text-sm text-[#9090a8]">
+                편집기에 내용을 입력하면<br />여기에 미리보기가 표시됩니다
+              </p>
+            </div>
+          </div>
+        )}
         <iframe
           ref={iframeRef}
           srcDoc={wrappedHtml}
-          className="w-full h-full min-h-[350px] md:min-h-[560px] border-none bg-white"
+          className="w-full h-full min-h-[260px] md:min-h-[380px] border-none bg-white"
           sandbox="allow-scripts allow-popups allow-modals"
           title="미리보기"
         />

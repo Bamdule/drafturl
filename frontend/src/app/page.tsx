@@ -37,7 +37,7 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative text-center px-6 pt-12 pb-8">
+      <section className="relative text-center px-6 pt-8 pb-6">
         {/* Glow effect */}
         <div className="pointer-events-none absolute top-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,var(--color-accent-glow),transparent_70%)]" />
         <h1 className="relative text-[clamp(24px,4vw,36px)] font-extrabold tracking-tight mb-3">
@@ -94,12 +94,12 @@ export default function HomePage() {
         {/* Editor Split View */}
         <div className="relative border border-border-dark rounded-b-xl overflow-hidden">
           {/* Desktop: side by side */}
-          <div className="hidden md:grid md:grid-cols-2 min-h-[600px]">
+          <div className="hidden md:grid md:grid-cols-2 min-h-[420px]">
             <EditorPanel />
             <PreviewPanel />
           </div>
           {/* Mobile: tab switch */}
-          <div className="md:hidden min-h-[400px]">
+          <div className="md:hidden min-h-[300px]">
             <div className={mobilePanel === "editor" ? "" : "hidden"}>
               <EditorPanel />
             </div>
@@ -191,6 +191,17 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border-dark mt-12">
+        <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted/60">
+          <span>&copy; 2026 DraftURL</span>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:text-text-muted transition-colors">이용약관</a>
+            <a href="#" className="hover:text-text-muted transition-colors">개인정보 처리방침</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

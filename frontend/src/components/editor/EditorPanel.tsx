@@ -93,11 +93,11 @@ export default function EditorPanel() {
             setContent(e.target.value);
           }}
           spellCheck={false}
-          className="flex-1 min-h-[300px] w-full resize-none border-none bg-[#1e1e1e] p-4 pt-3 text-[13px] leading-[1.7] text-[#d4d4d4] outline-none font-mono placeholder:text-text-muted"
+          className="flex-1 min-h-[260px] w-full resize-none border-none bg-[#1e1e1e] p-4 pt-3 text-[13px] leading-[1.7] text-[#d4d4d4] outline-none font-mono placeholder:text-text-muted"
           placeholder={docType === "html" ? "HTML을 입력하세요..." : "Markdown을 입력하세요..."}
         />
       ) : (
-        <div ref={editorRef} className="flex-1 min-h-[560px]">
+        <div ref={editorRef} className="flex-1 min-h-[380px]">
           <MonacoEditor
             height="100%"
             language={docType === "html" ? "html" : "markdown"}
