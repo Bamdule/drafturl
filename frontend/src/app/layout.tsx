@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import "./globals.css";
 
@@ -46,6 +47,11 @@ export default function RootLayout({
       className="h-full antialiased dark"
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
+        <Script
+          defer
+          src="https://stats.drafturl.com/script.js"
+          data-website-id="7e336802-2478-4f28-9e4b-06f849b031a3"
+        />
         <AuthInitializer />
         {children}
       </body>

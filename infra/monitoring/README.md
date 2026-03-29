@@ -34,7 +34,7 @@ Galaxy Book의 Cloudflare Tunnel 설정 파일(`~/.cloudflared/config.yml`)에 �
 # 기존 ingress 항목들 아래에 추가
 - hostname: monitor.drafturl.com
   service: http://localhost:3002
-- hostname: analytics.drafturl.com
+- hostname: stats.drafturl.com
   service: http://localhost:3003
 ```
 
@@ -43,7 +43,7 @@ Cloudflare DNS에 레코드 추가:
 | 타입 | 이름 | 내용 | 프록시 |
 |------|------|------|--------|
 | CNAME | monitor | `<터널-ID>.cfargotunnel.com` | O |
-| CNAME | analytics | `<터널-ID>.cfargotunnel.com` | O |
+| CNAME | stats | `<터널-ID>.cfargotunnel.com` | O |
 
 터널 재시작:
 
@@ -88,7 +88,7 @@ Status Pages → "New Status Page" → 위 모니터들을 추가하면 외부 �
 
 ## 4단계: Umami 초기 설정
 
-**접속**: https://analytics.drafturl.com (또는 http://localhost:3003)
+**접속**: https://stats.drafturl.com (또는 http://localhost:3003)
 
 ### 4-1. 로그인 및 비밀번호 변경
 
@@ -107,7 +107,7 @@ Settings → Websites → "Add website":
 웹사이트 추가 후 "Tracking code" 버튼을 클릭하면 아래와 같은 스크립트가 표시된다:
 
 ```html
-<script defer src="https://analytics.drafturl.com/script.js" data-website-id="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></script>
+<script defer src="https://stats.drafturl.com/script.js" data-website-id="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></script>
 ```
 
 이 `data-website-id` 값을 프론트엔드에 적용해야 한다. (아래 5단계 참조)
@@ -121,7 +121,7 @@ Settings → Websites → "Add website":
 ```tsx
 <Script
   defer
-  src="https://analytics.drafturl.com/script.js"
+  src="https://stats.drafturl.com/script.js"
   data-website-id="Umami에서 발급받은 ID"
 />
 ```
@@ -154,5 +154,5 @@ docker compose pull && docker compose up -d
 | 서비스 | 내부 포트 | 외부 포트 | 외부 도메인 |
 |--------|----------|----------|------------|
 | Uptime Kuma | 3001 | 3002 | monitor.drafturl.com |
-| Umami | 3000 | 3003 | analytics.drafturl.com |
+| Umami | 3000 | 3003 | stats.drafturl.com |
 | Umami DB | 5432 | - (내부 전용) | - |
