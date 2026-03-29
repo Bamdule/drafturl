@@ -60,8 +60,10 @@ public class ClientRegistrationStore {
             URI parsed = URI.create(uri);
             String host = parsed.getHost();
             String scheme = parsed.getScheme();
-            return "localhost".equals(host) || "127.0.0.1".equals(host)
-                    || "https".equals(scheme);
+            if ("localhost".equals(host) || "127.0.0.1".equals(host)) {
+                return "http".equals(scheme) || "https".equals(scheme);
+            }
+            return "https".equals(scheme);
         } catch (Exception e) {
             return false;
         }
