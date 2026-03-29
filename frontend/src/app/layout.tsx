@@ -37,6 +37,9 @@ export const metadata: Metadata = {
     "문서 공유",
     "URL 공유",
   ],
+  verification: {
+    google: "1la5UC8V_Dkwq9Ar8cgGAYuO4wMe94FHhGqF24zmLfk",
+  },
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
