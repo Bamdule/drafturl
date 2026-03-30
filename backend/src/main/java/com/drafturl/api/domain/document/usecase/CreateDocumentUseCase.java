@@ -83,8 +83,9 @@ public class CreateDocumentUseCase {
         String slug = slugGenerator.generate();
         String id = slug;
 
-        // HTML 새니타이징: iframe sandbox에 더해 서버 측 다층 방어 적용.
-        // form/input 등 피싱 요소를 제거하여 Google Safe Browsing 경고를 방지한다.
+        // HTML 콘텐츠 보안: 악성 패턴 탐지(validate) → 정화(sanitize)
+        // validate: 피싱(브랜드 사칭 + password), 악성 리다이렉트 탐지 → 차단
+        // sanitize: CSP 주입, password→text 변환, 위험 태그 제거
         if (docType == DocType.HTML) {
             contentValidator.validate(content);
             content = contentSanitizer.sanitize(content);
