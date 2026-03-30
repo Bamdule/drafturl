@@ -28,8 +28,8 @@ services:
 
   dev-frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: frontend/Dockerfile.dev
     container_name: drafturl-dev-frontend
     ports:
       - "3000:3000"

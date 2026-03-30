@@ -7,7 +7,10 @@ import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import type { Locale } from "@/dictionaries/types";
 
-const LEGAL_DIR = path.join(process.cwd(), "..", "docs", "legal");
+// Try monorepo root first (local dev), then fallback to copied location (Docker)
+const MONOREPO_LEGAL_DIR = path.join(process.cwd(), "..", "docs", "legal");
+const LOCAL_LEGAL_DIR = path.join(process.cwd(), "docs", "legal");
+const LEGAL_DIR = fs.existsSync(MONOREPO_LEGAL_DIR) ? MONOREPO_LEGAL_DIR : LOCAL_LEGAL_DIR;
 
 type LegalDoc = "terms-of-service" | "privacy-policy" | "acceptable-use-policy";
 
