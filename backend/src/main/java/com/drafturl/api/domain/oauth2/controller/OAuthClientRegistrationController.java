@@ -27,14 +27,23 @@ public class OAuthClientRegistrationController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> request) {
+        try {
+            return doRegister(request);
+        } catch (ClientRegistrationStore.InvalidRegistrationException e) {
+            return errorResponse(e.getError(), e.getErrorDescription());
+        } catch (ClassCastException e) {
+            return errorResponse("invalid_client_metadata", "Malformed request body");
+        }
+    }
 
+    private ResponseEntity<Map<String, Object>> doRegister(Map<String, Object> request) {
         // redirect_uris 추출
         @SuppressWarnings("unchecked")
         List<String> redirectUris = (List<String>) request.get("redirect_uris");
 
         // token_endpoint_auth_method 검증
-        String authMethod = (String) request.get("token_endpoint_auth_method");
-        if (authMethod != null && !"none".equals(authMethod)) {
+        Object authMethodObj = request.get("token_endpoint_auth_method");
+        if (authMethodObj != null && !"none".equals(authMethodObj)) {
             return errorResponse("invalid_client_metadata",
                     "Only token_endpoint_auth_method 'none' is supported");
         }
@@ -48,7 +57,7 @@ public class OAuthClientRegistrationController {
         }
 
         // client_name 추출
-        String clientName = (String) request.get("client_name");
+        String clientName = request.get("client_name") instanceof String name ? name : null;
 
         // 등록
         RegisteredClient client = clientRegistrationStore.register(redirectUris, clientName);
@@ -56,7 +65,9 @@ public class OAuthClientRegistrationController {
         // RFC 7591 응답
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("client_id", client.clientId());
-        response.put("client_name", client.clientName());
+        if (client.clientName() != null) {
+            response.put("client_name", client.clientName());
+        }
         response.put("redirect_uris", client.redirectUris());
         response.put("token_endpoint_auth_method", "none");
         response.put("grant_types", grantTypes != null ? grantTypes : List.of("authorization_code"));
@@ -64,12 +75,6 @@ public class OAuthClientRegistrationController {
         response.put("client_id_issued_at", client.createdAt().getEpochSecond());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @ExceptionHandler(ClientRegistrationStore.InvalidRegistrationException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidRegistration(
-            ClientRegistrationStore.InvalidRegistrationException e) {
-        return errorResponse(e.getError(), e.getErrorDescription());
     }
 
     private ResponseEntity<Map<String, Object>> errorResponse(String error, String description) {

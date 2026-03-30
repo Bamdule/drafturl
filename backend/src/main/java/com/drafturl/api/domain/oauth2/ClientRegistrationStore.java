@@ -14,10 +14,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientRegistrationStore {
 
     private static final long TTL_SECONDS = 604_800; // 7 days
+    private static final int MAX_CLIENTS = 1_000;
 
     private final ConcurrentHashMap<String, RegisteredClient> store = new ConcurrentHashMap<>();
 
     public RegisteredClient register(List<String> redirectUris, String clientName) {
+        if (store.size() >= MAX_CLIENTS) {
+            throw new InvalidRegistrationException("server_error",
+                    "Too many registered clients. Please try again later.");
+        }
         validateRedirectUris(redirectUris);
 
         String clientId = UUID.randomUUID().toString();
