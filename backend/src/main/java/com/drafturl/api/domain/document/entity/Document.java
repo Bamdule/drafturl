@@ -19,10 +19,10 @@ import java.util.UUID;
 public class Document extends BaseEntity {
 
     @Id
-    @Column(length = 8)
+    @Column(length = 12)
     private String id;
 
-    @Column(nullable = false, unique = true, length = 8)
+    @Column(nullable = false, unique = true, length = 12)
     private String slug;
 
     @Column

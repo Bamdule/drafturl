@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 
 /**
- * URL-safe slug(nanoid 8자리) 생성기.
+ * URL-safe slug(nanoid 12자리) 생성기.
  * SecureRandom + 커스텀 알파벳 [A-Za-z0-9] 사용.
  * DocumentRepository로 충돌을 확인하고 최대 3회 재시도한다.
  */
@@ -16,7 +16,7 @@ import java.security.SecureRandom;
 public class SlugGenerator {
 
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final int SLUG_LENGTH = 8;
+    private static final int SLUG_LENGTH = 12;
     private static final int MAX_RETRIES = 3;
 
     private final SecureRandom random = new SecureRandom();
@@ -29,7 +29,7 @@ public class SlugGenerator {
     /**
      * 유일한 slug를 생성한다.
      *
-     * @return 고유 slug (8자리)
+     * @return 고유 slug (12자리)
      * @throws BusinessException 최대 재시도 횟수 초과 시 (INTERNAL_ERROR)
      */
     public String generate() {
