@@ -63,7 +63,10 @@
     "newDocument": "+ 새 문서",
     "expiryNotice": "비로그인 시 24시간 후 만료됩니다.",
     "loginKeep": "로그인하면 영구 보관!",
-    "limitExceeded": "문서 생성 한도(30개)에 도달했습니다. 기존 문서를 삭제한 후 다시 시도해주세요."
+    "limitExceeded": "문서 생성 한도(30개)에 도달했습니다. 기존 문서를 삭제한 후 다시 시도해주세요.",
+    "termsAgreement": "공유 시 ",
+    "termsLink": "이용약관",
+    "termsAgreementSuffix": "에 동의합니다."
   },
   "publishModal": {
     "title": "공유 URL이 생성되었습니다!",

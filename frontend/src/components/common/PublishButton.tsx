@@ -175,6 +175,14 @@ export default function PublishButton({ onNewDocument }: PublishButtonProps) {
               {isPublishing ? dict.publish.publishing : `\u26A1 ${dict.publish.share}`}
             </button>
             </div>
+            {/* Terms agreement */}
+            <p className="text-xs text-text-muted/60">
+              {dict.publish.termsAgreement}
+              <Link href="/terms" className="hover:text-text-muted transition-colors underline">
+                {dict.publish.termsLink}
+              </Link>
+              {dict.publish.termsAgreementSuffix}
+            </p>
           </>
         )}
 

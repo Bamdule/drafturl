@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import Header from "@/components/layout/Header";
 import EditorPanel from "@/components/editor/EditorPanel";
 import PreviewPanel from "@/components/editor/PreviewPanel";
@@ -194,8 +195,8 @@ export default function HomePage() {
         <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted/60">
           <span>&copy; 2026 DraftURL</span>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-text-muted transition-colors">{dict.home.footer.terms}</a>
-            <a href="#" className="hover:text-text-muted transition-colors">{dict.home.footer.privacy}</a>
+            <Link href="/terms" className="hover:text-text-muted transition-colors">{dict.home.footer.terms}</Link>
+            <Link href="/privacy" className="hover:text-text-muted transition-colors">{dict.home.footer.privacy}</Link>
           </div>
         </div>
       </footer>

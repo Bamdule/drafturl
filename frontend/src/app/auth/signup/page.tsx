@@ -274,13 +274,13 @@ export default function SignupPage() {
           {/* Footer */}
           <div className="text-center mt-6 text-xs text-text-muted/60">
             {dict.auth.signup.agreement}{" "}
-            <a href="#" className="hover:text-text-muted transition-colors">
+            <Link href="/terms" className="hover:text-text-muted transition-colors">
               {dict.auth.signup.terms}
-            </a>{" "}
+            </Link>{" "}
             &amp;{" "}
-            <a href="#" className="hover:text-text-muted transition-colors">
+            <Link href="/privacy" className="hover:text-text-muted transition-colors">
               {dict.auth.signup.privacy}
-            </a>
+            </Link>
             {dict.auth.signup.agreementSuffix}
           </div>
         </div>

@@ -1,6 +1,9 @@
 # MCP config (contains auth tokens)
 .mcp.json
 
+# Superpowers brainstorm sessions
+.superpowers/
+
 # Dependencies
 node_modules/
 .pnp/

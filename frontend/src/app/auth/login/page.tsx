@@ -275,13 +275,13 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="text-center mt-6 text-xs text-text-muted/60">
             {dict.auth.login.agreement}{" "}
-            <a href="#" className="hover:text-text-muted transition-colors">
+            <Link href="/terms" className="hover:text-text-muted transition-colors">
               {dict.auth.login.terms}
-            </a>{" "}
+            </Link>{" "}
             &amp;{" "}
-            <a href="#" className="hover:text-text-muted transition-colors">
+            <Link href="/privacy" className="hover:text-text-muted transition-colors">
               {dict.auth.login.privacy}
-            </a>
+            </Link>
             {dict.auth.login.agreementSuffix}
           </div>
         </div>

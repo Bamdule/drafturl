@@ -63,7 +63,10 @@
     "newDocument": "+ New Doc",
     "expiryNotice": "Expires in 24 hours without login.",
     "loginKeep": "Login to keep permanently!",
-    "limitExceeded": "Document limit (30) reached. Please delete existing documents and try again."
+    "limitExceeded": "Document limit (30) reached. Please delete existing documents and try again.",
+    "termsAgreement": "By sharing, you agree to our ",
+    "termsLink": "Terms of Service",
+    "termsAgreementSuffix": "."
   },
   "publishModal": {
     "title": "Share URL created!",
