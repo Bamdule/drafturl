@@ -8,6 +8,7 @@ import com.drafturl.api.domain.user.usecase.EmailLoginUseCase;
 import com.drafturl.api.domain.user.usecase.EmailSignupUseCase;
 import com.drafturl.api.domain.user.usecase.GetCurrentUserUseCase;
 import com.drafturl.api.domain.user.usecase.LogoutUseCase;
+import com.drafturl.api.domain.user.usecase.DeleteAccountUseCase;
 import com.drafturl.api.domain.user.usecase.OAuthLoginUseCase;
 import com.drafturl.api.domain.user.usecase.RefreshTokenUseCase;
 import com.drafturl.api.global.auth.OAuthStateProvider;
@@ -46,12 +47,13 @@ class AuthControllerDocsTest extends RestDocsSupport {
     private final RefreshTokenUseCase refreshTokenUseCase = mock(RefreshTokenUseCase.class);
     private final LogoutUseCase logoutUseCase = mock(LogoutUseCase.class);
     private final GetCurrentUserUseCase getCurrentUserUseCase = mock(GetCurrentUserUseCase.class);
+    private final DeleteAccountUseCase deleteAccountUseCase = mock(DeleteAccountUseCase.class);
     private final OAuthStateProvider oAuthStateProvider = mock(OAuthStateProvider.class);
 
     @Override
     protected Object initController() {
         return new AuthController(oAuthLoginUseCase, emailSignupUseCase, emailLoginUseCase,
-                refreshTokenUseCase, logoutUseCase, getCurrentUserUseCase, oAuthStateProvider);
+                refreshTokenUseCase, logoutUseCase, getCurrentUserUseCase, deleteAccountUseCase, oAuthStateProvider);
     }
 
     @Override
