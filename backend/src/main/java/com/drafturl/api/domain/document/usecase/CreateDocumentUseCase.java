@@ -7,6 +7,7 @@ import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.ContentTooLargeException;
 import com.drafturl.api.domain.document.exception.DocumentLimitExceededException;
 import com.drafturl.api.domain.document.port.ContentSanitizer;
+import com.drafturl.api.domain.document.port.ContentValidator;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
 import com.drafturl.api.domain.document.service.SlugGenerator;
@@ -37,6 +38,7 @@ public class CreateDocumentUseCase {
 
     private final SlugGenerator slugGenerator;
     private final ContentSanitizer contentSanitizer;
+    private final ContentValidator contentValidator;
     private final FileStorage fileStorage;
     private final DocumentTransactionService txService;
     private final PasswordEncoder passwordEncoder;
@@ -45,6 +47,7 @@ public class CreateDocumentUseCase {
 
     public CreateDocumentUseCase(SlugGenerator slugGenerator,
                                   ContentSanitizer contentSanitizer,
+                                  ContentValidator contentValidator,
                                   FileStorage fileStorage,
                                   DocumentTransactionService txService,
                                   PasswordEncoder passwordEncoder,
@@ -52,6 +55,7 @@ public class CreateDocumentUseCase {
                                   @Value("${app.frontend-url}") String frontendUrl) {
         this.slugGenerator = slugGenerator;
         this.contentSanitizer = contentSanitizer;
+        this.contentValidator = contentValidator;
         this.fileStorage = fileStorage;
         this.txService = txService;
         this.passwordEncoder = passwordEncoder;
@@ -82,6 +86,7 @@ public class CreateDocumentUseCase {
         // HTML 새니타이징: iframe sandbox에 더해 서버 측 다층 방어 적용.
         // form/input 등 피싱 요소를 제거하여 Google Safe Browsing 경고를 방지한다.
         if (docType == DocType.HTML) {
+            contentValidator.validate(content);
             content = contentSanitizer.sanitize(content);
             contentBytes = content.getBytes(StandardCharsets.UTF_8);
         }

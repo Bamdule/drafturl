@@ -7,7 +7,9 @@ import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.ContentTooLargeException;
 import com.drafturl.api.domain.document.exception.DocumentNotFoundException;
+import com.drafturl.api.domain.document.exception.MaliciousContentException;
 import com.drafturl.api.domain.document.port.ContentSanitizer;
+import com.drafturl.api.domain.document.port.ContentValidator;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.repository.DocumentRepository;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
@@ -38,6 +40,7 @@ class UpdateDocumentUseCaseTest {
 
     @Mock private DocumentRepository documentRepository;
     @Mock private ContentSanitizer contentSanitizer;
+    @Mock private ContentValidator contentValidator;
     @Mock private FileStorage fileStorage;
     @Mock private DocumentTransactionService txService;
     @Mock private PasswordEncoder passwordEncoder;
@@ -48,7 +51,7 @@ class UpdateDocumentUseCaseTest {
     @BeforeEach
     void setUp() {
         useCase = new UpdateDocumentUseCase(documentRepository, contentSanitizer,
-                fileStorage, txService, passwordEncoder, FRONTEND_URL);
+                contentValidator, fileStorage, txService, passwordEncoder, FRONTEND_URL);
         ownerId = UUID.randomUUID();
     }
 
@@ -181,6 +184,50 @@ class UpdateDocumentUseCaseTest {
             var request = new UpdateDocumentRequest(large, null, null);
             assertThatThrownBy(() -> useCase.execute(SLUG, request, ownerId))
                     .isInstanceOf(ContentTooLargeException.class);
+        }
+
+        @Test
+        @DisplayName("HTML 문서 수정 시 ContentValidator를 호출한다")
+        void callsContentValidatorForHtml() {
+            Document doc = buildDocument(DocType.HTML);
+            when(documentRepository.findBySlug(SLUG)).thenReturn(Optional.of(doc));
+            when(contentSanitizer.sanitize("<p>new</p>")).thenReturn("<p>new</p>");
+            when(txService.updateDocument(anyString(), any(), isNull(), anyLong(), anyLong(), any(), anyBoolean()))
+                    .thenReturn(doc);
+
+            var request = new UpdateDocumentRequest("<p>new</p>", null, null);
+            useCase.execute(SLUG, request, ownerId);
+
+            verify(contentValidator).validate("<p>new</p>");
+        }
+
+        @Test
+        @DisplayName("Markdown 문서 수정 시 ContentValidator를 호출하지 않는다")
+        void skipsContentValidatorForMarkdown() {
+            Document doc = buildDocument(DocType.MARKDOWN);
+            when(documentRepository.findBySlug(SLUG)).thenReturn(Optional.of(doc));
+            when(txService.updateDocument(anyString(), any(), isNull(), anyLong(), anyLong(), any(), anyBoolean()))
+                    .thenReturn(doc);
+
+            var request = new UpdateDocumentRequest("# new", null, null);
+            useCase.execute(SLUG, request, ownerId);
+
+            verify(contentValidator, never()).validate(anyString());
+        }
+
+        @Test
+        @DisplayName("ContentValidator가 예외를 던지면 문서가 수정되지 않는다")
+        void blocksDocumentUpdateOnMaliciousContent() {
+            Document doc = buildDocument(DocType.HTML);
+            when(documentRepository.findBySlug(SLUG)).thenReturn(Optional.of(doc));
+
+            doThrow(new MaliciousContentException("피싱 탐지"))
+                    .when(contentValidator).validate(anyString());
+
+            var request = new UpdateDocumentRequest("<input type='password'>", null, null);
+            assertThatThrownBy(() -> useCase.execute(SLUG, request, ownerId))
+                    .isInstanceOf(MaliciousContentException.class);
+            verify(fileStorage, never()).upload(anyString(), any(byte[].class), anyString());
         }
     }
 }

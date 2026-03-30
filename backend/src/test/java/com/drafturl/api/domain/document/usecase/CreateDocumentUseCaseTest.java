@@ -6,7 +6,9 @@ import com.drafturl.api.domain.document.controller.request.CreateDocumentRequest
 import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.ContentTooLargeException;
+import com.drafturl.api.domain.document.exception.MaliciousContentException;
 import com.drafturl.api.domain.document.port.ContentSanitizer;
+import com.drafturl.api.domain.document.port.ContentValidator;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
 import com.drafturl.api.domain.document.service.SlugGenerator;
@@ -20,6 +22,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.drafturl.api.domain.storage.service.StorageUsageService;
+import com.drafturl.api.domain.user.controller.response.UserResponse;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,19 +42,23 @@ class CreateDocumentUseCaseTest {
 
     @Mock private SlugGenerator slugGenerator;
     @Mock private ContentSanitizer contentSanitizer;
+    @Mock private ContentValidator contentValidator;
     @Mock private FileStorage fileStorage;
     @Mock private DocumentTransactionService txService;
     @Mock private PasswordEncoder passwordEncoder;
+    @Mock private StorageUsageService storageUsageService;
 
     private CreateDocumentUseCase useCase;
 
     @BeforeEach
     void setUp() {
         useCase = new CreateDocumentUseCase(
-                slugGenerator, contentSanitizer, fileStorage,
-                txService, passwordEncoder, FRONTEND_URL);
+                slugGenerator, contentSanitizer, contentValidator, fileStorage,
+                txService, passwordEncoder, storageUsageService, FRONTEND_URL);
         lenient().when(slugGenerator.generate()).thenReturn(TEST_SLUG);
         lenient().when(contentSanitizer.sanitize(anyString())).thenAnswer(inv -> inv.getArgument(0));
+        lenient().when(storageUsageService.getUsageInfo(any()))
+                .thenReturn(new UserResponse.StorageUsageInfo(0L, 0));
     }
 
     private Document buildDocument(UUID userId, String title, DocType docType,
@@ -246,6 +255,59 @@ class CreateDocumentUseCaseTest {
             var request = new CreateDocumentRequest(large, "html", "대용량", null);
             assertThatThrownBy(() -> useCase.execute(request, UUID.randomUUID()))
                     .isInstanceOf(ContentTooLargeException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("악성 콘텐츠 검증")
+    class MaliciousContentValidation {
+
+        @Test
+        @DisplayName("HTML 문서 생성 시 ContentValidator를 호출한다")
+        void callsContentValidatorForHtml() {
+            UUID userId = UUID.randomUUID();
+            var request = new CreateDocumentRequest("<h1>Hello</h1>", "html", "테스트", null);
+            Document doc = buildDocument(userId, "테스트", DocType.HTML, 15L, DocumentStatus.ACTIVE, null, null);
+
+            when(txService.insertPendingDocument(anyString(), anyString(), any(), anyString(),
+                    any(DocType.class), anyString(), anyLong(), any(), any())).thenReturn(doc);
+            when(txService.activateDocument(anyString(), any(), anyLong())).thenReturn(doc);
+
+            useCase.execute(request, userId);
+
+            verify(contentValidator).validate("<h1>Hello</h1>");
+        }
+
+        @Test
+        @DisplayName("Markdown 문서 생성 시 ContentValidator를 호출하지 않는다")
+        void skipsContentValidatorForMarkdown() {
+            UUID userId = UUID.randomUUID();
+            var request = new CreateDocumentRequest("# Hello", "markdown", "MD", null);
+            Document doc = buildDocument(userId, "MD", DocType.MARKDOWN, 7L, DocumentStatus.ACTIVE, null, null);
+
+            when(txService.insertPendingDocument(anyString(), anyString(), any(), anyString(),
+                    eq(DocType.MARKDOWN), anyString(), anyLong(), any(), any())).thenReturn(doc);
+            when(txService.activateDocument(anyString(), any(), anyLong())).thenReturn(doc);
+
+            useCase.execute(request, userId);
+
+            verify(contentValidator, never()).validate(anyString());
+        }
+
+        @Test
+        @DisplayName("ContentValidator가 예외를 던지면 문서가 생성되지 않는다")
+        void blocksDocumentCreationOnMaliciousContent() {
+            UUID userId = UUID.randomUUID();
+            var request = new CreateDocumentRequest("<input type='password'>", "html", "피싱", null);
+
+            doThrow(new MaliciousContentException("피싱 탐지"))
+                    .when(contentValidator).validate(anyString());
+
+            assertThatThrownBy(() -> useCase.execute(request, userId))
+                    .isInstanceOf(MaliciousContentException.class);
+            verify(txService, never()).insertPendingDocument(
+                    anyString(), anyString(), any(), anyString(),
+                    any(DocType.class), anyString(), anyLong(), any(), any());
         }
     }
 }

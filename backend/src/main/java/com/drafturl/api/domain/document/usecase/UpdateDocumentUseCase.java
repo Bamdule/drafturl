@@ -7,6 +7,7 @@ import com.drafturl.api.domain.document.entity.Document;
 import com.drafturl.api.domain.document.exception.ContentTooLargeException;
 import com.drafturl.api.domain.document.exception.DocumentNotFoundException;
 import com.drafturl.api.domain.document.port.ContentSanitizer;
+import com.drafturl.api.domain.document.port.ContentValidator;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.repository.DocumentRepository;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
@@ -31,6 +32,7 @@ public class UpdateDocumentUseCase {
 
     private final DocumentRepository documentRepository;
     private final ContentSanitizer contentSanitizer;
+    private final ContentValidator contentValidator;
     private final FileStorage fileStorage;
     private final DocumentTransactionService txService;
     private final PasswordEncoder passwordEncoder;
@@ -38,12 +40,14 @@ public class UpdateDocumentUseCase {
 
     public UpdateDocumentUseCase(DocumentRepository documentRepository,
                                   ContentSanitizer contentSanitizer,
+                                  ContentValidator contentValidator,
                                   FileStorage fileStorage,
                                   DocumentTransactionService txService,
                                   PasswordEncoder passwordEncoder,
                                   @Value("${app.frontend-url}") String frontendUrl) {
         this.documentRepository = documentRepository;
         this.contentSanitizer = contentSanitizer;
+        this.contentValidator = contentValidator;
         this.fileStorage = fileStorage;
         this.txService = txService;
         this.passwordEncoder = passwordEncoder;
@@ -76,6 +80,7 @@ public class UpdateDocumentUseCase {
             }
 
             if (document.getDocType() == DocType.HTML) {
+                contentValidator.validate(content);
                 content = contentSanitizer.sanitize(content);
                 contentBytes = content.getBytes(StandardCharsets.UTF_8);
             }
