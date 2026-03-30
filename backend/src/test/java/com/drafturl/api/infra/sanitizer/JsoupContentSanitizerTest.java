@@ -210,6 +210,78 @@ class JsoupContentSanitizerTest {
     }
 
     @Nested
+    @DisplayName("CSP 주입")
+    class CspInjection {
+
+        @Test
+        @DisplayName("connect-src 'none' CSP meta 태그를 head에 주입한다")
+        void injectsConnectSrcNoneCsp() {
+            String html = "<html><head><title>Test</title></head><body><p>hello</p></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).contains("<meta http-equiv=\"Content-Security-Policy\" content=\"connect-src 'none';\">");
+        }
+
+        @Test
+        @DisplayName("CSP meta 태그가 head의 가장 앞에 위치한다")
+        void cspIsFirstInHead() {
+            String html = "<html><head><title>Test</title><meta charset='utf-8'></head><body></body></html>";
+            String result = sanitizer.sanitize(html);
+            String headContent = result.substring(result.indexOf("<head>") + 6, result.indexOf("</head>"));
+            assertThat(headContent.trim()).startsWith("<meta http-equiv=\"Content-Security-Policy\"");
+        }
+
+        @Test
+        @DisplayName("공격자가 삽입한 CSP를 완화할 수 없다")
+        void attackerCannotRelaxCsp() {
+            String html = "<html><head><meta http-equiv='Content-Security-Policy' content=\"connect-src *;\"><title>Test</title></head><body></body></html>";
+            String result = sanitizer.sanitize(html);
+            String headContent = result.substring(result.indexOf("<head>") + 6, result.indexOf("</head>"));
+            assertThat(headContent.trim()).startsWith("<meta http-equiv=\"Content-Security-Policy\" content=\"connect-src 'none';\">");
+        }
+    }
+
+    @Nested
+    @DisplayName("password input 무력화")
+    class PasswordInputNeutralization {
+
+        @Test
+        @DisplayName("type=password를 type=text로 변환한다")
+        void convertsPasswordToText() {
+            String html = "<html><body><input type='password' name='pw'></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).contains("type=\"text\"");
+            assertThat(result).doesNotContain("type=\"password\"");
+        }
+
+        @Test
+        @DisplayName("대소문자 구분 없이 PASSWORD도 변환한다")
+        void convertsCaseInsensitive() {
+            String html = "<html><body><input type='Password' name='pw'></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).contains("type=\"text\"");
+            assertThat(result).doesNotContain("Password");
+        }
+
+        @Test
+        @DisplayName("type=text인 input은 변경하지 않는다")
+        void doesNotChangeTextInput() {
+            String html = "<html><body><input type='text' name='name' value='hello'></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).contains("type=\"text\"");
+            assertThat(result).contains("name=\"name\"");
+        }
+
+        @Test
+        @DisplayName("다른 타입의 input은 변경하지 않는다")
+        void doesNotChangeOtherInputTypes() {
+            String html = "<html><body><input type='email' name='email'><input type='number' name='num'></body></html>";
+            String result = sanitizer.sanitize(html);
+            assertThat(result).contains("type=\"email\"");
+            assertThat(result).contains("type=\"number\"");
+        }
+    }
+
+    @Nested
     @DisplayName("HTML 문서 구조 보존")
     class DocumentStructurePreservation {
 
