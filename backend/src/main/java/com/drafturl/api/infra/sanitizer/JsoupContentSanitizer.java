@@ -128,8 +128,11 @@ public class JsoupContentSanitizer implements ContentSanitizer {
         // 1. head 영역 새니타이징: 허용 태그 외 제거 (특히 script 제거)
         String sanitizedHead = sanitizeHead(document);
 
-        // 2. body 영역: Safelist 기반 clean() 적용
+        // 2. body 영역: 피싱 방지 변환 후 Safelist 기반 clean() 적용
         Element body = document.body();
+        if (body != null) {
+            neutralizePasswordInputs(body);
+        }
         String bodyHtml = body != null ? body.html() : "";
         String sanitizedBody = Jsoup.clean(bodyHtml, "", BODY_SAFELIST,
                 new Document.OutputSettings().prettyPrint(false));
@@ -159,6 +162,16 @@ public class JsoupContentSanitizer implements ContentSanitizer {
         head.select("link[href^=javascript:]").remove();
 
         return head.html();
+    }
+
+    /**
+     * 피싱 방지를 위해 type="password" input을 type="text"로 변환한다.
+     * 마스킹(●●●●)을 제거하여 사용자가 진짜 로그인 폼으로 착각하는 것을 방지한다.
+     */
+    private void neutralizePasswordInputs(Element parent) {
+        for (Element input : parent.select("input[type=password]")) {
+            input.attr("type", "text");
+        }
     }
 
     /**
