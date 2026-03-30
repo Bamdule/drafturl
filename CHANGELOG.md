@@ -5,6 +5,26 @@
 
 ---
 
+## [v0.6.0] - 2026-03-30
+
+HTML sanitizer 보안 강화. 다층 방어 체계를 통해 피싱, 악성 리다이렉트, 데이터 유출을 방지한다.
+
+### Added
+- CSP `connect-src 'none'` meta 태그 자동 주입 (fetch/XHR/WebSocket 차단)
+- ContentValidator 포트 — 업로드 시점에 악성 콘텐츠 탐지 및 거부
+- 피싱 탐지: 유명 브랜드(네이버, 구글, 카카오 등) 사칭 + password input 조합 차단
+- 악성 리다이렉트 탐지: meta refresh 외부 URL, JS location 변경 차단
+- MaliciousContentException — 악성 콘텐츠 업로드 시 400 응답
+
+### Changed
+- 폼 태그(form, input, select, button 등) 허용으로 정책 변경 (sandbox iframe이 폼 제출 차단)
+- `type="password"` input을 `type="text"`로 자동 변환 (피싱 UI 무력화)
+
+### Security
+- 4중 방어 체계: ContentValidator(업로드 차단) → ContentSanitizer(CSP 주입, password 변환) → CSP(네트워크 차단) → Sandbox iframe(폼 제출, 내비게이션 차단)
+
+---
+
 ## [v0.5.0] - 2026-03-30
 
 법적 약관 페이지 및 노출 위치 구현. 국내외 서비스를 위한 이용약관, 개인정보처리방침, 이용제한정책 한국어/영어 페이지 추가.
