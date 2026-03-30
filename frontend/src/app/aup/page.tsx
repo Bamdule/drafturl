@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import type { Locale } from "@/dictionaries/types";
 import { renderLegalMarkdown } from "@/lib/legal/renderMarkdown";
+import "../legal.css";
 
 export const metadata: Metadata = {
   title: "Acceptable Use Policy",
@@ -28,12 +29,7 @@ export default async function AupPage() {
           </div>
         )}
         <article
-          className="prose prose-invert prose-sm max-w-none
-            prose-headings:text-text-primary prose-p:text-text-secondary
-            prose-a:text-accent prose-strong:text-text-primary
-            prose-table:text-text-secondary prose-th:text-text-primary
-            prose-td:border-border-dark prose-th:border-border-dark
-            prose-hr:border-border-dark"
+          className="legal-article"
           dangerouslySetInnerHTML={{ __html: html }}
         />
         <nav className="mt-12 pt-6 border-t border-border-dark flex gap-4 text-sm text-text-muted">
