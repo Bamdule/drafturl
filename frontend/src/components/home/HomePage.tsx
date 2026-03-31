@@ -47,20 +47,13 @@ export default function HomePage({ children }: { children?: React.ReactNode }) {
           <span className="gradient-text">{dict.home.titleHighlight}</span>
           {dict.home.titleSuffix ? ` ${dict.home.titleSuffix}` : ""}
         </h1>
-        <p className="text-text-secondary text-[clamp(14px,2vw,16px)] max-w-[500px] mx-auto mb-5">
+        <p className="text-text-secondary text-[clamp(14px,2vw,16px)] max-w-[500px] mx-auto">
           {dict.home.subtitle}
         </p>
-        <a
-          href="#editor"
-          className="relative inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 transition-colors"
-        >
-          {dict.home.heroCta}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-        </a>
       </section>
 
       {/* Main Editor Area */}
-      <main id="editor" className="max-w-[1280px] mx-auto w-full px-6 pb-12 scroll-mt-4">
+      <main className="max-w-[1280px] mx-auto w-full px-6 pb-12">
         {/* Drop Banner */}
         <div className="mx-auto mb-3 max-w-[640px] flex items-center gap-2.5 rounded-[10px] border border-dashed border-accent/40 bg-accent/[0.04] px-4 py-2.5 cursor-default">
           <svg

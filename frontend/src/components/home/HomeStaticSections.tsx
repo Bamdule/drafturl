@@ -91,11 +91,6 @@ const content = {
         },
       ],
     },
-    cta: {
-      heading: "Ready to share?",
-      description: "Paste your document and get a shareable URL in seconds.",
-      button: "Start Now",
-    },
     footer: {
       terms: "Terms of Service",
       privacy: "Privacy Policy",
@@ -176,11 +171,6 @@ const content = {
           a: "네, 완전 무료로 사용할 수 있습니다. 기본 기능은 신용카드나 회원가입 없이 이용 가능합니다.",
         },
       ],
-    },
-    cta: {
-      heading: "지금 바로 공유해보세요",
-      description: "문서를 붙여넣으면 몇 초 안에 공유 URL이 생성됩니다.",
-      button: "시작하기",
     },
     footer: {
       terms: "이용약관",
@@ -264,25 +254,6 @@ export default function HomeStaticSections({ locale }: { locale: Locale }) {
               </p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="max-w-[1280px] mx-auto w-full px-6 py-12">
-        <div className="text-center rounded-2xl border border-border-dark bg-bg-secondary px-6 py-10">
-          <h2 className="text-xl font-bold text-text-primary mb-2">
-            {t.cta.heading}
-          </h2>
-          <p className="text-sm text-text-secondary mb-6">
-            {t.cta.description}
-          </p>
-          <a
-            href="#editor"
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 transition-colors"
-          >
-            {t.cta.button}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" /></svg>
-          </a>
         </div>
       </section>
 
