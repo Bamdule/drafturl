@@ -10,8 +10,11 @@
     "titleHighlight": "3초 만에",
     "titleSuffix": "공유하세요",
     "subtitle": "HTML이나 Markdown을 붙여넣거나 파일을 드래그앤드롭하면 즉시 공유 URL이 생성됩니다. 가입도 필요 없어요.",
+    "heroCta": "바로 시작하기",
     "mobileEditor": "편집기",
     "mobilePreview": "미리보기",
+    "dropBanner": "<strong>.html / .md 파일</strong>을 드래그하여 즉시 공유하세요",
+    "dropBannerSize": "최대 5MB",
     "features": {
       "deploy": {
         "title": "3초 배포",

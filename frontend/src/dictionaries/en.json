@@ -10,8 +10,11 @@
     "titleHighlight": "in 3 seconds",
     "titleSuffix": "",
     "subtitle": "Paste HTML or Markdown, or drag & drop a file, and get a shareable URL instantly. No signup needed.",
+    "heroCta": "Start Sharing",
     "mobileEditor": "Editor",
     "mobilePreview": "Preview",
+    "dropBanner": "Drag & drop <strong>.html / .md files</strong> to share instantly",
+    "dropBannerSize": "Max 5MB",
     "features": {
       "deploy": {
         "title": "3-Second Deploy",

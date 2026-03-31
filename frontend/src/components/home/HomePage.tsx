@@ -47,13 +47,46 @@ export default function HomePage({ children }: { children?: React.ReactNode }) {
           <span className="gradient-text">{dict.home.titleHighlight}</span>
           {dict.home.titleSuffix ? ` ${dict.home.titleSuffix}` : ""}
         </h1>
-        <p className="text-text-secondary text-[clamp(14px,2vw,16px)] max-w-[500px] mx-auto">
+        <p className="text-text-secondary text-[clamp(14px,2vw,16px)] max-w-[500px] mx-auto mb-5">
           {dict.home.subtitle}
         </p>
+        <a
+          href="#editor"
+          className="relative inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 transition-colors"
+        >
+          {dict.home.heroCta}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
       </section>
 
       {/* Main Editor Area */}
-      <main className="max-w-[1280px] mx-auto w-full px-6 pb-12">
+      <main id="editor" className="max-w-[1280px] mx-auto w-full px-6 pb-12 scroll-mt-4">
+        {/* Drop Banner */}
+        <div className="mx-auto mb-3 max-w-[640px] flex items-center gap-2.5 rounded-[10px] border border-dashed border-accent/40 bg-accent/[0.04] px-4 py-2.5 cursor-default">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="shrink-0"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span
+            className="text-xs text-text-secondary [&_strong]:text-text-primary [&_strong]:font-semibold"
+            dangerouslySetInnerHTML={{ __html: dict.home.dropBanner }}
+          />
+          <span className="ml-auto shrink-0 text-[10px] text-text-muted">
+            {dict.home.dropBannerSize}
+          </span>
+        </div>
+
         {/* Editor Tabs */}
         <div className="flex bg-bg-secondary border border-border-dark border-b-0 rounded-t-xl overflow-hidden">
           <TabButton

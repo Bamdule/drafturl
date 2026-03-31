@@ -3,6 +3,18 @@ import Link from "next/link";
 
 type Locale = "en" | "ko";
 
+/* Feature 아이콘 — Lucide 스타일 인라인 SVG */
+const featureIcons = [
+  /* Zap — 3초 배포 */
+  <svg key="zap" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
+  /* Eye — 실시간 미리보기 */
+  <svg key="eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
+  /* Link — 깔끔한 URL */
+  <svg key="link" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>,
+  /* Sparkles — AI 최적화 */
+  <svg key="sparkles" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>,
+];
+
 const content = {
   en: {
     features: {
@@ -78,6 +90,11 @@ const content = {
           a: "Yes, DraftURL is completely free to use. No credit card or signup required for basic usage.",
         },
       ],
+    },
+    cta: {
+      heading: "Ready to share?",
+      description: "Paste your document and get a shareable URL in seconds.",
+      button: "Start Now",
     },
     footer: {
       terms: "Terms of Service",
@@ -160,6 +177,11 @@ const content = {
         },
       ],
     },
+    cta: {
+      heading: "지금 바로 공유해보세요",
+      description: "문서를 붙여넣으면 몇 초 안에 공유 URL이 생성됩니다.",
+      button: "시작하기",
+    },
     footer: {
       terms: "이용약관",
       privacy: "개인정보 처리방침",
@@ -179,11 +201,14 @@ export default function HomeStaticSections({ locale }: { locale: Locale }) {
           {t.features.heading}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {t.features.items.map((feature) => (
+          {t.features.items.map((feature, index) => (
             <div
               key={feature.title}
               className="bg-bg-secondary border border-border-dark rounded-xl p-6 hover:border-border-dark-hover transition-colors"
             >
+              <div className="w-9 h-9 rounded-lg bg-accent/15 text-accent flex items-center justify-center mb-3">
+                {featureIcons[index]}
+              </div>
               <h3 className="text-[15px] font-semibold mb-1.5 text-text-primary">
                 {feature.title}
               </h3>
@@ -239,6 +264,25 @@ export default function HomeStaticSections({ locale }: { locale: Locale }) {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="max-w-[1280px] mx-auto w-full px-6 py-12">
+        <div className="text-center rounded-2xl border border-border-dark bg-bg-secondary px-6 py-10">
+          <h2 className="text-xl font-bold text-text-primary mb-2">
+            {t.cta.heading}
+          </h2>
+          <p className="text-sm text-text-secondary mb-6">
+            {t.cta.description}
+          </p>
+          <a
+            href="#editor"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 transition-colors"
+          >
+            {t.cta.button}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" /></svg>
+          </a>
         </div>
       </section>
 
