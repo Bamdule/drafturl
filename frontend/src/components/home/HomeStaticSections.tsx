@@ -82,6 +82,7 @@ const content = {
     footer: {
       terms: "Terms of Service",
       privacy: "Privacy Policy",
+      contact: "Contact",
     },
   },
   ko: {
@@ -162,6 +163,7 @@ const content = {
     footer: {
       terms: "이용약관",
       privacy: "개인정보 처리방침",
+      contact: "문의",
     },
   },
 };
@@ -256,6 +258,12 @@ export default function HomeStaticSections({ locale }: { locale: Locale }) {
               className="hover:text-text-muted transition-colors"
             >
               {t.footer.privacy}
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-text-muted transition-colors"
+            >
+              {t.footer.contact}
             </Link>
           </div>
         </div>

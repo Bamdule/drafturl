@@ -5,6 +5,24 @@
 
 ---
 
+## [v0.7.0] - 2026-03-31
+
+1:1 문의, 버그 리포트, 콘텐츠 신고 기능 추가. 서비스 이메일 구축 완료.
+
+### Added
+- 문의 페이지 (/contact) — 일반 문의, 버그 리포트 폼 (로그인 시 이메일/이름 자동 채움)
+- 콘텐츠 신고 기능 — 문서 뷰어에서 신고 버튼 + Dialog
+- Backend: Inquiry 도메인 (POST /api/v1/inquiries, DB 저장)
+- DB 마이그레이션 V5: inquiries 테이블 추가
+- 서비스 이메일: Cloudflare Email Routing (support@, abuse@drafturl.com)
+- 내 정보 페이지 (/account) — 계정 정보 확인 및 회원탈퇴
+- 배포 워크플로우에 백로그 자동 갱신 단계 추가
+
+### Changed
+- 푸터 문의 링크: mailto → /contact 페이지로 변경
+
+---
+
 ## [v0.6.1] - 2026-03-31
 
 SEO 개선. 정적 콘텐츠 Server Component 분리, OG 이미지 추가, FAQPage/HowTo 구조화 데이터 스키마 추가, favicon 수정.

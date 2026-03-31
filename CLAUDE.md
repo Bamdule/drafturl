@@ -26,7 +26,8 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
   2. `docs/plans/product/vX.X.X-tasks.md` 체크박스 반영
   3. `CHANGELOG.md` 해당 버전 섹션 추가
   4. `docs/releases/vX.X.X.md` 릴리즈 노트 작성
-  5. git commit → git tag vX.X.X → push (main + release)
+  5. `docs/plans/product/backlog.md` 업데이트: 완료 항목 제거/취소선, 최신 릴리즈 버전 갱신, 새로 발견된 후속 작업 추가
+  6. git commit → git tag vX.X.X → push (main + release)
 - 배포 트리거: `release` 브랜치 push 시 GitHub Actions 자동 배포
 
 ## 문서 규칙

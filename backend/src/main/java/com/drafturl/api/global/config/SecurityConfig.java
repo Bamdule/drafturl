@@ -109,6 +109,9 @@ public class SecurityConfig {
                         // MCP 엔드포인트 - 도구 내부에서 개별 인증 검증
                         .requestMatchers("/mcp/**").permitAll()
 
+                        // 문의/신고 - permitAll
+                        .requestMatchers(HttpMethod.POST, "/api/v1/inquiries").permitAll()
+
                         // 헬스체크
                         .requestMatchers("/api/v1/health").permitAll()
 
