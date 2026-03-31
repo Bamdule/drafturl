@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Link from "next/link";
 import Header from "@/components/layout/Header";
 import EditorPanel from "@/components/editor/EditorPanel";
 import PreviewPanel from "@/components/editor/PreviewPanel";
@@ -12,7 +11,7 @@ import { useEditorStore } from "@/lib/store/useEditorStore";
 import { useDict } from "@/components/i18n/DictProvider";
 import type { DocType } from "@/lib/constants";
 
-export default function HomePage() {
+export default function HomePage({ children }: { children?: React.ReactNode }) {
   const { dict, locale } = useDict();
   const { docType, setDocType, setContent } = useEditorStore();
   const [typewriterActive, setTypewriterActive] = useState(true);
@@ -121,85 +120,9 @@ export default function HomePage() {
 
         {/* Publish Area */}
         <PublishButton onNewDocument={handleNewDocument} />
-
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-          <FeatureCard
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
-            }
-            title={dict.home.features.deploy.title}
-          >
-            {dict.home.features.deploy.description}
-          </FeatureCard>
-          <FeatureCard
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            }
-            title={dict.home.features.preview.title}
-          >
-            {dict.home.features.preview.description}
-          </FeatureCard>
-          <FeatureCard
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-              </svg>
-            }
-            title={dict.home.features.url.title}
-          >
-            {dict.home.features.url.description}
-          </FeatureCard>
-          <FeatureCard
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
-                <path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z" />
-                <circle cx="9" cy="6" r="0.5" fill="currentColor" />
-                <circle cx="15" cy="6" r="0.5" fill="currentColor" />
-              </svg>
-            }
-            title={dict.home.features.ai.title}
-          >
-            {dict.home.features.ai.description}
-          </FeatureCard>
-        </div>
-
-        {/* How to Use Section */}
-        <section className="mt-16 mb-4">
-          <h2 className="text-xl font-bold text-text-primary text-center mb-8">
-            {dict.home.howToUse}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StepCard step={1} title={dict.home.steps.paste.title}>
-              {dict.home.steps.paste.description}
-            </StepCard>
-            <StepCard step={2} title={dict.home.steps.check.title}>
-              {dict.home.steps.check.description}
-            </StepCard>
-            <StepCard step={3} title={dict.home.steps.share.title}>
-              {dict.home.steps.share.description}
-            </StepCard>
-          </div>
-        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border-dark mt-12">
-        <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted/60">
-          <span>&copy; 2026 DraftURL</span>
-          <div className="flex items-center gap-4">
-            <Link href="/terms" className="hover:text-text-muted transition-colors">{dict.home.footer.terms}</Link>
-            <Link href="/privacy" className="hover:text-text-muted transition-colors">{dict.home.footer.privacy}</Link>
-          </div>
-        </div>
-      </footer>
+      {children}
     </div>
   );
 }
@@ -230,50 +153,3 @@ function TabButton({
   );
 }
 
-function FeatureCard({
-  icon,
-  title,
-  children,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="bg-bg-secondary border border-border-dark rounded-xl p-6 hover:border-border-dark-hover transition-colors">
-      <div className="w-10 h-10 rounded-[10px] bg-accent-subtle flex items-center justify-center text-accent mb-3">
-        {icon}
-      </div>
-      <h3 className="text-[15px] font-semibold mb-1.5 text-text-primary">
-        {title}
-      </h3>
-      <p className="text-[13px] text-text-secondary leading-relaxed">
-        {children}
-      </p>
-    </div>
-  );
-}
-
-function StepCard({
-  step,
-  title,
-  children,
-}: {
-  step: number;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="relative bg-bg-secondary border border-border-dark rounded-xl p-6">
-      <div className="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center text-sm font-bold mb-3">
-        {step}
-      </div>
-      <h3 className="text-[15px] font-semibold mb-1.5 text-text-primary">
-        {title}
-      </h3>
-      <p className="text-[13px] text-text-secondary leading-relaxed">
-        {children}
-      </p>
-    </div>
-  );
-}

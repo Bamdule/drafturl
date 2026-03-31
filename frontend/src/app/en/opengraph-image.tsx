@@ -5,100 +5,116 @@ export const alt = "DraftURL — Share HTML & Markdown Instantly via URL";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OgImage() {
+export default function Image() {
   return new ImageResponse(
     (
       <div
         style={{
+          background: "#0f1117",
           width: "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0f0f17 0%, #1a1a2e 50%, #16213e 100%)",
-          fontFamily: "sans-serif",
+          fontFamily: "system-ui, sans-serif",
+          position: "relative",
         }}
       >
+        {/* Background glow */}
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: 0,
             left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "600px",
-            height: "400px",
-            borderRadius: "50%",
-            background: "radial-gradient(ellipse, rgba(99, 102, 241, 0.15), transparent 70%)",
+            transform: "translateX(-50%)",
+            width: 800,
+            height: 400,
+            background:
+              "radial-gradient(ellipse, rgba(99,102,241,0.15) 0%, transparent 70%)",
           }}
         />
+        {/* Logo */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "24px",
+            gap: 16,
+            marginBottom: 32,
           }}
         >
           <div
             style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #7c5cfc, #a78bfa)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              fontSize: 32,
+              fontWeight: 700,
               color: "white",
-              fontSize: "24px",
-              fontWeight: 800,
             }}
           >
             D
           </div>
           <span
             style={{
-              fontSize: "36px",
+              fontSize: 36,
               fontWeight: 700,
               color: "#e2e8f0",
-              letterSpacing: "-0.02em",
+              letterSpacing: -1,
             }}
           >
             DraftURL
           </span>
         </div>
+        {/* Headline */}
         <div
           style={{
-            fontSize: "28px",
-            fontWeight: 600,
-            color: "#f1f5f9",
+            fontSize: 56,
+            fontWeight: 800,
+            color: "#ffffff",
             textAlign: "center",
-            maxWidth: "700px",
-            lineHeight: 1.4,
+            lineHeight: 1.15,
+            letterSpacing: -2,
+            maxWidth: 900,
+            marginBottom: 24,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
-          Share HTML & Markdown
+          Share HTML & Markdown{" "}
+          <span style={{ color: "#a78bfa" }}>Instantly via URL</span>
         </div>
+        {/* Subtitle */}
         <div
           style={{
-            fontSize: "28px",
-            fontWeight: 600,
-            color: "#818cf8",
-            textAlign: "center",
-            marginTop: "4px",
-          }}
-        >
-          Instantly via URL
-        </div>
-        <div
-          style={{
-            fontSize: "16px",
+            fontSize: 24,
             color: "#94a3b8",
-            marginTop: "20px",
             textAlign: "center",
+            maxWidth: 700,
+            lineHeight: 1.5,
           }}
         >
-          No signup required · Paste and share in 3 seconds
+          Paste your document · Get a shareable link · No signup required
+        </div>
+        {/* URL badge */}
+        <div
+          style={{
+            marginTop: 40,
+            background: "#1e293b",
+            border: "1px solid #334155",
+            borderRadius: 10,
+            padding: "10px 24px",
+            fontSize: 20,
+            color: "#7c5cfc",
+            fontFamily: "monospace",
+          }}
+        >
+          drafturl.com
         </div>
       </div>
     ),

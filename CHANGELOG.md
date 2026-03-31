@@ -5,6 +5,22 @@
 
 ---
 
+## [v0.6.1] - 2026-03-31
+
+SEO 개선. 정적 콘텐츠 Server Component 분리, OG 이미지 추가, FAQPage/HowTo 구조화 데이터 스키마 추가, favicon 수정.
+
+### Added
+- `HomeStaticSections` Server Component — Feature Cards, How-to-Use Steps, FAQ 섹션을 서버 렌더링으로 분리하여 크롤러 텍스트 인식 개선
+- FAQ 섹션 — 홈페이지 하단에 자주 묻는 질문 6개 추가 (en/ko)
+- OG 이미지 — `/en`, `/ko` 경로에 `opengraph-image.tsx` 추가 (소셜 공유 미리보기)
+- FAQPage JSON-LD 스키마 — Google 리치 스니펫(FAQ 펼치기) 대응
+- HowTo JSON-LD 스키마 — 3단계 사용법 구조화 데이터
+
+### Fixed
+- `favicon.ico` (Next.js 기본 삼각형 아이콘) 삭제 → `favicon.svg` (D 로고) 적용
+
+---
+
 ## [v0.6.0] - 2026-03-30
 
 HTML sanitizer 보안 강화. 다층 방어 체계를 통해 피싱, 악성 리다이렉트, 데이터 유출을 방지한다.
