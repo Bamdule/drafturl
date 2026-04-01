@@ -72,11 +72,11 @@ export default function PublishResultModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-lg"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-lg"
       onClick={() => onOpenChange(false)}
     >
       <div
-        className="bg-bg-secondary border border-border-dark rounded-xl p-8 max-w-[480px] w-full text-center"
+        className="bg-bg-secondary border border-border-dark rounded-xl p-5 sm:p-8 max-w-[480px] w-full text-center"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Check icon */}
@@ -93,15 +93,15 @@ export default function PublishResultModal({
         </p>
 
         {/* URL display */}
-        <div className="flex items-center gap-2 bg-bg-primary border border-border-dark rounded-lg px-4 py-3 mb-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-bg-primary border border-border-dark rounded-lg px-3 sm:px-4 py-3 mb-4">
           <input
             readOnly
             value={doc.url}
-            className="flex-1 bg-transparent border-none text-accent text-[15px] font-medium font-mono outline-none min-w-0"
+            className="flex-1 bg-transparent border-none text-accent text-[13px] sm:text-[15px] font-medium font-mono outline-none min-w-0"
           />
           <button
             onClick={handleCopy}
-            className="px-3 py-1.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer"
+            className="shrink-0 px-4 py-2 sm:py-1.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer"
           >
             {copied ? dict.publishModal.copied : dict.publishModal.copy}
           </button>
@@ -118,7 +118,7 @@ export default function PublishResultModal({
           </button>
         )}
         {isAuthenticated && passwordOpen && (
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-2">
             <input
               type="text"
               name="doc-pin"
@@ -126,22 +126,24 @@ export default function PublishResultModal({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={dict.publishModal.passwordPlaceholder}
-              className="h-9 flex-1 rounded-md border border-border-dark bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/50 [-webkit-text-security:disc]"
+              className="h-10 sm:h-9 flex-1 rounded-md border border-border-dark bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/50 [-webkit-text-security:disc]"
               onKeyDown={(e) => e.key === "Enter" && handleSetPassword()}
             />
-            <button
-              onClick={handleSetPassword}
-              disabled={passwordSaving}
-              className="px-3 py-2 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer disabled:opacity-50"
-            >
-              {passwordSaving ? "..." : dict.publishModal.passwordConfirm}
-            </button>
-            <button
-              onClick={() => { setPasswordOpen(false); setPassword(""); setPasswordError(null); }}
-              className="px-2 py-2 text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
-            >
-              {dict.publishModal.passwordCancel}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSetPassword}
+                disabled={passwordSaving}
+                className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {passwordSaving ? "..." : dict.publishModal.passwordConfirm}
+              </button>
+              <button
+                onClick={() => { setPasswordOpen(false); setPassword(""); setPasswordError(null); }}
+                className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
+              >
+                {dict.publishModal.passwordCancel}
+              </button>
+            </div>
           </div>
         )}
         {passwordError && (
@@ -155,21 +157,21 @@ export default function PublishResultModal({
         )}
 
         {/* Actions */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex flex-col-reverse sm:flex-row gap-2 mt-4">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex-1 inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors cursor-pointer"
+          >
+            {dict.publishModal.close}
+          </button>
           <a
             href={`/${doc.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-md text-sm font-medium text-text-primary border border-border-dark hover:border-border-dark-hover hover:bg-bg-tertiary transition-colors"
+            className="flex-1 inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-lg text-sm font-medium text-text-primary border border-border-dark hover:border-border-dark-hover hover:bg-bg-tertiary transition-colors"
           >
             {dict.publishModal.viewDetail}
           </a>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors cursor-pointer"
-          >
-            {dict.publishModal.close}
-          </button>
         </div>
       </div>
     </div>

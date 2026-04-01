@@ -129,7 +129,7 @@ export default async function GuidePage() {
   const t = content[locale];
 
   return (
-    <main className="min-h-screen bg-bg-primary">
+    <main>
       <div className="mx-auto max-w-3xl px-6 py-12">
         <h1 className="mb-2 text-2xl font-bold text-text-primary">
           {t.heading}

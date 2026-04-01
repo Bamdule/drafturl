@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { oauthCallback } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/types";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useDict } from "@/components/i18n/DictProvider";
 import { COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER, OAUTH_PROVIDERS } from "@/lib/constants";
@@ -11,7 +12,7 @@ import type { OAuthProvider } from "@/lib/constants";
 import { getCookie, deleteCookie } from "@/lib/utils/cookie";
 
 function AuthCallbackContent() {
-  const { dict } = useDict();
+  const { dict, locale } = useDict();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { login } = useAuthStore();
@@ -61,11 +62,23 @@ function AuthCallbackContent() {
         window.umami?.track("login", { provider: provider as string });
         window.location.href = "/dashboard";
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : dict.auth.callback.error,
-        );
+        if (err instanceof ApiError && err.code === "EMAIL_ALREADY_EXISTS") {
+          const providerNames: Record<string, string> = {
+            email: locale === "ko" ? "이메일/비밀번호" : "Email/Password",
+            google: "Google",
+            github: "GitHub",
+            naver: locale === "ko" ? "네이버" : "Naver",
+            kakao: locale === "ko" ? "카카오" : "Kakao",
+          };
+          const displayName = providerNames[err.message] ?? err.message;
+          setError(dict.auth.callback.emailExists.replaceAll("{provider}", displayName));
+        } else {
+          setError(
+            err instanceof Error
+              ? err.message
+              : dict.auth.callback.error,
+          );
+        }
       }
     }
 

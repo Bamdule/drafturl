@@ -169,7 +169,7 @@ export default function LoginPage() {
                       setPassword(e.target.value);
                       setEmailError(null);
                     }}
-                    placeholder={dict.auth.login.password}
+                    placeholder="••••••••"
                     className="flex h-10 w-full rounded-lg border border-border-dark bg-bg-primary px-3 pr-10 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
                   />
                   <button
@@ -219,36 +219,6 @@ export default function LoginPage() {
                 preparingLabel={dict.auth.login.preparing}
               >
                 <GoogleIcon />
-              </OAuthButton>
-              <OAuthButton
-                provider="github"
-                label="GitHub"
-                onClick={() => handleOAuthLogin("github")}
-                disabled={isLoading}
-                unavailable={!OAUTH_CLIENT_IDS.github}
-                preparingLabel={dict.auth.login.preparing}
-              >
-                <GitHubIcon />
-              </OAuthButton>
-              <OAuthButton
-                provider="naver"
-                label="네이버"
-                onClick={() => handleOAuthLogin("naver")}
-                disabled={isLoading}
-                unavailable={!OAUTH_CLIENT_IDS.naver}
-                preparingLabel={dict.auth.login.preparing}
-              >
-                <NaverIcon />
-              </OAuthButton>
-              <OAuthButton
-                provider="kakao"
-                label="카카오"
-                onClick={() => handleOAuthLogin("kakao")}
-                disabled={isLoading}
-                unavailable={!OAUTH_CLIENT_IDS.kakao}
-                preparingLabel={dict.auth.login.preparing}
-              >
-                <KakaoIcon />
               </OAuthButton>
             </div>
           </div>
@@ -333,7 +303,7 @@ function OAuthButton({
 }) {
   const style = PROVIDER_STYLES[provider];
   return (
-    <div className={`flex flex-col items-center gap-1.5 ${unavailable ? "opacity-30 pointer-events-none" : ""}`}>
+    <div className={`flex flex-col items-center gap-1.5 ${unavailable ? "opacity-50 pointer-events-none" : ""}`}>
       <button
         type="button"
         onClick={onClick}

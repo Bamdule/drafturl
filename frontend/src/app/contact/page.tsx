@@ -165,6 +165,7 @@ export default function ContactPage() {
               >
                 <option value="CONTACT">{t.typeContact}</option>
                 <option value="BUG_REPORT">{t.typeBug}</option>
+                <option value="CONTENT_REPORT">{t.typeReport}</option>
               </select>
             </div>
 

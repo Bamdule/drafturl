@@ -93,7 +93,7 @@ const DialogContent = React.forwardRef<
       role="dialog"
       aria-modal="true"
       className={cn(
-        "relative z-50 w-full max-w-lg rounded-xl border border-border-dark bg-bg-secondary p-7 shadow-lg",
+        "relative z-50 w-full max-w-lg rounded-xl border border-border-dark bg-bg-secondary p-5 sm:p-7 shadow-lg",
         className,
       )}
       onClick={(e) => e.stopPropagation()}
@@ -154,7 +154,7 @@ function DialogFooter({
   return (
     <div
       className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2",
         className,
       )}
       {...props}

@@ -105,6 +105,9 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
       );
       setResult(doc);
       setModalOpen(true);
+      setContent("");
+      setFileName(null);
+      setFileSize(null);
       window.umami?.track("document_create", { type: docType });
     } catch (err) {
       if (err instanceof ApiError && err.code === "DOCUMENT_LIMIT_EXCEEDED") {
@@ -123,11 +126,6 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
   const displayName =
     fileName || (docType === "html" ? "document.html" : "document.md");
   const displaySize = fileSize || formatBytes(new Blob([content]).size);
-  const pasteHint =
-    locale === "ko"
-      ? "\uB610\uB294 \uD074\uB9BD\uBCF4\uB4DC\uC5D0\uC11C \uBC14\uB85C \uBD99\uC5EC\uB123\uAE30"
-      : "Or paste from clipboard";
-
   return (
     <div className="flex min-h-screen flex-col bg-bg-primary" lang={locale}>
       <FileDropZone onFileDrop={handleFileDrop} />
@@ -368,19 +366,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
                 <div className="text-base md:text-lg font-bold text-text-primary">
                   {dict.fileDrop.dropHere}
                 </div>
-                <div className="text-xs md:text-sm text-text-muted">{pasteHint}</div>
-                <div className="mt-2 hidden md:flex items-center gap-2 text-sm text-text-muted">
-                  <kbd className="rounded border border-white/10 bg-white/[0.06] px-2 py-0.5 font-mono text-xs font-semibold text-text-secondary">
-                    Ctrl
-                  </kbd>
-                  <span>+</span>
-                  <kbd className="rounded border border-white/10 bg-white/[0.06] px-2 py-0.5 font-mono text-xs font-semibold text-text-secondary">
-                    V
-                  </kbd>
-                  <span className="mx-1 opacity-30">|</span>
-                  <span>{dict.fileDrop.supportedFormats}</span>
-                </div>
-                <div className="mt-1 flex md:hidden text-xs text-text-muted">
+                <div className="mt-2 text-xs md:text-sm text-text-muted">
                   {dict.fileDrop.supportedFormats}
                 </div>
               </div>

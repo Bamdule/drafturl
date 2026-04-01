@@ -44,8 +44,7 @@ public class AuthTransactionService {
                     userRepository.findByEmail(userInfo.email()).ifPresent(existing -> {
                         String existingProvider = existing.getProvider();
                         throw new BusinessException(HttpStatus.CONFLICT, "EMAIL_ALREADY_EXISTS",
-                                String.format("이미 %s 계정으로 가입된 이메일입니다. %s로 로그인해주세요.",
-                                        existingProvider, existingProvider));
+                                existingProvider);
                     });
                     return userRepository.save(
                             new User(userInfo.email(), userInfo.name(), userInfo.avatarUrl(), provider, userInfo.providerId())

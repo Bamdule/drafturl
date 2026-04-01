@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import type { Locale } from "@/dictionaries/types";
 import { renderGuideHtml } from "@/lib/guide/renderGuide";
+import CodeBlockCopy from "@/components/guide/CodeBlockCopy";
 import "../guide.css";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function McpGuidePage() {
   const html = renderGuideHtml("mcp", locale);
 
   return (
-    <main className="min-h-screen bg-bg-primary">
+    <main>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <nav className="mb-6 text-sm text-text-muted">
           <Link href="/guide" className="hover:text-text-primary transition-colors">
@@ -33,6 +34,7 @@ export default async function McpGuidePage() {
           className="guide-article"
           dangerouslySetInnerHTML={{ __html: html }}
         />
+        <CodeBlockCopy />
 
         <nav className="mt-12 pt-6 border-t border-border-dark flex gap-4 text-sm text-text-muted">
           <Link

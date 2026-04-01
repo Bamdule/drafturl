@@ -158,6 +158,7 @@
       "invalidRequest": "Invalid callback request.",
       "noProvider": "Could not verify OAuth provider.",
       "error": "An error occurred during authentication.",
+      "emailExists": "This email is already registered with {provider}. Please log in with {provider} instead.",
       "errorTitle": "Authentication Error",
       "retry": "Try Again",
       "loading": "Processing login..."
@@ -263,6 +264,7 @@
     "typeLabel": "Type",
     "typeContact": "General Inquiry",
     "typeBug": "Bug Report",
+    "typeReport": "Content Report",
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "name": "Name (optional)",
