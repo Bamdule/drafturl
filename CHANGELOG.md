@@ -5,6 +5,27 @@
 
 ---
 
+## [v0.9.0] - 2026-04-01
+
+랜딩페이지 전면 리디자인, 탈퇴 로그, Resend 이메일 알림, 스케줄러 최적화.
+
+### Added
+- 랜딩페이지 리디자인: 2컬럼 레이아웃 (히어로+3스텝 | 드롭존+공유), 모바일 반응형
+- 탈퇴 로그: withdrawal_logs 테이블 (V6 마이그레이션), 이메일 SHA-256 해시 기록
+- Resend 이메일 알림: 문의 접수 시 관리자 Gmail로 알림 발송
+- 회원탈퇴 시 문서에 1시간 만료 부여 → 기존 배치가 R2 파일과 함께 정리
+- 사용자 획득 전략 문서 (docs/plans/product/growth-strategy.md)
+
+### Changed
+- 랜딩페이지: Monaco Editor/미리보기 패널 제거 → 드롭존 기반 UI
+- HomeStaticSections: Features/Steps/FAQ → 가이드 페이지로 이동, Footer만 잔류
+- 가이드 페이지: 가이드 목록 최상단 배치, 시작하기/주요기능/FAQ 구성
+- PendingCleanupScheduler 주기 5분 → 1시간
+- 배포 설계 문서: Railway/Vercel → Docker Compose + Tunnel 현행화
+- 프론트엔드 페이지 설계 문서 현행화
+
+---
+
 ## [v0.8.0] - 2026-04-01
 
 가이드 페이지 추가 — MCP 연결 방법 안내.
