@@ -37,6 +37,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       INTERNAL_API_URL: http://drafturl-dev-backend:8080
     networks:
       - drafturl-net
