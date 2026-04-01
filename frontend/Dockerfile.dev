@@ -6,6 +6,8 @@ COPY frontend/ .
 COPY docs/legal/ docs/legal/
 COPY docs/guide/ docs/guide/
 ENV NEXT_PUBLIC_API_URL=https://api.drafturl.com
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
 RUN npm run build
 EXPOSE 3000
 
