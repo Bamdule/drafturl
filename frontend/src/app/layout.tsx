@@ -38,7 +38,10 @@ export const metadata: Metadata = {
     "URL 공유",
   ],
   verification: {
-    google: "1la5UC8V_Dkwq9Ar8cgGAYuO4wMe94FHhGqF24zmLfk",
+    google: [
+      "1la5UC8V_Dkwq9Ar8cgGAYuO4wMe94FHhGqF24zmLfk",
+      "u_-QfAN_82FwZpZi2g1pjlffbAbmO6FfWt0fYH-kRnI",
+    ],
   },
   icons: {
     icon: "/favicon.svg",
