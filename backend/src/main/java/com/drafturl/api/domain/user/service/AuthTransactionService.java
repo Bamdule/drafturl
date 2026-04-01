@@ -39,9 +39,18 @@ public class AuthTransactionService {
                     existingUser.updateProfile(userInfo.name(), userInfo.avatarUrl());
                     return existingUser;
                 })
-                .orElseGet(() -> userRepository.save(
-                        new User(userInfo.email(), userInfo.name(), userInfo.avatarUrl(), provider, userInfo.providerId())
-                ));
+                .orElseGet(() -> {
+                    // 같은 이메일이 다른 provider로 이미 등록되어 있는지 확인
+                    userRepository.findByEmail(userInfo.email()).ifPresent(existing -> {
+                        String existingProvider = existing.getProvider();
+                        throw new BusinessException(HttpStatus.CONFLICT, "EMAIL_ALREADY_EXISTS",
+                                String.format("이미 %s 계정으로 가입된 이메일입니다. %s로 로그인해주세요.",
+                                        existingProvider, existingProvider));
+                    });
+                    return userRepository.save(
+                            new User(userInfo.email(), userInfo.name(), userInfo.avatarUrl(), provider, userInfo.providerId())
+                    );
+                });
     }
 
     /**
