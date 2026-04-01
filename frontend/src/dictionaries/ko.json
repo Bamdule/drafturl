@@ -79,7 +79,14 @@
     "copy": "복사",
     "copied": "복사됨!",
     "viewDetail": "상세 보기",
-    "close": "닫기"
+    "close": "닫기",
+    "addPassword": "비밀번호 설정",
+    "passwordPlaceholder": "비밀번호 (4자 이상)",
+    "passwordConfirm": "설정",
+    "passwordCancel": "취소",
+    "passwordMinLength": "비밀번호는 4자 이상이어야 합니다.",
+    "passwordError": "비밀번호 설정에 실패했습니다.",
+    "passwordSet": "비밀번호가 설정되었습니다"
   },
   "typewriter": {
     "editor": "편집기",

@@ -79,7 +79,14 @@
     "copy": "Copy",
     "copied": "Copied!",
     "viewDetail": "View Detail",
-    "close": "Close"
+    "close": "Close",
+    "addPassword": "Set Password",
+    "passwordPlaceholder": "Password (min 4 chars)",
+    "passwordConfirm": "Set",
+    "passwordCancel": "Cancel",
+    "passwordMinLength": "Password must be at least 4 characters.",
+    "passwordError": "Failed to set password.",
+    "passwordSet": "Password has been set"
   },
   "typewriter": {
     "editor": "Editor",
