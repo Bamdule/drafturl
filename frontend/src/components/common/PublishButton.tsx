@@ -120,9 +120,10 @@ export default function PublishButton({ onNewDocument }: PublishButtonProps) {
               href={`/${result.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all no-underline"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all no-underline"
             >
-              &#128064; {dict.publish.viewDetail}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+              {dict.publish.viewDetail}
             </a>
             <button
               onClick={handleNewDocument}
@@ -163,16 +164,24 @@ export default function PublishButton({ onNewDocument }: PublishButtonProps) {
             <button
               onClick={handlePreview}
               disabled={!content.trim()}
-              className="px-6 py-3.5 text-base font-medium text-text-secondary border border-border-dark rounded-lg hover:bg-bg-tertiary hover:text-text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3.5 text-base font-medium text-text-secondary border border-border-dark rounded-lg hover:bg-bg-tertiary hover:text-text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              &#128064; {dict.publish.preview}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+              {dict.publish.preview}
             </button>
             <button
               onClick={handlePublish}
               disabled={isPublishing || !content.trim() || isDemo}
-              className="px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-br from-accent to-accent-hover rounded-lg shadow-[0_0_24px_rgba(124,92,252,0.3)] hover:shadow-[0_0_32px_rgba(124,92,252,0.45)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isPublishing ? dict.publish.publishing : `\u26A1 ${dict.publish.share}`}
+              {isPublishing ? (
+                dict.publish.publishing
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>
+                  {dict.publish.share}
+                </>
+              )}
             </button>
             </div>
             {/* Terms agreement */}
