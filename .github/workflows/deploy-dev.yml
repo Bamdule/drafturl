@@ -41,6 +41,7 @@ jobs:
           R2_SECRET_KEY=${{ secrets.R2_SECRET_KEY }}
           R2_BUCKET=${{ secrets.R2_BUCKET }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
           ENVEOF
 
       - name: Deploy with Docker Compose
