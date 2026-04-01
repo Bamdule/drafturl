@@ -77,6 +77,15 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
     List<SitemapEntry> findSitemapEntries(Pageable pageable);
 
     /**
+     * 사용자의 ACTIVE 문서에 만료 시간을 일괄 설정한다 (회원탈퇴 시 사용).
+     */
+    @Modifying
+    @Query("UPDATE Document d SET d.expiresAt = :expiresAt, d.updatedAt = CURRENT_TIMESTAMP " +
+            "WHERE d.userId = :userId AND d.status = 'ACTIVE' AND d.expiresAt IS NULL")
+    int bulkSetExpiresAtByUserId(@Param("userId") UUID userId,
+                                  @Param("expiresAt") LocalDateTime expiresAt);
+
+    /**
      * 벌크 만료 시간 설정: 지정된 ID 목록의 문서에 expiresAt을 일괄 설정한다.
      */
     @Modifying

@@ -21,9 +21,10 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
 ## 버전 관리 (배포 시 자동 수행)
 - 현재 버전: 루트 `VERSION` 파일 (single source of truth)
 - SemVer 규칙: Major(하위호환 깨짐), Minor(새 기능), Patch(버그/보안 수정)
+- 작업 완료 시 `docs/plans/product/current-tasks.md`에 기록한다 (배포 전까지 누적)
 - "배포해줘" 요청 시 자동으로 수행할 것:
-  1. 변경 내용 분석 → major/minor/patch 판단 → `VERSION` 업데이트
-  2. `docs/plans/product/vX.X.X-tasks.md` 체크박스 반영
+  1. `current-tasks.md`의 변경 내용 분석 → major/minor/patch 판단 → `VERSION` 업데이트
+  2. `current-tasks.md`를 `vX.X.X-tasks.md`로 복사한 뒤 `current-tasks.md` 초기화
   3. `CHANGELOG.md` 해당 버전 섹션 추가
   4. `docs/releases/vX.X.X.md` 릴리즈 노트 작성
   5. `docs/plans/product/backlog.md` 업데이트: 완료 항목 제거/취소선, 최신 릴리즈 버전 갱신, 새로 발견된 후속 작업 추가

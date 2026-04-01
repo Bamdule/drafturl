@@ -24,7 +24,7 @@ public class PendingCleanupScheduler {
         this.documentCleanupService = documentCleanupService;
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 30 * * * *")
     public void cleanupPendingDocuments() {
         log.info("PENDING 문서 정리 스케줄러 시작");
         try {
