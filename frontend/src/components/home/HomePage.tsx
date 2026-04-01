@@ -283,9 +283,24 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
               /* File loaded content */
               <div className="relative flex w-full flex-col items-center gap-5">
                 <div className="flex flex-col items-center gap-2">
-                  <span className="text-lg font-bold text-text-primary">
-                    {displayName}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-text-primary">
+                      {displayName}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setContent("");
+                        setFileName(null);
+                        setFileSize(null);
+                        setError(null);
+                      }}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-text-muted hover:bg-white/10 hover:text-text-primary transition-colors cursor-pointer"
+                      aria-label="Remove file"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </button>
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="rounded border border-accent/20 bg-accent/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
                       {fileType}
