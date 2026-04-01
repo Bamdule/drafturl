@@ -23,6 +23,8 @@ services:
       APP_FRONTEND_URL: https://drafturl.com
       APP_MCP_OAUTH2_ISSUER: https://drafturl.com
       RESEND_API_KEY: ${RESEND_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     networks:
       - drafturl-net
     restart: unless-stopped
