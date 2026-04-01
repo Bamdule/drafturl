@@ -20,6 +20,7 @@ services:
       APP_STORAGE_BUCKET: ${R2_BUCKET:-drafturl-files}
       APP_CORS_ALLOWED_ORIGINS: http://localhost:3001
       APP_FRONTEND_URL: http://localhost:3001
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
     networks:
       - drafturl-net
     restart: on-failure

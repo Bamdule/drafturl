@@ -6,6 +6,8 @@ import com.drafturl.api.domain.inquiry.controller.response.InquiryResponse;
 import com.drafturl.api.domain.inquiry.entity.Inquiry;
 import com.drafturl.api.domain.inquiry.repository.InquiryRepository;
 import com.drafturl.api.global.exception.BusinessException;
+import com.drafturl.api.infra.email.EmailService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateInquiryUseCase {
 
     private final InquiryRepository inquiryRepository;
+    private final EmailService emailService;
+    private final String adminEmail;
 
-    public CreateInquiryUseCase(InquiryRepository inquiryRepository) {
+    public CreateInquiryUseCase(InquiryRepository inquiryRepository,
+                                 EmailService emailService,
+                                 @Value("${app.resend.admin-email:drafturl.team@gmail.com}") String adminEmail) {
         this.inquiryRepository = inquiryRepository;
+        this.emailService = emailService;
+        this.adminEmail = adminEmail;
     }
 
     @Transactional
@@ -38,7 +46,22 @@ public class CreateInquiryUseCase {
         );
 
         inquiry = inquiryRepository.save(inquiry);
+
+        sendNotification(inquiry);
+
         return InquiryResponse.from(inquiry);
+    }
+
+    private void sendNotification(Inquiry inquiry) {
+        String subject = "[DraftURL] " + inquiry.getType().name() + ": " + inquiry.getSubject();
+        String html = "<h3>" + inquiry.getSubject() + "</h3>"
+                + "<p><b>유형:</b> " + inquiry.getType().name() + "</p>"
+                + "<p><b>발신자:</b> " + inquiry.getEmail()
+                + (inquiry.getName() != null ? " (" + inquiry.getName() + ")" : "") + "</p>"
+                + (inquiry.getDocumentId() != null ? "<p><b>문서:</b> " + inquiry.getDocumentId() + "</p>" : "")
+                + "<hr><p>" + inquiry.getMessage().replace("\n", "<br>") + "</p>";
+
+        emailService.send(adminEmail, subject, html);
     }
 
     private InquiryType parseType(String type) {

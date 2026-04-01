@@ -22,6 +22,7 @@ services:
       APP_CORS_ALLOWED_ORIGINS: https://drafturl.com,https://www.drafturl.com
       APP_FRONTEND_URL: https://drafturl.com
       APP_MCP_OAUTH2_ISSUER: https://drafturl.com
+      RESEND_API_KEY: ${RESEND_API_KEY}
     networks:
       - drafturl-net
     restart: unless-stopped
