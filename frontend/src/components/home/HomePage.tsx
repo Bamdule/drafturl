@@ -206,7 +206,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
           <input
             ref={fileInputRef}
             type="file"
-            accept=".html,.htm,.md,.markdown,text/html,text/markdown,text/plain"
+            accept=".html,.htm,.md,.markdown"
             className="hidden"
             onChange={handleFileInput}
           />
