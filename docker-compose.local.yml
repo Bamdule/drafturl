@@ -38,6 +38,7 @@ services:
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
+      - ./docs/guide:/docs/guide
     networks:
       - drafturl-net
     depends_on:

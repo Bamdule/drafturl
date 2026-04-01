@@ -9,13 +9,13 @@
 | 영역 | 문서 | TC 수 | 상태 |
 |------|------|-------|------|
 | 인증 | [auth.md](auth.md) | 12 | - |
-| 문서 생성 | [document-create.md](document-create.md) | 10 | - |
+| 문서 생성 | [document-create.md](document-create.md) | 15 | - |
 | 문서 관리 | [document-manage.md](document-manage.md) | 11 | - |
 | 문서 조회 | [document-view.md](document-view.md) | 8 | - |
-| 에디터 | [editor.md](editor.md) | 12 | - |
-| 인프라 | [infra.md](infra.md) | 8 | - |
+| 에디터 | [editor.md](editor.md) | 13 | - |
+| 인프라 | [infra.md](infra.md) | 11 | - |
 
-**전체 테스트 케이스: 61개**
+**전체 테스트 케이스: 70개**
 
 ---
 
