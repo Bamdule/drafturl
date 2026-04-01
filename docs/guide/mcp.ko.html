@@ -1,0 +1,107 @@
+<h1>MCP 연결 가이드</h1>
+
+<p>DraftURL은 <strong>MCP(Model Context Protocol)</strong> 서버를 제공합니다. AI 클라이언트(Claude Desktop, Claude Code, Cursor 등)에서 DraftURL에 직접 문서를 생성하고 관리할 수 있습니다.</p>
+
+<h2>MCP 서버 정보</h2>
+
+<table>
+  <thead>
+    <tr><th>항목</th><th>값</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>서버 URL</td><td><code>https://drafturl.com/mcp/transport</code></td></tr>
+    <tr><td>프로토콜</td><td>Streamable HTTP</td></tr>
+    <tr><td>인증</td><td>OAuth2 (PKCE)</td></tr>
+  </tbody>
+</table>
+
+<h2>클라이언트별 연결 방법</h2>
+
+<h3>Claude Desktop</h3>
+
+<p><code>claude_desktop_config.json</code> 파일에 다음을 추가하세요.</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<p>설정 파일 위치:</p>
+<ul>
+  <li><strong>macOS:</strong> <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+  <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+</ul>
+
+<h3>Claude Code</h3>
+
+<p>터미널에서 다음 명령어를 실행하세요.</p>
+
+<pre><code>claude mcp add drafturl --transport streamable-http https://drafturl.com/mcp/transport</code></pre>
+
+<h3>Cursor</h3>
+
+<p>프로젝트 루트의 <code>.cursor/mcp.json</code> 파일에 다음을 추가하세요.</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<h2>사용 가능한 도구</h2>
+
+<table>
+  <thead>
+    <tr><th>도구</th><th>설명</th><th>인증</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>create_document</code></td><td>HTML 또는 Markdown 문서를 생성하고 공유 URL을 발급합니다.</td><td>선택</td></tr>
+    <tr><td><code>get_document</code></td><td>slug로 문서의 내용과 메타데이터를 조회합니다.</td><td>필수</td></tr>
+    <tr><td><code>update_document</code></td><td>기존 문서의 내용, 제목, 비밀번호를 수정합니다.</td><td>필수</td></tr>
+    <tr><td><code>delete_document</code></td><td>문서를 삭제합니다.</td><td>필수</td></tr>
+    <tr><td><code>list_documents</code></td><td>내 문서 목록을 페이지네이션으로 조회합니다.</td><td>필수</td></tr>
+  </tbody>
+</table>
+
+<h3>create_document 파라미터</h3>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>content</code></td><td>O</td><td>문서 내용 (HTML 또는 Markdown)</td></tr>
+    <tr><td><code>type</code></td><td>O</td><td>문서 유형: <code>html</code> 또는 <code>markdown</code></td></tr>
+    <tr><td><code>title</code></td><td>X</td><td>문서 제목 (최대 200자)</td></tr>
+    <tr><td><code>password</code></td><td>X</td><td>문서 비밀번호 (4~100자)</td></tr>
+  </tbody>
+</table>
+
+<h2>인증</h2>
+
+<p>문서 조회, 수정, 삭제, 목록 도구는 <strong>로그인이 필요</strong>합니다. MCP 클라이언트에서 처음 인증이 필요한 도구를 호출하면, OAuth2 인증 흐름이 자동으로 시작됩니다.</p>
+
+<ol>
+  <li>브라우저에서 DraftURL 로그인 페이지가 열립니다.</li>
+  <li>로그인 후 접근 권한을 승인합니다.</li>
+  <li>인증이 완료되면 MCP 클라이언트로 자동 돌아옵니다.</li>
+</ol>
+
+<blockquote>
+  <p><strong>참고:</strong> <code>create_document</code>는 로그인 없이도 사용할 수 있지만, 비로그인으로 생성한 문서는 24시간 후 자동 만료됩니다.</p>
+</blockquote>
+
+<h2>사용 예시</h2>
+
+<p>Claude에게 다음과 같이 요청해보세요.</p>
+
+<ul>
+  <li>"이 마크다운 문서를 DraftURL에 공유해줘"</li>
+  <li>"내 DraftURL 문서 목록을 보여줘"</li>
+  <li>"이 HTML 리포트를 DraftURL에 올리고 URL을 알려줘"</li>
+</ul>

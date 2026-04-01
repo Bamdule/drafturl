@@ -39,6 +39,12 @@ export default function Header() {
 
       {/* Desktop nav */}
       <nav className="hidden sm:flex items-center gap-2">
+        <Link
+          href="/guide"
+          className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
+        >
+          {dict.header.guide}
+        </Link>
         {isAuthenticated ? (
           <>
             <Link
@@ -89,6 +95,13 @@ export default function Header() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className="sm:hidden absolute top-14 left-0 right-0 bg-bg-primary border-b border-border-dark px-4 py-3 flex flex-col gap-1">
+          <Link
+            href="/guide"
+            onClick={() => setMenuOpen(false)}
+            className="px-3 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
+          >
+            {dict.header.guide}
+          </Link>
           {isAuthenticated ? (
             <>
               <Link

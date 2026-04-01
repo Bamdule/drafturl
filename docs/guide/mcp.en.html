@@ -1,0 +1,107 @@
+<h1>MCP Connection Guide</h1>
+
+<p>DraftURL provides an <strong>MCP (Model Context Protocol)</strong> server. You can create and manage documents on DraftURL directly from AI clients like Claude Desktop, Claude Code, and Cursor.</p>
+
+<h2>MCP Server Info</h2>
+
+<table>
+  <thead>
+    <tr><th>Item</th><th>Value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Server URL</td><td><code>https://drafturl.com/mcp/transport</code></td></tr>
+    <tr><td>Protocol</td><td>Streamable HTTP</td></tr>
+    <tr><td>Authentication</td><td>OAuth2 (PKCE)</td></tr>
+  </tbody>
+</table>
+
+<h2>Setup by Client</h2>
+
+<h3>Claude Desktop</h3>
+
+<p>Add the following to your <code>claude_desktop_config.json</code>.</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<p>Config file location:</p>
+<ul>
+  <li><strong>macOS:</strong> <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+  <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+</ul>
+
+<h3>Claude Code</h3>
+
+<p>Run the following command in your terminal.</p>
+
+<pre><code>claude mcp add drafturl --transport streamable-http https://drafturl.com/mcp/transport</code></pre>
+
+<h3>Cursor</h3>
+
+<p>Add the following to <code>.cursor/mcp.json</code> in your project root.</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<h2>Available Tools</h2>
+
+<table>
+  <thead>
+    <tr><th>Tool</th><th>Description</th><th>Auth</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>create_document</code></td><td>Create an HTML or Markdown document and get a shareable URL.</td><td>Optional</td></tr>
+    <tr><td><code>get_document</code></td><td>Get a document's content and metadata by slug.</td><td>Required</td></tr>
+    <tr><td><code>update_document</code></td><td>Update an existing document's content, title, or password.</td><td>Required</td></tr>
+    <tr><td><code>delete_document</code></td><td>Delete a document.</td><td>Required</td></tr>
+    <tr><td><code>list_documents</code></td><td>List your documents with pagination.</td><td>Required</td></tr>
+  </tbody>
+</table>
+
+<h3>create_document Parameters</h3>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>content</code></td><td>Yes</td><td>Document content (HTML or Markdown)</td></tr>
+    <tr><td><code>type</code></td><td>Yes</td><td>Document type: <code>html</code> or <code>markdown</code></td></tr>
+    <tr><td><code>title</code></td><td>No</td><td>Document title (max 200 chars)</td></tr>
+    <tr><td><code>password</code></td><td>No</td><td>Password to protect document (4-100 chars)</td></tr>
+  </tbody>
+</table>
+
+<h2>Authentication</h2>
+
+<p>The get, update, delete, and list tools <strong>require login</strong>. When you first call a tool that requires authentication, the OAuth2 flow starts automatically.</p>
+
+<ol>
+  <li>A DraftURL login page opens in your browser.</li>
+  <li>Log in and approve access.</li>
+  <li>Once authenticated, you're returned to the MCP client.</li>
+</ol>
+
+<blockquote>
+  <p><strong>Note:</strong> <code>create_document</code> works without login, but guest documents expire after 24 hours.</p>
+</blockquote>
+
+<h2>Usage Examples</h2>
+
+<p>Try asking Claude:</p>
+
+<ul>
+  <li>"Share this markdown document on DraftURL"</li>
+  <li>"Show me my DraftURL documents"</li>
+  <li>"Upload this HTML report to DraftURL and give me the URL"</li>
+</ul>
