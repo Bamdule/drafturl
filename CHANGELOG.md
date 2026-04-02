@@ -5,6 +5,20 @@
 
 ---
 
+## [v0.9.4] - 2026-04-03
+
+랜딩 페이지 UX 개선 — Ctrl+V 붙여넣기 기능 구현, 레이아웃 수정.
+
+### Added
+- Ctrl+V 전체 페이지 붙여넣기 기능 구현 (HTML/Markdown 자동 감지)
+
+### Fixed
+- 드롭존 button-in-button HTML 구조 오류 수정 (role="button" div 내부 button 중첩)
+- 수직 레이아웃 중앙 정렬 개선 (flex-1 items-center 래퍼 추가)
+- use case 태그 및 만료 안내 문구 모바일에서도 노출 (`hidden md:*` → 항상 표시)
+
+---
+
 ## [v0.9.3] - 2026-04-03
 
 SEO canonical 수정, 랜딩 페이지 UI 개선.

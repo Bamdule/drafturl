@@ -38,7 +38,7 @@
     "steps": {
       "paste": {
         "title": "붙여넣기 또는 드래그앤드롭",
-        "description": "ChatGPT, Claude 등 LLM이 생성한 HTML이나 Markdown을 에디터에 붙여넣거나, .html/.md 파일을 화면에 드래그앤드롭하세요."
+        "description": "ChatGPT, Claude 등 LLM이 생성한 HTML이나 Markdown을 붙여넣거나, .html/.md 파일을 드래그앤드롭하세요."
       },
       "check": {
         "title": "미리보기 확인",

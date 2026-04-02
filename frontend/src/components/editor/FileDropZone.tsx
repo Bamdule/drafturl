@@ -56,6 +56,26 @@ export default function FileDropZone({ onFileDrop }: FileDropZoneProps) {
     [setContent, setDocType, onFileDrop, dict],
   );
 
+  // 전체 페이지 Ctrl+V 붙여넣기
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const active = document.activeElement;
+      if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) return;
+
+      const text = e.clipboardData?.getData("text/plain");
+      if (!text?.trim()) return;
+
+      const isHtml = /^\s*<!DOCTYPE|^\s*<html/i.test(text) || /<\/(div|p|h[1-6]|span|body|head)>/i.test(text);
+      setContent(text);
+      setDocType(isHtml ? "html" : "markdown");
+      setToast({ message: dict.fileDrop.loadSuccess, type: "success" });
+      onFileDrop?.();
+    };
+
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [setContent, setDocType, onFileDrop, dict]);
+
   // 전체 페이지 드래그앤드롭 이벤트
   useEffect(() => {
     let dragCounter = 0;

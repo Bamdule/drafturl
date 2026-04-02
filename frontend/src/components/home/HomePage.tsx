@@ -131,7 +131,8 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
       <FileDropZone onFileDrop={handleFileDrop} />
       <Header />
 
-      <div className="mx-auto w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-[5fr_7fr] gap-8 px-6 pt-6 pb-8 md:gap-12 md:px-10">
+      <div className="flex flex-1 items-center py-8">
+      <div className="mx-auto w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-[5fr_7fr] gap-8 px-6 md:gap-12 md:px-10">
         {/* Left: Hero + Steps */}
         <div className="flex flex-col gap-7">
           <section className="animate-fade-up" style={{ animationDelay: "0.05s" }}>
@@ -194,7 +195,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
           </div>
 
           {/* Use cases */}
-          <div className="hidden md:flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted/40">
               {dict.useCases.label}
             </p>
@@ -211,7 +212,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
             </div>
           </div>
 
-          <div className="hidden md:block text-xs text-text-muted">
+          <div className="text-xs text-text-muted">
             {dict.publish.expiryNotice}{" "}
             <Link href="/auth/login" className="text-accent hover:underline">
               {dict.publish.loginKeep}
@@ -231,23 +232,10 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
           />
 
           <div
-            onClick={!hasFile ? handleDropZoneClick : undefined}
-            role={!hasFile ? "button" : undefined}
-            tabIndex={!hasFile ? 0 : undefined}
-            onKeyDown={
-              !hasFile
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleDropZoneClick();
-                    }
-                  }
-                : undefined
-            }
             className={`relative flex min-h-[280px] md:min-h-[420px] flex-col items-center justify-center gap-5 overflow-hidden rounded-2xl p-6 md:p-8 transition-all ${
               hasFile
                 ? "border-2 border-solid border-green-500/30 bg-gradient-to-b from-green-500/[0.04] to-bg-secondary/80"
-                : "cursor-pointer border-2 border-dashed border-accent/25 bg-gradient-to-b from-accent/[0.04] to-bg-secondary/80 hover:border-accent/50 hover:shadow-[0_0_48px_rgba(124,92,252,0.08)]"
+                : "border-2 border-dashed border-accent/25 bg-gradient-to-b from-accent/[0.04] to-bg-secondary/80 hover:border-accent/50 hover:shadow-[0_0_48px_rgba(124,92,252,0.08)]"
             }`}
             style={
               hasFile
@@ -422,6 +410,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
             )}
           </div>
         </div>
+      </div>
       </div>
 
       {children}

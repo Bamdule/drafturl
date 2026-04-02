@@ -38,7 +38,7 @@
     "steps": {
       "paste": {
         "title": "Paste or Drag & Drop",
-        "description": "Paste HTML or Markdown from ChatGPT, Claude, or any LLM into the editor — or drag & drop an .html/.md file."
+        "description": "Paste HTML or Markdown from ChatGPT, Claude, or any LLM — or drag & drop an .html/.md file."
       },
       "check": {
         "title": "Check the Preview",
