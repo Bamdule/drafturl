@@ -2,6 +2,10 @@
 
 <p>DraftURL은 <strong>MCP(Model Context Protocol)</strong> 서버를 제공합니다. AI 클라이언트(Claude Desktop, Claude Code, Cursor 등)에서 DraftURL에 직접 문서를 생성하고 관리할 수 있습니다.</p>
 
+<blockquote>
+  <p><strong>공식 레지스트리 등록:</strong> DraftURL MCP는 <a href="https://registry.modelcontextprotocol.io/" target="_blank">MCP Registry</a>에 <code>io.github.Bamdule/drafturl</code>로 등록되어 있습니다.</p>
+</blockquote>
+
 <h2>MCP 서버 정보</h2>
 
 <table>
@@ -39,7 +43,7 @@
 
 <p>터미널에서 다음 명령어를 실행하세요.</p>
 
-<pre><code>claude mcp add drafturl --transport streamable-http https://drafturl.com/mcp/transport</code></pre>
+<pre><code>claude mcp add --transport http drafturl https://drafturl.com/mcp/transport</code></pre>
 
 <h3>Cursor</h3>
 
@@ -88,7 +92,8 @@
 
 <ol>
   <li>브라우저에서 DraftURL 로그인 페이지가 열립니다.</li>
-  <li>로그인 후 접근 권한을 승인합니다.</li>
+  <li>이메일/비밀번호 또는 <strong>Google 계정</strong>으로 로그인합니다.</li>
+  <li>접근 권한을 승인합니다.</li>
   <li>인증이 완료되면 MCP 클라이언트로 자동 돌아옵니다.</li>
 </ol>
 
