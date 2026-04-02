@@ -37,7 +37,7 @@ export function proxy(request: NextRequest) {
   // 1. 루트 경로 → 선호 locale로 리다이렉트
   if (pathname === "/") {
     const locale = getPreferredLocale(request);
-    return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    return NextResponse.redirect(new URL(`/${locale}`, request.url), 301);
   }
 
   // 2. locale 경로 → 쿠키 저장 + x-locale 헤더 주입

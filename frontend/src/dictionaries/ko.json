@@ -42,7 +42,7 @@
       },
       "check": {
         "title": "미리보기 확인",
-        "description": "오른쪽 미리보기에서 결과를 실시간으로 확인하고, 필요하면 바로 수정하세요."
+        "description": "미리보기 버튼으로 렌더링 결과를 확인하세요. 수정이 필요하면 파일을 다시 올리면 됩니다."
       },
       "share": {
         "title": "공유 URL 발급",
@@ -96,11 +96,17 @@
   },
   "fileDrop": {
     "dropHere": "여기에 파일을 놓으세요",
-    "supportedFormats": ".html, .htm, .md, .markdown 파일을 지원합니다",
+    "pasteHint": "또는 Ctrl+V로 붙여넣기",
+    "selectFile": "파일 선택하기",
+    "supportedFormats": ".html .htm .md .markdown · 최대 5MB",
     "fileSizeError": "파일 크기가 5MB를 초과합니다.",
     "unsupportedError": "지원하지 않는 파일 형식입니다.",
     "loadSuccess": "파일을 불러왔습니다.",
     "loadError": "파일을 읽는 중 오류가 발생했습니다."
+  },
+  "useCases": {
+    "label": "이런 분들이 사용해요",
+    "items": ["Claude 결과물 공유", "ChatGPT 보고서 전달", "Cursor 페이지 배포", "팀 문서 링크 공유", "Markdown 즉시 게시"]
   },
   "auth": {
     "login": {

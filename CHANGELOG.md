@@ -5,6 +5,25 @@
 
 ---
 
+## [v0.9.3] - 2026-04-03
+
+SEO canonical 수정, 랜딩 페이지 UI 개선.
+
+### Fixed
+- SEO: canonical 태그가 `localhost:3000`을 가리키던 문제 수정 (`NEXT_PUBLIC_SITE_URL` Dockerfile 누락)
+- SEO: 루트(`/`) 리다이렉트 307 → 301 변경 (Google에 영구 리다이렉트 신호 전달)
+
+### Improved
+- 랜딩 페이지 히어로 타이틀 fade-up 진입 애니메이션
+- gradient-text 색상 이동 애니메이션 (gradient-shift)
+- use case 태그 섹션 추가 ("Claude 결과물 공유", "ChatGPT 보고서 전달" 등)
+- 파일 드롭존 문구 개선 (Ctrl+V 힌트, 파일 선택하기 버튼 추가)
+
+### Docs
+- 구버전 태스크 파일 `docs/archive/tasks/`로 정리
+
+---
+
 ## [v0.9.2] - 2026-04-02
 
 MCP 인증 플로우 개선, 보안 수정.

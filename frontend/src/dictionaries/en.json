@@ -42,7 +42,7 @@
       },
       "check": {
         "title": "Check the Preview",
-        "description": "See the result in the live preview on the right. Edit on the spot if needed."
+        "description": "Click Preview to see the rendered result. Re-upload if you need to make changes."
       },
       "share": {
         "title": "Get a Share URL",
@@ -96,11 +96,17 @@
   },
   "fileDrop": {
     "dropHere": "Drop your file here",
-    "supportedFormats": "Supports .html, .htm, .md, .markdown files",
+    "pasteHint": "or paste with Ctrl+V",
+    "selectFile": "Select a file",
+    "supportedFormats": ".html .htm .md .markdown · Max 5MB",
     "fileSizeError": "File size exceeds 5MB.",
     "unsupportedError": "Unsupported file format.",
     "loadSuccess": "File loaded successfully.",
     "loadError": "An error occurred while reading the file."
+  },
+  "useCases": {
+    "label": "Used for",
+    "items": ["Share Claude output", "Send ChatGPT reports", "Deploy Cursor pages", "Share team docs", "Publish Markdown instantly"]
   },
   "auth": {
     "login": {

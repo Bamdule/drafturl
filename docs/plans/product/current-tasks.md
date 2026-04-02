@@ -4,11 +4,9 @@
 
 ## 완료
 
-- [x] MCP Registry 등록 (io.github.Bamdule/drafturl v1.0.0)
-
 ## 진행 중
 
 ## 예정
+- [ ] GSC 색인 재요청 (drafturl.com/ko, /en)
 - [ ] SEO 블로그 콘텐츠 작성 (3~5개)
 - [ ] Product Hunt 런칭 준비
-- [ ] GSC 색인 재요청
