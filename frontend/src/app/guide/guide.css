@@ -124,3 +124,25 @@
   font-size: 0.82rem;
   line-height: 1.6;
 }
+
+.guide-article .example-box {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.guide-article .example-box strong {
+  color: var(--color-text-primary);
+}
+
+.guide-article .example-box code {
+  color: var(--color-accent);
+}
+
+.guide-article .example-box .mb-2 {
+  margin-bottom: 0.5rem;
+}
