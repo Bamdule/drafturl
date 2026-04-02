@@ -5,6 +5,24 @@
 
 ---
 
+## [v0.9.2] - 2026-04-02
+
+MCP 인증 플로우 개선, 보안 수정.
+
+### Added
+- MCP 로그인에 "Continue with Google" 지원 (Google OAuth 사용자도 MCP 인증 가능)
+- 프론트엔드 로그인 returnTo 파라미터 (MCP → Google 로그인 → MCP 복귀)
+- 1:1 문의에 "콘텐츠 신고" 유형 추가
+
+### Fixed
+- MCP consent user_id 보안 수정 (hidden field → 세션 쿠키에서만 추출)
+- MCP 에러 응답 안정화 (수동 문자열 조합 → ObjectMapper)
+
+### Removed
+- 문서 뷰어 신고 버튼 제거 (1:1 문의로 통합)
+
+---
+
 ## [v0.9.1] - 2026-04-02
 
 전체 UI/UX 개선, 모바일 최적화, 버그 수정.

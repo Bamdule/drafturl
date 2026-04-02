@@ -8,7 +8,6 @@
 
 ## 예정
 
-- [ ] Google OAuth2 앱 등록 (소셜 로그인 활성화)
 - [ ] MCP Registry 등록
 - [ ] SEO 블로그 콘텐츠 작성 (3~5개)
 - [ ] Product Hunt 런칭 준비

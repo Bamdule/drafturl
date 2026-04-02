@@ -136,6 +136,10 @@ public class DocumentMcpTools {
 
     private String errorResponse(Exception e) {
         log.warn("MCP 도구 실행 실패: {}", e.getMessage());
-        return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
+        try {
+            return objectMapper.writeValueAsString(java.util.Map.of("error", e.getMessage() != null ? e.getMessage() : "Unknown error"));
+        } catch (JsonProcessingException ex) {
+            return "{\"error\":\"Internal error\"}";
+        }
     }
 }

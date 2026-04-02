@@ -60,7 +60,15 @@ function AuthCallbackContent() {
 
         login(result.user);
         window.umami?.track("login", { provider: provider as string });
-        window.location.href = "/dashboard";
+
+        // MCP OAuth2 인증 시 저장된 returnTo로 리다이렉트 (open redirect 방지)
+        const mcpReturnTo = sessionStorage.getItem("mcp_return_to");
+        if (mcpReturnTo && mcpReturnTo.startsWith("/")) {
+          sessionStorage.removeItem("mcp_return_to");
+          window.location.href = mcpReturnTo;
+        } else {
+          window.location.href = "/dashboard";
+        }
       } catch (err) {
         if (err instanceof ApiError && err.code === "EMAIL_ALREADY_EXISTS") {
           const providerNames: Record<string, string> = {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { generateOAuthState, emailLogin } from "@/lib/api/auth";
 import { OAUTH_PROVIDERS, COOKIE_OAUTH_STATE, COOKIE_OAUTH_PROVIDER } from "@/lib/constants";
 import { setCookie } from "@/lib/utils/cookie";
@@ -11,6 +12,8 @@ import { ApiError } from "@/lib/api/types";
 import type { OAuthProvider } from "@/lib/constants";
 import Header from "@/components/layout/Header";
 
+const SESSION_KEY_RETURN_TO = "mcp_return_to";
+
 /** 각 프로바이더의 Client ID 환경변수 매핑 */
 const OAUTH_CLIENT_IDS: Record<OAuthProvider, string | undefined> = {
   google: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -19,10 +22,22 @@ const OAUTH_CLIENT_IDS: Record<OAuthProvider, string | undefined> = {
   kakao: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const { dict } = useDict();
   const { login } = useAuthStore();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
+
+  /** returnTo가 유효한 상대 경로인지 검증 (open redirect 방지) */
+  const getRedirectUrl = useCallback(() => {
+    const savedReturnTo = sessionStorage.getItem(SESSION_KEY_RETURN_TO) || returnTo;
+    if (savedReturnTo && savedReturnTo.startsWith("/")) {
+      sessionStorage.removeItem(SESSION_KEY_RETURN_TO);
+      return savedReturnTo;
+    }
+    return "/dashboard";
+  }, [returnTo]);
 
   // Email login state
   const [email, setEmail] = useState("");
@@ -38,6 +53,13 @@ export default function LoginPage() {
       setIsOAuthLoading(true);
 
       try {
+        // OAuth 콜백 후 returnTo로 리다이렉트하기 위해 sessionStorage에 저장
+        if (returnTo && returnTo.startsWith("/")) {
+          sessionStorage.setItem(SESSION_KEY_RETURN_TO, returnTo);
+        } else {
+          sessionStorage.removeItem(SESSION_KEY_RETURN_TO);
+        }
+
         const { state } = await generateOAuthState();
         setCookie(COOKIE_OAUTH_STATE, state, { maxAge: 300, sameSite: "Lax" });
         setCookie(COOKIE_OAUTH_PROVIDER, provider, {
@@ -65,7 +87,7 @@ export default function LoginPage() {
         setIsOAuthLoading(false);
       }
     },
-    [isOAuthLoading],
+    [isOAuthLoading, returnTo],
   );
 
   const handleEmailLogin = useCallback(
@@ -94,7 +116,7 @@ export default function LoginPage() {
 
         login(result.user);
         window.umami?.track("login", { provider: "email" });
-        window.location.href = "/dashboard";
+        window.location.href = getRedirectUrl();
       } catch (err) {
         if (err instanceof ApiError) {
           setServerError(err.message);
@@ -105,7 +127,7 @@ export default function LoginPage() {
         setIsLoginLoading(false);
       }
     },
-    [email, password, isLoginLoading, login, dict],
+    [email, password, isLoginLoading, login, dict, getRedirectUrl],
   );
 
   const isLoading = isOAuthLoading || isLoginLoading;
@@ -406,5 +428,21 @@ function EyeOffIcon() {
         d="M3.98 8.223A10.477 10.477 0 001.934 12.07a1.012 1.012 0 000 .639C3.423 16.49 7.36 19.5 12 19.5c1.658 0 3.222-.394 4.601-1.092M6.228 6.228A10.45 10.45 0 0112 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639a10.496 10.496 0 01-3.752 5.014M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 01-4.243-4.243m4.242 4.242L9.88 9.88"
       />
     </svg>
+  );
+}
+
+/* ---------- Page (default export with Suspense boundary) ---------- */
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-bg-primary">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border-dark border-t-accent" />
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
