@@ -16,10 +16,34 @@
     <tr><td>Server URL</td><td><code>https://drafturl.com/mcp/transport</code></td></tr>
     <tr><td>Protocol</td><td>Streamable HTTP</td></tr>
     <tr><td>Authentication</td><td>OAuth2 (PKCE)</td></tr>
+    <tr><td>Installation</td><td>Not required (remote server)</td></tr>
   </tbody>
 </table>
 
 <h2>Setup by Client</h2>
+
+<h3>Claude Code (Terminal)</h3>
+
+<p>The simplest way. Just run one command in your terminal.</p>
+
+<pre><code>claude mcp add --transport http drafturl https://drafturl.com/mcp/transport</code></pre>
+
+<p>This registers as a <strong>global setting</strong>. DraftURL MCP will be available in all projects.</p>
+
+<p>For per-project setup, create a <code>.mcp.json</code> file in your project root:</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "type": "http",
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<blockquote>
+  <p><strong>Note:</strong> Project-level MCP shows a trust confirmation dialog on first use.</p>
+</blockquote>
 
 <h3>Claude Desktop</h3>
 
@@ -39,12 +63,6 @@
   <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
 </ul>
 
-<h3>Claude Code</h3>
-
-<p>Run the following command in your terminal.</p>
-
-<pre><code>claude mcp add --transport http drafturl https://drafturl.com/mcp/transport</code></pre>
-
 <h3>Cursor</h3>
 
 <p>Add the following to <code>.cursor/mcp.json</code> in your project root.</p>
@@ -56,35 +74,6 @@
     }
   }
 }</code></pre>
-
-<h2>Available Tools</h2>
-
-<table>
-  <thead>
-    <tr><th>Tool</th><th>Description</th><th>Auth</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>create_document</code></td><td>Create an HTML or Markdown document and get a shareable URL.</td><td>Optional</td></tr>
-    <tr><td><code>get_document</code></td><td>Get a document's content and metadata by slug.</td><td>Required</td></tr>
-    <tr><td><code>update_document</code></td><td>Update an existing document's content, title, or password.</td><td>Required</td></tr>
-    <tr><td><code>delete_document</code></td><td>Delete a document.</td><td>Required</td></tr>
-    <tr><td><code>list_documents</code></td><td>List your documents with pagination.</td><td>Required</td></tr>
-  </tbody>
-</table>
-
-<h3>create_document Parameters</h3>
-
-<table>
-  <thead>
-    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>content</code></td><td>Yes</td><td>Document content (HTML or Markdown)</td></tr>
-    <tr><td><code>type</code></td><td>Yes</td><td>Document type: <code>html</code> or <code>markdown</code></td></tr>
-    <tr><td><code>title</code></td><td>No</td><td>Document title (max 200 chars)</td></tr>
-    <tr><td><code>password</code></td><td>No</td><td>Password to protect document (4-100 chars)</td></tr>
-  </tbody>
-</table>
 
 <h2>Authentication</h2>
 
@@ -98,15 +87,158 @@
 </ol>
 
 <blockquote>
-  <p><strong>Note:</strong> <code>create_document</code> works without login, but guest documents expire after 24 hours.</p>
+  <p><strong>Note:</strong> <code>create_document</code> works without login, but guest documents expire after <strong>24 hours</strong>. Log in to keep them permanently.</p>
 </blockquote>
+
+<h2>Available Tools</h2>
+
+<h3>create_document — Create a document</h3>
+
+<p>Create an HTML or Markdown document and get a shareable URL.</p>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>content</code></td><td>Yes</td><td>Document content (HTML or Markdown)</td></tr>
+    <tr><td><code>type</code></td><td>Yes</td><td>Document type: <code>html</code> or <code>markdown</code></td></tr>
+    <tr><td><code>title</code></td><td>No</td><td>Document title (max 200 chars)</td></tr>
+    <tr><td><code>password</code></td><td>No</td><td>Password to protect document (4-100 chars)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Example response:</strong></p>
+<pre><code>{
+  "id": "ELaEXHezsupz",
+  "slug": "ELaEXHezsupz",
+  "url": "https://drafturl.com/ELaEXHezsupz",
+  "title": "Marketing Report",
+  "docType": "html",
+  "status": "active"
+}</code></pre>
+
+<h3>get_document — Get a document</h3>
+
+<p>Get a document's content and metadata by slug. Only <strong>your own documents</strong> can be retrieved.</p>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>Yes</td><td>Document identifier (last part of URL, e.g., <code>ELaEXHezsupz</code>)</td></tr>
+  </tbody>
+</table>
+
+<h3>update_document — Update a document</h3>
+
+<p>Update an existing document's content, title, or password. Only send the fields you want to change.</p>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>Yes</td><td>Document identifier</td></tr>
+    <tr><td><code>content</code></td><td>No</td><td>New content (HTML or Markdown)</td></tr>
+    <tr><td><code>title</code></td><td>No</td><td>New title (max 200 chars)</td></tr>
+    <tr><td><code>password</code></td><td>No</td><td>New password. Send empty string ("") to remove password</td></tr>
+  </tbody>
+</table>
+
+<h3>delete_document — Delete a document</h3>
+
+<p>Delete a document. The shared URL will no longer be accessible.</p>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>Yes</td><td>Document identifier</td></tr>
+  </tbody>
+</table>
+
+<h3>list_documents — List documents</h3>
+
+<p>List your documents with pagination.</p>
+
+<table>
+  <thead>
+    <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>page</code></td><td>No</td><td>Page number (0-based, default: 0)</td></tr>
+    <tr><td><code>size</code></td><td>No</td><td>Page size (max 50, default: 20)</td></tr>
+  </tbody>
+</table>
 
 <h2>Usage Examples</h2>
 
-<p>Try asking Claude:</p>
+<p>Just ask your AI client in natural language and DraftURL MCP tools will be called automatically.</p>
 
-<ul>
-  <li>"Share this markdown document on DraftURL"</li>
-  <li>"Show me my DraftURL documents"</li>
-  <li>"Upload this HTML report to DraftURL and give me the URL"</li>
-</ul>
+<h3>Create &amp; Share a document</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>You:</strong> "Create an HTML report of this quarter's marketing results and share it on DraftURL"</p>
+  <p style="margin-bottom:8px;"><strong>AI:</strong> Writes an HTML report and calls <code>create_document</code>.</p>
+  <p><strong>Result:</strong> <code>https://drafturl.com/xK9mP2nQ</code> — Share this URL with your team.</p>
+</div>
+
+<h3>Update an existing document</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>You:</strong> "Change the title of xK9mP2nQ to '2026 Q1 Marketing Report'"</p>
+  <p><strong>AI:</strong> Calls <code>update_document</code> to update the title.</p>
+</div>
+
+<h3>List your documents</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>You:</strong> "Show me my DraftURL documents"</p>
+  <p><strong>AI:</strong> Calls <code>list_documents</code> and displays titles, URLs, and creation dates.</p>
+</div>
+
+<h3>Create a password-protected document</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>You:</strong> "Upload this proposal to DraftURL with password '1234'"</p>
+  <p><strong>AI:</strong> Calls <code>create_document</code> with <code>password: "1234"</code>.</p>
+</div>
+
+<h3>Share a Markdown file</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>You:</strong> "Upload the README.md to DraftURL"</p>
+  <p><strong>AI:</strong> Reads the file and calls <code>create_document</code> with <code>type: "markdown"</code>.</p>
+</div>
+
+<h2>Limits</h2>
+
+<table>
+  <thead>
+    <tr><th>Item</th><th>Limit</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Max document size</td><td>5MB</td></tr>
+    <tr><td>Max documents</td><td>30 (Free plan)</td></tr>
+    <tr><td>Guest document expiry</td><td>24 hours</td></tr>
+    <tr><td>Supported formats</td><td>HTML, Markdown</td></tr>
+    <tr><td>Access Token TTL</td><td>1 hour (auto-refresh)</td></tr>
+  </tbody>
+</table>
+
+<h2>Troubleshooting</h2>
+
+<h3>"Session not found" error</h3>
+<p>MCP sessions may expire after server updates. In Claude Code, use the <code>/mcp</code> command to restart the drafturl server.</p>
+
+<h3>Authentication keeps being requested</h3>
+<p>Access tokens auto-refresh every hour. If browser cookies were cleared or the server was restarted, re-authentication may be required.</p>
+
+<h3>Google login doesn't work</h3>
+<p>On the MCP login page, click "Continue with Google" to be redirected to the DraftURL login page. After Google login, you'll be automatically returned to the MCP authorization screen.</p>
+
+<h3>"DOCUMENT_LIMIT_EXCEEDED" error</h3>
+<p>Free plan allows up to 30 documents. Delete existing documents and try again.</p>

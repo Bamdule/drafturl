@@ -16,10 +16,34 @@
     <tr><td>서버 URL</td><td><code>https://drafturl.com/mcp/transport</code></td></tr>
     <tr><td>프로토콜</td><td>Streamable HTTP</td></tr>
     <tr><td>인증</td><td>OAuth2 (PKCE)</td></tr>
+    <tr><td>설치</td><td>불필요 (원격 서버)</td></tr>
   </tbody>
 </table>
 
 <h2>클라이언트별 연결 방법</h2>
+
+<h3>Claude Code (터미널)</h3>
+
+<p>가장 간단한 방법입니다. 터미널에서 한 줄만 실행하세요.</p>
+
+<pre><code>claude mcp add --transport http drafturl https://drafturl.com/mcp/transport</code></pre>
+
+<p>이 명령어는 <strong>글로벌 설정</strong>으로 등록됩니다. 모든 프로젝트에서 DraftURL MCP를 사용할 수 있습니다.</p>
+
+<p>프로젝트별로 설정하려면 프로젝트 루트에 <code>.mcp.json</code> 파일을 생성하세요:</p>
+
+<pre><code>{
+  "mcpServers": {
+    "drafturl": {
+      "type": "http",
+      "url": "https://drafturl.com/mcp/transport"
+    }
+  }
+}</code></pre>
+
+<blockquote>
+  <p><strong>참고:</strong> 프로젝트 레벨 MCP는 첫 사용 시 신뢰 확인 다이얼로그가 표시됩니다.</p>
+</blockquote>
 
 <h3>Claude Desktop</h3>
 
@@ -39,12 +63,6 @@
   <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
 </ul>
 
-<h3>Claude Code</h3>
-
-<p>터미널에서 다음 명령어를 실행하세요.</p>
-
-<pre><code>claude mcp add --transport http drafturl https://drafturl.com/mcp/transport</code></pre>
-
 <h3>Cursor</h3>
 
 <p>프로젝트 루트의 <code>.cursor/mcp.json</code> 파일에 다음을 추가하세요.</p>
@@ -56,35 +74,6 @@
     }
   }
 }</code></pre>
-
-<h2>사용 가능한 도구</h2>
-
-<table>
-  <thead>
-    <tr><th>도구</th><th>설명</th><th>인증</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>create_document</code></td><td>HTML 또는 Markdown 문서를 생성하고 공유 URL을 발급합니다.</td><td>선택</td></tr>
-    <tr><td><code>get_document</code></td><td>slug로 문서의 내용과 메타데이터를 조회합니다.</td><td>필수</td></tr>
-    <tr><td><code>update_document</code></td><td>기존 문서의 내용, 제목, 비밀번호를 수정합니다.</td><td>필수</td></tr>
-    <tr><td><code>delete_document</code></td><td>문서를 삭제합니다.</td><td>필수</td></tr>
-    <tr><td><code>list_documents</code></td><td>내 문서 목록을 페이지네이션으로 조회합니다.</td><td>필수</td></tr>
-  </tbody>
-</table>
-
-<h3>create_document 파라미터</h3>
-
-<table>
-  <thead>
-    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>content</code></td><td>O</td><td>문서 내용 (HTML 또는 Markdown)</td></tr>
-    <tr><td><code>type</code></td><td>O</td><td>문서 유형: <code>html</code> 또는 <code>markdown</code></td></tr>
-    <tr><td><code>title</code></td><td>X</td><td>문서 제목 (최대 200자)</td></tr>
-    <tr><td><code>password</code></td><td>X</td><td>문서 비밀번호 (4~100자)</td></tr>
-  </tbody>
-</table>
 
 <h2>인증</h2>
 
@@ -98,15 +87,158 @@
 </ol>
 
 <blockquote>
-  <p><strong>참고:</strong> <code>create_document</code>는 로그인 없이도 사용할 수 있지만, 비로그인으로 생성한 문서는 24시간 후 자동 만료됩니다.</p>
+  <p><strong>참고:</strong> <code>create_document</code>는 로그인 없이도 사용할 수 있지만, 비로그인으로 생성한 문서는 <strong>24시간 후 자동 만료</strong>됩니다. 로그인하면 영구 보관됩니다.</p>
 </blockquote>
+
+<h2>사용 가능한 도구</h2>
+
+<h3>create_document — 문서 생성</h3>
+
+<p>HTML 또는 Markdown 문서를 생성하고 공유 URL을 발급합니다.</p>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>content</code></td><td>O</td><td>문서 내용 (HTML 또는 Markdown)</td></tr>
+    <tr><td><code>type</code></td><td>O</td><td>문서 유형: <code>html</code> 또는 <code>markdown</code></td></tr>
+    <tr><td><code>title</code></td><td>X</td><td>문서 제목 (최대 200자)</td></tr>
+    <tr><td><code>password</code></td><td>X</td><td>문서 비밀번호 (4~100자)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>응답 예시:</strong></p>
+<pre><code>{
+  "id": "ELaEXHezsupz",
+  "slug": "ELaEXHezsupz",
+  "url": "https://drafturl.com/ELaEXHezsupz",
+  "title": "마케팅 보고서",
+  "docType": "html",
+  "status": "active"
+}</code></pre>
+
+<h3>get_document — 문서 조회</h3>
+
+<p>slug로 문서의 내용과 메타데이터를 조회합니다. <strong>소유한 문서만</strong> 조회 가능합니다.</p>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>O</td><td>문서 식별자 (URL의 마지막 부분, 예: <code>ELaEXHezsupz</code>)</td></tr>
+  </tbody>
+</table>
+
+<h3>update_document — 문서 수정</h3>
+
+<p>기존 문서의 내용, 제목, 비밀번호를 수정합니다. 변경할 항목만 전달하면 됩니다.</p>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>O</td><td>문서 식별자</td></tr>
+    <tr><td><code>content</code></td><td>X</td><td>새 내용 (HTML 또는 Markdown)</td></tr>
+    <tr><td><code>title</code></td><td>X</td><td>새 제목 (최대 200자)</td></tr>
+    <tr><td><code>password</code></td><td>X</td><td>새 비밀번호. 빈 문자열("")을 보내면 비밀번호 해제</td></tr>
+  </tbody>
+</table>
+
+<h3>delete_document — 문서 삭제</h3>
+
+<p>문서를 삭제합니다. 삭제 후 공유 URL은 더 이상 접근할 수 없습니다.</p>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>slug</code></td><td>O</td><td>문서 식별자</td></tr>
+  </tbody>
+</table>
+
+<h3>list_documents — 문서 목록</h3>
+
+<p>내 문서 목록을 페이지네이션으로 조회합니다.</p>
+
+<table>
+  <thead>
+    <tr><th>파라미터</th><th>필수</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>page</code></td><td>X</td><td>페이지 번호 (0부터 시작, 기본: 0)</td></tr>
+    <tr><td><code>size</code></td><td>X</td><td>페이지 크기 (최대 50, 기본: 20)</td></tr>
+  </tbody>
+</table>
 
 <h2>사용 예시</h2>
 
-<p>Claude에게 다음과 같이 요청해보세요.</p>
+<p>AI 클라이언트에서 자연어로 요청하면 DraftURL MCP 도구가 자동으로 호출됩니다.</p>
 
-<ul>
-  <li>"이 마크다운 문서를 DraftURL에 공유해줘"</li>
-  <li>"내 DraftURL 문서 목록을 보여줘"</li>
-  <li>"이 HTML 리포트를 DraftURL에 올리고 URL을 알려줘"</li>
-</ul>
+<h3>문서 생성 &amp; 공유</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>사용자:</strong> "이번 분기 마케팅 실적을 HTML 보고서로 만들어서 DraftURL에 공유해줘"</p>
+  <p style="margin-bottom:8px;"><strong>AI:</strong> HTML 보고서를 작성하고 <code>create_document</code>를 호출합니다.</p>
+  <p><strong>결과:</strong> <code>https://drafturl.com/xK9mP2nQ</code> — 이 URL을 팀원에게 공유하세요.</p>
+</div>
+
+<h3>기존 문서 수정</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>사용자:</strong> "xK9mP2nQ 문서의 제목을 '2026 Q1 마케팅 보고서'로 바꿔줘"</p>
+  <p><strong>AI:</strong> <code>update_document</code>를 호출하여 제목을 변경합니다.</p>
+</div>
+
+<h3>문서 목록 확인</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>사용자:</strong> "내 DraftURL 문서 목록을 보여줘"</p>
+  <p><strong>AI:</strong> <code>list_documents</code>를 호출하여 문서 제목, URL, 생성일 등을 표시합니다.</p>
+</div>
+
+<h3>비밀번호 보호 문서 생성</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>사용자:</strong> "이 제안서를 DraftURL에 올리고 비밀번호 '1234'로 보호해줘"</p>
+  <p><strong>AI:</strong> <code>create_document</code>에 <code>password: "1234"</code>를 포함하여 호출합니다.</p>
+</div>
+
+<h3>Markdown 문서 공유</h3>
+
+<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:12px 0;font-size:14px;color:#333;">
+  <p style="margin-bottom:8px;"><strong>사용자:</strong> "README.md 내용을 DraftURL에 올려줘"</p>
+  <p><strong>AI:</strong> 파일을 읽고 <code>create_document</code>에 <code>type: "markdown"</code>으로 호출합니다.</p>
+</div>
+
+<h2>제한사항</h2>
+
+<table>
+  <thead>
+    <tr><th>항목</th><th>제한</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>문서 최대 크기</td><td>5MB</td></tr>
+    <tr><td>문서 최대 개수</td><td>30개 (Free 플랜)</td></tr>
+    <tr><td>비로그인 문서 만료</td><td>24시간</td></tr>
+    <tr><td>지원 형식</td><td>HTML, Markdown</td></tr>
+    <tr><td>Access Token 유효기간</td><td>1시간 (자동 갱신)</td></tr>
+  </tbody>
+</table>
+
+<h2>트러블슈팅</h2>
+
+<h3>"Session not found" 에러</h3>
+<p>서버 업데이트 후 MCP 세션이 만료될 수 있습니다. Claude Code에서 <code>/mcp</code> 명령으로 drafturl 서버를 재시작하세요.</p>
+
+<h3>인증이 반복적으로 요구됨</h3>
+<p>Access Token은 1시간마다 자동 갱신됩니다. 브라우저 쿠키가 삭제되었거나 서버가 재시작된 경우 재인증이 필요할 수 있습니다.</p>
+
+<h3>Google 로그인이 안 됨</h3>
+<p>MCP 로그인 페이지에서 "Continue with Google" 버튼을 클릭하면 DraftURL 로그인 페이지로 이동합니다. Google 로그인 후 자동으로 MCP 인증 화면으로 돌아옵니다.</p>
+
+<h3>"DOCUMENT_LIMIT_EXCEEDED" 에러</h3>
+<p>Free 플랜은 최대 30개 문서를 생성할 수 있습니다. 기존 문서를 삭제한 후 다시 시도하세요.</p>
