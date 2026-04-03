@@ -397,6 +397,9 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
                   {dict.fileDrop.dropHere}
                 </div>
                 <div className="text-xs text-text-muted">{dict.fileDrop.pasteHint}</div>
+                <p className="max-w-[320px] text-center text-xs leading-relaxed text-text-muted/70">
+                  {dict.editor.homePlaceholder}
+                </p>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDropZoneClick(); }}
                   className="mt-1 rounded-lg border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20 cursor-pointer"

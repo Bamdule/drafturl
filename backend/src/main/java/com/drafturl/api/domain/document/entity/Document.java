@@ -135,6 +135,21 @@ public class Document extends BaseEntity {
         this.status = DocumentStatus.EXPIRED;
     }
 
+    /**
+     * 게스트 문서를 로그인 사용자에게 이관한다.
+     * userId가 null(게스트)이고 ACTIVE 상태인 문서만 이관 가능하다.
+     */
+    public void claim(UUID newUserId) {
+        if (this.userId != null) {
+            throw new IllegalStateException("이미 소유자가 있는 문서는 이관할 수 없습니다");
+        }
+        if (this.status != DocumentStatus.ACTIVE) {
+            throw new IllegalStateException("ACTIVE 상태의 문서만 이관할 수 있습니다. 현재: " + this.status);
+        }
+        this.userId = newUserId;
+        this.expiresAt = null;
+    }
+
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
     }

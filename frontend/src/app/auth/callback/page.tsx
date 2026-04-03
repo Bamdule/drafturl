@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { oauthCallback } from "@/lib/api/auth";
+import { claimDocument } from "@/lib/api/documents";
 import { ApiError } from "@/lib/api/types";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useDict } from "@/components/i18n/DictProvider";
@@ -60,6 +61,17 @@ function AuthCallbackContent() {
 
         login(result.user);
         window.umami?.track("login", { provider: provider as string });
+
+        // 게스트 문서 이관 (claim) — 실패해도 로그인 자체는 성공
+        const pendingSlug = sessionStorage.getItem("pendingClaimSlug");
+        if (pendingSlug) {
+          sessionStorage.removeItem("pendingClaimSlug");
+          try {
+            await claimDocument(pendingSlug);
+          } catch {
+            // claim 실패(만료, 이미 이관 등)는 조용히 무시
+          }
+        }
 
         // MCP OAuth2 인증 시 저장된 returnTo로 리다이렉트 (open redirect 방지)
         const mcpReturnTo = sessionStorage.getItem("mcp_return_to");

@@ -5,6 +5,22 @@
 
 ---
 
+## [v0.9.5] - 2026-04-03
+
+게스트 문서 이관, PublishResultModal UX 개선.
+
+### Added
+- 게스트 문서 이관 기능: 비로그인 문서 생성 후 로그인 시 자동으로 내 계정에 영구 보관
+- 백엔드: `POST /api/v1/documents/{slug}/claim` 엔드포인트
+- 프론트엔드: 로그인 후 콜백에서 pendingClaimSlug 처리
+
+### Improved
+- PublishResultModal: 비로그인 사용자에게 로그인 유도 배너 (24시간 만료 경고 강조)
+- PublishResultModal: 로그인 사용자에게 "편집하기" 버튼 추가
+- 에디터 placeholder 개선 (Claude/ChatGPT/Cursor 언급)
+
+---
+
 ## [v0.9.4] - 2026-04-03
 
 랜딩 페이지 UX 개선 — Ctrl+V 붙여넣기 기능 구현, 레이아웃 수정.

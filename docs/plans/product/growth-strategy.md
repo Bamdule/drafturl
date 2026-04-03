@@ -1,53 +1,107 @@
 # DraftURL — 사용자 획득 전략
 
 > 작성일: 2026-04-01
+> 최종 수정일: 2026-04-03
 > 상태: active
 
 ---
 
 ## 현황 진단
 
-- 기술 완성도 높음 (MCP, OAuth, i18n, 보안 등 갖춤)
-- 사용자 획득 채널 없음 (SEO 콘텐츠 0개, 커뮤니티 런칭 0회)
-- 신규 회원 없음
-- **핵심 문제**: 기능은 충분한데 "발견"되지 않고 있음
+| 항목 | 상태 |
+|------|------|
+| MCP Registry 등록 | ✅ 완료 (2026-04-02, active) |
+| GSC 등록 | ✅ 완료 — canonical 버그 수정 후 색인 재요청 필요 |
+| SEO 콘텐츠 | ❌ 0개 |
+| 커뮤니티 런칭 | ❌ 0회 |
+| X(Twitter) 계정 | ❌ 미생성 |
+| 신규 회원 | ❌ 없음 |
+
+**핵심 문제**: 기능은 충분한데 "발견"되지 않고 있음
 
 ---
 
 ## Phase 1: 발견되게 만들기 (1~2주)
 
-### 1. MCP Registry 등록
-- 목표: AI 도구(Claude Code, Cursor 등) 사용자가 자연스럽게 발견
-- 작업: mcp-registry-plan.md에 따라 등록 진행
-- 난이도: 낮음
+### 1. X(Twitter) 데모 포스팅 ← 지금 당장
 
-### 2. SEO 블로그 콘텐츠 (3~5개)
-- 목표: Google 검색 유입 확보
-- 주제 후보:
-  - "ChatGPT 출력을 URL로 공유하는 방법"
-  - "Claude가 만든 HTML을 바로 배포하기"
-  - "DraftURL vs PageDrop vs Tiiny Host 비교"
-  - "MCP로 AI가 직접 웹페이지를 만드는 방법"
-  - "HTML/Markdown 즉시 공유 서비스 추천"
-- 참고: Tiiny Host는 SEO 블로그로 $20K MRR 달성
+**왜 먼저?** AI 도구 커뮤니티가 가장 활발한 채널. 비용 0, 시간 30분, 타겟 정확.
 
-### 3. Product Hunt 런칭
-- 목표: 초기 트래픽 + 백링크 + 커뮤니티 피드백
-- 준비물: 스크린샷, GIF, 한 줄 소개, 메이커 코멘트
-- 타이밍: 블로그 2~3개 게시 후 진행
+**계정 전략**
+- 개인 계정으로 시작 (서비스 계정은 팔로워 0에서 반응 없음)
+- 핸들: `@drafturl` 가능 여부 확인 후 선점
 
-### 4. GSC 색인 재요청
-- drafturl.com/en, /ko 색인 재요청
+**포스팅 형식**
+```
+[GIF: Claude 출력 붙여넣기 → 3초 → URL 복사]
+
+Claude가 만든 페이지를 바로 공유하고 싶었는데
+Artifacts는 URL이 없고, GitHub Pages는 너무 복잡해서 만들었습니다.
+
+붙여넣기 → URL. 그게 전부입니다.
+drafturl.com
+
+#ClaudeAI #cursor #MCP
+```
+
+**GIF 녹화**: Kap (맥 무료) 으로 실제 사용 화면 30초 녹화
+
+---
+
+### 2. Reddit 타겟 포스팅
+
+**타겟 서브레딧**
+
+| 서브레딧 | 각도 | 주의 |
+|---------|------|------|
+| `r/ClaudeAI` | "Share your Claude artifacts as a real URL" | 셀프프로모 규칙 확인 |
+| `r/ChatGPT` | "Stop copy-pasting to Notion, just get a URL" | 피드백 요청 프레이밍 |
+| `r/cursor` | MCP 연동 시연 | 개발자 대상, 기술적 내용 |
+
+**프레이밍**: "나 이거 만들었는데 피드백 줘" → 홍보글보다 훨씬 잘 받힘
+
+---
+
+### 3. GSC 색인 재요청
+
+- v0.9.3 배포 후 `drafturl.com/ko`, `drafturl.com/en` 색인 재요청
+- canonical 버그 수정됨 → 이제 재요청해도 의미 있음
 - FAQ/HowTo 리치 스니펫 반영 확인
+
+---
+
+### 4. SEO 블로그 콘텐츠 (3~5개)
+
+**왜?** Tiiny Host는 SEO 블로그로 $20K MRR 달성. 장기 무비용 유입.
+
+**우선순위 주제** (검색 의도 명확한 것부터)
+
+| 주제 | 타겟 키워드 | 언어 |
+|------|------------|------|
+| Claude Artifacts URL 공유하는 방법 | "claude artifacts share url" | EN 우선 |
+| Claude가 만든 HTML 즉시 배포하기 | "claude html 배포" | KO |
+| ChatGPT 출력을 웹페이지로 공유하기 | "chatgpt output share webpage" | EN |
+| DraftURL vs Tiiny Host 비교 | "tiiny host alternative" | EN |
+| MCP로 AI가 직접 웹페이지를 만드는 방법 | "mcp deploy webpage" | EN/KO |
+
+**블로그 위치**: 별도 서브도메인(`blog.drafturl.com`) 또는 `/blog` 경로
+
+---
+
+### 5. Product Hunt 런칭
+
+- **타이밍**: 블로그 2~3개 게시 후 (백링크 + 신뢰도 확보 뒤)
+- **준비물**: 스크린샷, GIF, 한 줄 소개, 메이커 코멘트
+- **효과**: 초기 트래픽 + 백링크 + 커뮤니티 피드백
 
 ---
 
 ## Phase 2: 사용자 반응 관찰 (2~4주)
 
-- Umami 데이터 분석: 유입 경로, 이탈 지점, 전환율
-- GSC 성과 모니터링: 노출 키워드, CTR
+- Umami 데이터: 유입 경로, 이탈 지점, 전환율
+- GSC 성과: 노출 키워드, CTR
 - 문의 확인: Resend 알림으로 실제 피드백 수집
-- MCP 사용량 확인: 도구 호출 빈도
+- MCP 사용량: 도구 호출 빈도
 
 ---
 

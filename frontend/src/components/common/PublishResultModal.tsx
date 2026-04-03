@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Pencil } from "lucide-react";
 import { useDict } from "@/components/i18n/DictProvider";
 import { updateDocument } from "@/lib/api/documents";
 import type { DocumentSummary } from "@/lib/api/types";
@@ -19,6 +22,7 @@ export default function PublishResultModal({
   isAuthenticated,
 }: PublishResultModalProps) {
   const { dict } = useDict();
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [password, setPassword] = useState("");
@@ -89,7 +93,6 @@ export default function PublishResultModal({
         </h2>
         <p className="text-sm text-text-secondary mb-5">
           {dict.publishModal.description}
-          {!isAuthenticated && dict.publishModal.expiryNotice}
         </p>
 
         {/* URL display */}
@@ -106,6 +109,35 @@ export default function PublishResultModal({
             {copied ? dict.publishModal.copied : dict.publishModal.copy}
           </button>
         </div>
+
+        {/* Login CTA — 비로그인 사용자만 */}
+        {!isAuthenticated && (
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 rounded-lg border border-accent/20 bg-accent/5 px-4 py-3 mb-4">
+            <p className="flex-1 text-sm text-text-secondary text-left">
+              {dict.publishModal.loginBanner}
+            </p>
+            <button
+              onClick={() => {
+                sessionStorage.setItem("pendingClaimSlug", doc.slug);
+                router.push("/auth/login");
+              }}
+              className="shrink-0 px-4 py-1.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer"
+            >
+              {dict.publishModal.loginButton}
+            </button>
+          </div>
+        )}
+
+        {/* Edit button — 로그인 사용자만 */}
+        {isAuthenticated && (
+          <Link
+            href={`/dashboard/${doc.slug}/edit`}
+            className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover transition-colors mb-4"
+          >
+            <Pencil size={14} />
+            {dict.publishModal.editDocument}
+          </Link>
+        )}
 
         {/* Password setting — 로그인 사용자만 */}
         {isAuthenticated && !passwordSaved && !passwordOpen && (

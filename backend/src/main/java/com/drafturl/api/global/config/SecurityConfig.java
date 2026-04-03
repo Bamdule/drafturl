@@ -91,6 +91,9 @@ public class SecurityConfig {
                         // 비로그인 문서 생성 - permitAll
                         .requestMatchers(HttpMethod.POST, "/api/v1/documents").permitAll()
 
+                        // 게스트 문서 이관 - authenticated
+                        .requestMatchers(HttpMethod.POST, "/api/v1/documents/*/claim").authenticated()
+
                         // 문서 CRUD (GET 목록/상세, PUT, DELETE) - authenticated
                         .requestMatchers(HttpMethod.GET, "/api/v1/documents/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/documents").authenticated()

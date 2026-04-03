@@ -9,6 +9,7 @@ import com.drafturl.api.domain.document.controller.response.DocumentListResponse
 import com.drafturl.api.domain.document.controller.response.DocumentResponse;
 import com.drafturl.api.domain.document.controller.response.DocumentViewResponse;
 import com.drafturl.api.domain.document.controller.response.SitemapEntry;
+import com.drafturl.api.domain.document.usecase.ClaimDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.CreateDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.DeleteDocumentUseCase;
 import com.drafturl.api.domain.document.usecase.GetDocumentForEditUseCase;
@@ -32,6 +33,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/documents")
 public class DocumentController {
 
+    private final ClaimDocumentUseCase claimDocumentUseCase;
     private final CreateDocumentUseCase createDocumentUseCase;
     private final ViewDocumentUseCase viewDocumentUseCase;
     private final GetDocumentListUseCase getDocumentListUseCase;
@@ -40,13 +42,15 @@ public class DocumentController {
     private final DeleteDocumentUseCase deleteDocumentUseCase;
     private final GetSitemapUseCase getSitemapUseCase;
 
-    public DocumentController(CreateDocumentUseCase createDocumentUseCase,
+    public DocumentController(ClaimDocumentUseCase claimDocumentUseCase,
+                               CreateDocumentUseCase createDocumentUseCase,
                                ViewDocumentUseCase viewDocumentUseCase,
                                GetDocumentListUseCase getDocumentListUseCase,
                                GetDocumentForEditUseCase getDocumentForEditUseCase,
                                UpdateDocumentUseCase updateDocumentUseCase,
                                DeleteDocumentUseCase deleteDocumentUseCase,
                                GetSitemapUseCase getSitemapUseCase) {
+        this.claimDocumentUseCase = claimDocumentUseCase;
         this.createDocumentUseCase = createDocumentUseCase;
         this.viewDocumentUseCase = viewDocumentUseCase;
         this.getDocumentListUseCase = getDocumentListUseCase;
@@ -135,5 +139,13 @@ public class DocumentController {
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiResponse.success(
                 deleteDocumentUseCase.execute(slug, userPrincipal.userId())));
+    }
+
+    @PostMapping("/{slug}/claim")
+    public ResponseEntity<ApiResponse<Void>> claimDocument(
+            @PathVariable String slug,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        claimDocumentUseCase.execute(slug, userPrincipal.userId());
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

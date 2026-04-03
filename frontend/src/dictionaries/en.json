@@ -86,7 +86,10 @@
     "passwordCancel": "Cancel",
     "passwordMinLength": "Password must be at least 4 characters.",
     "passwordError": "Failed to set password.",
-    "passwordSet": "Password has been set"
+    "passwordSet": "Password has been set",
+    "loginBanner": "This document will expire in 24 hours. Log in to keep it permanently.",
+    "loginButton": "Login",
+    "editDocument": "Edit"
   },
   "typewriter": {
     "editor": "Editor",
@@ -239,7 +242,8 @@
     "previewLive": "Live",
     "previewEmpty": "Enter content in the editor\nto see a preview here",
     "htmlPlaceholder": "Enter HTML...",
-    "mdPlaceholder": "Enter Markdown..."
+    "mdPlaceholder": "Enter Markdown...",
+    "homePlaceholder": "Paste HTML or Markdown from Claude, ChatGPT, Cursor, or any LLM here"
   },
   "expired": {
     "title": "Document Expired",

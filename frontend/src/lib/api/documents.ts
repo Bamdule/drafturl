@@ -84,6 +84,14 @@ export function updateDocument(
   });
 }
 
+/** 게스트 문서를 내 계정으로 이관 (claim) */
+export function claimDocument(slug: string): Promise<void> {
+  return apiFetch<void>(`/api/v1/documents/${slug}/claim`, {
+    method: "POST",
+    auth: true,
+  });
+}
+
 /** 문서 삭제 */
 export function deleteDocument(
   slug: string,

@@ -154,6 +154,24 @@ public class DocumentTransactionService {
         documentRepository.deleteAllInBatch(documents);
     }
 
+    /**
+     * 게스트 문서 이관: userId 설정 + expiresAt 제거 + StorageUsage 증가 -- 단일 트랜잭션.
+     */
+    @Transactional
+    public Document claimDocument(String documentId, UUID userId, long contentSize) {
+        Document managed = documentRepository.findById(documentId)
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
+                        "문서를 찾을 수 없습니다: " + documentId));
+
+        managed.claim(userId);
+        Document saved = documentRepository.save(managed);
+
+        storageUsageService.incrementUsage(userId, contentSize, 1);
+
+        return saved;
+    }
+
     // ========== 배치 최적화 메서드 (N+1 쓰기 방지) ==========
 
     /**
