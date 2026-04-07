@@ -6,11 +6,14 @@ import com.drafturl.api.domain.document.exception.DocumentNotFoundException;
 import com.drafturl.api.domain.document.port.FileStorage;
 import com.drafturl.api.domain.document.repository.DocumentRepository;
 import com.drafturl.api.domain.document.service.DocumentTransactionService;
+import com.drafturl.api.domain.tag.repository.DocumentTagRepository;
+import com.drafturl.api.domain.tag.repository.TagRepository;
 import com.drafturl.api.global.exception.ForbiddenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,13 +28,19 @@ public class DeleteDocumentUseCase {
     private final DocumentRepository documentRepository;
     private final DocumentTransactionService txService;
     private final FileStorage fileStorage;
+    private final DocumentTagRepository documentTagRepository;
+    private final TagRepository tagRepository;
 
     public DeleteDocumentUseCase(DocumentRepository documentRepository,
                                   DocumentTransactionService txService,
-                                  FileStorage fileStorage) {
+                                  FileStorage fileStorage,
+                                  DocumentTagRepository documentTagRepository,
+                                  TagRepository tagRepository) {
         this.documentRepository = documentRepository;
         this.txService = txService;
         this.fileStorage = fileStorage;
+        this.documentTagRepository = documentTagRepository;
+        this.tagRepository = tagRepository;
     }
 
     public DocumentDeleteResponse execute(String slug, UUID userId) {
@@ -39,7 +48,18 @@ public class DeleteDocumentUseCase {
                 .orElseThrow(() -> new DocumentNotFoundException(slug));
         verifyOwnership(document, userId);
 
+        // soft delete 전에 태그 ID 목록 조회
+        List<Long> tagIds = documentTagRepository.findById_DocumentIdIn(List.of(document.getId()))
+                .stream().map(dt -> dt.getId().getTagId()).toList();
+
         Document deleted = txService.softDeleteDocument(document.getId(), userId, document.getContentSize());
+
+        // soft delete 후 ACTIVE 문서 없는 태그 자동 삭제
+        for (Long tagId : tagIds) {
+            if (documentTagRepository.countActiveDocumentsForTag(tagId) == 0) {
+                tagRepository.findById(tagId).ifPresent(tagRepository::delete);
+            }
+        }
 
         try {
             fileStorage.delete(document.getR2Key());

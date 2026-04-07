@@ -8,6 +8,7 @@ const BACKEND_URL =
 const ALLOWED_PATHS = [
   /^\/api\/v1\/documents(\/.*)?$/,
   /^\/api\/v1\/auth(\/.*)?$/,
+  /^\/api\/v1\/tags(\/.*)?$/,
   /^\/api\/v1\/health$/,
 ];
 

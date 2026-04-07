@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.drafturl.api.domain.document.controller.response.SitemapEntry;
 
+import com.drafturl.api.domain.tag.entity.DocumentTag;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +20,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DocumentRepository extends JpaRepository<Document, String> {
+
+    @Query("""
+        SELECT d FROM Document d
+        WHERE d.userId = :userId
+          AND d.status = 'ACTIVE'
+          AND (:search = '' OR LOWER(COALESCE(d.title, '')) LIKE LOWER(CONCAT('%', :search, '%')))
+          AND (:tagId IS NULL OR EXISTS (
+              SELECT 1 FROM DocumentTag dt WHERE dt.id.documentId = d.id AND dt.id.tagId = :tagId
+          ))
+    """)
+    Page<Document> searchDocuments(
+            @Param("userId") UUID userId,
+            @Param("search") String search,
+            @Param("tagId") Long tagId,
+            Pageable pageable
+    );
 
     Optional<Document> findBySlug(String slug);
 

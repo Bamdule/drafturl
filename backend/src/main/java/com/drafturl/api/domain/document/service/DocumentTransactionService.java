@@ -47,9 +47,9 @@ public class DocumentTransactionService {
     @Transactional
     public Document insertPendingDocument(String id, String slug, UUID userId, String title,
                                           DocType docType, String r2Key, long contentSize,
-                                          LocalDateTime expiresAt, String passwordHash) {
+                                          LocalDateTime expiresAt, String passwordHash, String preview) {
         Document document = new Document(id, slug, userId, title, docType, r2Key,
-                contentSize, DocumentStatus.PENDING, expiresAt, passwordHash);
+                contentSize, DocumentStatus.PENDING, expiresAt, passwordHash, preview);
         return documentRepository.save(document);
     }
 
@@ -88,7 +88,7 @@ public class DocumentTransactionService {
     @Transactional
     public Document updateDocument(String documentId, UUID userId, String title,
                                    long newContentSize, long oldContentSize,
-                                   String passwordHash, boolean removePassword) {
+                                   String passwordHash, boolean removePassword, String preview) {
         Document managed = documentRepository.findById(documentId)
                 .orElseThrow(() -> new BusinessException(
                         HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
@@ -101,6 +101,9 @@ public class DocumentTransactionService {
             managed.updatePasswordHash(passwordHash);
         } else if (removePassword) {
             managed.updatePasswordHash(null);
+        }
+        if (preview != null) {
+            managed.updatePreview(preview);
         }
         managed.updateContentSize(newContentSize);
         Document saved = documentRepository.save(managed);

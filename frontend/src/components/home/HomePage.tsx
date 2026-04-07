@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import FileDropZone from "@/components/editor/FileDropZone";
@@ -8,9 +8,11 @@ import PublishResultModal from "@/components/common/PublishResultModal";
 import { useEditorStore } from "@/lib/store/useEditorStore";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { createDocument } from "@/lib/api/documents";
+import { getMyTags, createTag, addTagToDocument } from "@/lib/api/tags";
 import { useDict } from "@/components/i18n/DictProvider";
 import { ApiError } from "@/lib/api/types";
 import type { DocumentSummary } from "@/lib/api/types";
+import type { TagWithCount } from "@/lib/api/tags";
 
 export default function HomePage({ children }: { children?: React.ReactNode }) {
   const { dict, locale } = useDict();
@@ -23,8 +25,24 @@ export default function HomePage({ children }: { children?: React.ReactNode }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tagInputRef = useRef<HTMLInputElement>(null);
+
+  // 공유 전 태그/비밀번호 설정 state (로그인 사용자 전용)
+  const [preShareTags, setPreShareTags] = useState<TagWithCount[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
+  const [newTagName, setNewTagName] = useState("");
+  const [pendingNewTagNames, setPendingNewTagNames] = useState<string[]>([]);
+  const [flashTagId, setFlashTagId] = useState<number | null>(null);
+  const [pendingPassword, setPendingPassword] = useState("");
+  const [passwordOpen, setPasswordOpen] = useState(false);
 
   const hasFile = content.trim().length > 0;
+
+  useEffect(() => {
+    if (hasFile && isAuthenticated) {
+      getMyTags().then(setPreShareTags).catch(() => {});
+    }
+  }, [hasFile, isAuthenticated]);
 
   const handleFileDrop = useCallback(() => {
     // FileDropZone이 에디터 스토어에 content를 설정함
@@ -88,6 +106,36 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
     }
   };
 
+  const handleCreatePreShareTag = () => {
+    const name = newTagName.trim();
+    if (!name) return;
+
+    // 중복 체크 — 기존 태그 하이라이트 후 자동 선택
+    const duplicate = preShareTags.find(
+      (t) => t.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (duplicate) {
+      setFlashTagId(duplicate.id);
+      setSelectedTagIds((prev) => new Set([...prev, duplicate.id]));
+      setNewTagName("");
+      setTimeout(() => setFlashTagId(null), 700);
+      tagInputRef.current?.focus();
+      return;
+    }
+
+    // pending 태그 중복 체크
+    if (pendingNewTagNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
+      setNewTagName("");
+      tagInputRef.current?.focus();
+      return;
+    }
+
+    // 로컬에만 추가 (API 호출 없음)
+    setPendingNewTagNames((prev) => [...prev, name]);
+    setNewTagName("");
+    tagInputRef.current?.focus();
+  };
+
   const handlePublish = async () => {
     if (!content.trim()) return;
     setIsPublishing(true);
@@ -100,14 +148,40 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
           type: docType,
           title:
             fileName?.replace(/\.(html?|md|markdown)$/i, "") || undefined,
+          password: pendingPassword.trim() || undefined,
         },
         isAuthenticated,
       );
+      // 기존 선택 태그 + 새로 만들 태그 처리
+      const allTagIds: number[] = [...selectedTagIds];
+
+      if (pendingNewTagNames.length > 0) {
+        const results = await Promise.allSettled(
+          pendingNewTagNames.map((name) => createTag(name)),
+        );
+        for (const result of results) {
+          if (result.status === "fulfilled") {
+            allTagIds.push(result.value.id);
+          }
+        }
+      }
+
+      if (allTagIds.length > 0) {
+        await Promise.allSettled(
+          allTagIds.map((id) => addTagToDocument(doc.slug, id)),
+        );
+      }
+
       setResult(doc);
       setModalOpen(true);
       setContent("");
       setFileName(null);
       setFileSize(null);
+      setSelectedTagIds(new Set());
+      setPendingNewTagNames([]);
+      setPendingPassword("");
+      setPasswordOpen(false);
+      setNewTagName("");
       window.umami?.track("document_create", { type: docType });
     } catch (err) {
       if (err instanceof ApiError && err.code === "DOCUMENT_LIMIT_EXCEEDED") {
@@ -326,68 +400,153 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
                   </div>
                 </div>
 
+                {/* 공유 전 태그/비밀번호 설정 — 로그인 사용자만 */}
+                {isAuthenticated && (
+                  <div className="w-full max-w-[400px] text-left border-t border-border-dark/40 pt-3 pb-3 border-b flex flex-col gap-3">
+
+                    {/* 태그: 라벨 | 칩들(wrap) + 입력(별도 행) */}
+                    <div className="flex gap-3 items-start">
+                      <span className="w-16 shrink-0 text-sm text-text-muted mt-[5px]">{dict.home.tagLabel}</span>
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        {(preShareTags.length > 0 || pendingNewTagNames.length > 0) && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {preShareTags.map((tag) => {
+                              const selected = selectedTagIds.has(tag.id);
+                              const flashing = flashTagId === tag.id;
+                              return (
+                                <button
+                                  key={tag.id}
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedTagIds((prev) => {
+                                      const s = new Set(prev);
+                                      if (s.has(tag.id)) { s.delete(tag.id); } else { s.add(tag.id); }
+                                      return s;
+                                    })
+                                  }
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                                    selected
+                                      ? "bg-accent text-white shadow-[0_0_10px_rgba(124,92,252,0.4)]"
+                                      : "bg-bg-secondary text-text-secondary border border-border-dark hover:border-accent/50 hover:text-text-primary"
+                                  } ${flashing ? "outline outline-2 outline-[#7c5cfc] outline-offset-1 scale-105" : ""}`}
+                                >
+                                  {selected && (
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                                  )}
+                                  {tag.name}
+                                </button>
+                              );
+                            })}
+                            {pendingNewTagNames.map((name, i) => (
+                              <span
+                                key={`pending-${i}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-accent/20 text-accent border border-accent/40"
+                              >
+                                {name}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setPendingNewTagNames((prev) =>
+                                      prev.filter((_, idx) => idx !== i),
+                                    )
+                                  }
+                                  className="opacity-60 hover:opacity-100 bg-transparent border-none cursor-pointer leading-none"
+                                >
+                                  &times;
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <input
+                          ref={tagInputRef}
+                          type="text"
+                          value={newTagName}
+                          onChange={(e) => setNewTagName(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleCreatePreShareTag()}
+                          placeholder={preShareTags.length === 0 ? dict.home.tagEnterHint : dict.home.tagAddPlaceholder}
+                          maxLength={50}
+                          className="text-sm bg-transparent border-none outline-none text-accent placeholder:text-accent/40 hover:placeholder:text-accent/70 w-full transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 비밀번호 */}
+                    <div className="flex gap-3 items-center">
+                      <span className="w-16 shrink-0 text-sm text-text-muted">{dict.home.passwordLabel}</span>
+                      {!passwordOpen ? (
+                        <button
+                          type="button"
+                          onClick={() => setPasswordOpen(true)}
+                          className="text-sm bg-transparent border-none outline-none text-accent/40 hover:text-accent/80 transition-colors cursor-pointer"
+                        >
+                          {dict.home.passwordAdd}
+                        </button>
+                      ) : (
+                        <div className="flex gap-2 items-center flex-1">
+                          <input
+                            type="text"
+                            name="doc-pin"
+                            autoComplete="off"
+                            value={pendingPassword}
+                            onChange={(e) => setPendingPassword(e.target.value)}
+                            placeholder={dict.home.passwordPlaceholder}
+                            className="flex-1 h-8 px-3 text-sm bg-bg-secondary border border-border-dark rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/50 transition-colors [-webkit-text-security:disc]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => { setPasswordOpen(false); setPendingPassword(""); }}
+                            className="shrink-0 text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
+                          >
+                            {dict.publishModal.passwordCancel}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {error && (
                   <p className="text-center text-sm text-danger">{error}</p>
                 )}
 
-                <div className="flex w-full max-w-[360px] gap-2.5 flex-col sm:flex-row">
+                {/* 공유하기 — 단독 풀-폭 CTA */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handlePublish(); }}
+                  disabled={isPublishing}
+                  className="w-full max-w-[400px] inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-accent to-accent-hover px-5 py-3.5 text-sm font-bold text-white shadow-[0_4px_20px_rgba(124,92,252,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_28px_rgba(124,92,252,0.4)] disabled:opacity-50"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                  {isPublishing ? dict.publish.publishing : dict.publish.share}
+                </button>
+
+                {/* 서브 액션 행 — 미리보기 · 상태 */}
+                <div className="flex items-center justify-center gap-3 text-sm">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePreview();
-                    }}
-                    className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border-dark bg-bg-tertiary/50 px-5 py-3.5 text-sm font-bold text-text-secondary transition-all hover:border-border-dark-hover hover:bg-accent/[0.06] hover:text-text-primary"
+                    onClick={(e) => { e.stopPropagation(); handlePreview(); }}
+                    className="inline-flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                     {dict.publish.preview}
                   </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePublish();
-                    }}
-                    disabled={isPublishing}
-                    className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-accent to-accent-hover px-5 py-3.5 text-sm font-bold text-white shadow-[0_4px_20px_rgba(124,92,252,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_28px_rgba(124,92,252,0.4)] disabled:opacity-50"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    >
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                      <polyline points="16 6 12 2 8 6" />
-                      <line x1="12" y1="2" x2="12" y2="15" />
-                    </svg>
-                    {isPublishing
-                      ? dict.publish.publishing
-                      : dict.publish.share}
-                  </button>
-                </div>
-
-                <div className="text-center text-xs text-text-muted">
-                  {dict.publish.expiryNotice}{" "}
-                  <Link
-                    href="/auth/login"
-                    className="text-accent hover:underline"
-                  >
-                    {dict.publish.loginKeep}
-                  </Link>
+                  <span className="text-border-dark/60 select-none">·</span>
+                  {isAuthenticated ? (
+                    <span className="inline-flex items-center gap-1 text-success/80">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                      {dict.home.permanentNotice}
+                    </span>
+                  ) : (
+                    <Link href="/auth/login" className="text-accent hover:underline">
+                      {dict.publish.loginKeep}
+                    </Link>
+                  )}
                 </div>
               </div>
             ) : (

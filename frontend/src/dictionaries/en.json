@@ -52,7 +52,16 @@
     "footer": {
       "terms": "Terms of Service",
       "privacy": "Privacy Policy"
-    }
+    },
+    "tagLabel": "Tags",
+    "tagExisting": "Existing tags",
+    "tagNew": "Create new tag",
+    "tagAddPlaceholder": "+ Add tag",
+    "tagEnterHint": "Press Enter to add",
+    "passwordLabel": "Password",
+    "passwordAdd": "+ Add password",
+    "passwordPlaceholder": "Optional, 4+ chars",
+    "permanentNotice": "Saved permanently"
   },
   "publish": {
     "emptyError": "Please enter document content.",
@@ -89,7 +98,9 @@
     "passwordSet": "Password has been set",
     "loginBanner": "This document will expire in 24 hours. Log in to keep it permanently.",
     "loginButton": "Login",
-    "editDocument": "Edit"
+    "editDocument": "Edit",
+    "tagSection": "Tags",
+    "tagHint": "You can also add tags later from the dashboard"
   },
   "typewriter": {
     "editor": "Editor",
@@ -183,7 +194,8 @@
     "permanentStorage": "Permanent storage with login",
     "sizeLimit": "Storage limit: 5MB",
     "title": "My Documents",
-    "newDocument": "+ Create New Document"
+    "newDocument": "+ Create New Document",
+    "searchPlaceholder": "Search by title..."
   },
   "document": {
     "expired": "Expired",
@@ -293,6 +305,15 @@
     "successMessage": "We will respond as soon as possible.",
     "newInquiry": "New Inquiry",
     "backToHome": "Go Home"
+  },
+  "tag": {
+    "add": "Add tag",
+    "new": "New tag",
+    "namePlaceholder": "Tag name",
+    "create": "Create",
+    "allDocs": "All",
+    "maxLength": "Tag must be 50 characters or less.",
+    "duplicate": "This tag already exists."
   },
   "report": {
     "button": "Report",

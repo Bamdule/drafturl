@@ -101,8 +101,30 @@ public class UpdateDocumentUseCase {
             }
         }
 
-        Document updated = txService.updateDocument(document.getId(), userId, newTitle, newContentSize, oldContentSize, passwordHash, removePassword);
+        String preview = hasContent ? extractPreview(request.content(), document.getDocType()) : null;
+
+        Document updated = txService.updateDocument(document.getId(), userId, newTitle, newContentSize, oldContentSize, passwordHash, removePassword, preview);
         return DocumentResponse.from(updated, frontendUrl);
+    }
+
+    private String extractPreview(String content, DocType docType) {
+        String text;
+        if (docType == DocType.HTML) {
+            text = content.replaceAll("<[^>]+>", " ")
+                         .replaceAll("&[a-zA-Z]+;", " ")
+                         .replaceAll("\\s+", " ")
+                         .trim();
+        } else {
+            text = content.replaceAll("(?m)^#{1,6}\\s+", "")
+                         .replaceAll("\\*\\*([^*]+)\\*\\*", "$1")
+                         .replaceAll("\\*([^*]+)\\*", "$1")
+                         .replaceAll("`[^`]+`", "")
+                         .replaceAll("!?\\[[^\\]]*\\]\\([^)]*\\)", "")
+                         .replaceAll("(?m)^[-*+>]\\s+", "")
+                         .replaceAll("\\s+", " ")
+                         .trim();
+        }
+        return text.length() > 120 ? text.substring(0, 120) + "\u2026" : text;
     }
 
     private void verifyOwnership(Document document, UUID userId) {

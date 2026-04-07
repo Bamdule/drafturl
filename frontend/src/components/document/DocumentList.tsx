@@ -7,12 +7,16 @@ import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { deleteDocument } from "@/lib/api/documents";
 import { useDict } from "@/components/i18n/DictProvider";
 import type { DocumentSummary, PaginationInfo } from "@/lib/api/types";
+import type { TagWithCount } from "@/lib/api/tags";
 
 interface DocumentListProps {
   documents: DocumentSummary[];
   pagination: PaginationInfo;
   onPageChange: (page: number) => void;
   onDocumentDeleted: () => void;
+  allTags: TagWithCount[];
+  onTagsChange: () => void;
+  isSearching?: boolean;
 }
 
 export default function DocumentList({
@@ -20,6 +24,9 @@ export default function DocumentList({
   pagination,
   onPageChange,
   onDocumentDeleted,
+  allTags,
+  onTagsChange,
+  isSearching,
 }: DocumentListProps) {
   const { dict } = useDict();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -49,17 +56,19 @@ export default function DocumentList({
           <line x1="9" y1="15" x2="15" y2="15" />
         </svg>
         <h3 className="text-lg text-text-secondary mb-2">
-          {dict.documentList.empty}
+          {isSearching ? "검색 결과가 없습니다" : dict.documentList.empty}
         </h3>
         <p className="text-sm mb-6">
-          {dict.documentList.emptyHint}
+          {isSearching ? "다른 키워드로 검색해보세요." : dict.documentList.emptyHint}
         </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold text-white bg-accent hover:bg-accent-hover transition-colors no-underline"
-        >
-          {dict.documentList.newDocument}
-        </Link>
+        {!isSearching && (
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold text-white bg-accent hover:bg-accent-hover transition-colors no-underline"
+          >
+            {dict.documentList.newDocument}
+          </Link>
+        )}
       </div>
     );
   }
@@ -73,6 +82,8 @@ export default function DocumentList({
             document={doc}
             onDelete={(slug) => setDeleteTarget(slug)}
             onUpdate={onDocumentDeleted}
+            allTags={allTags}
+            onTagsChange={onTagsChange}
           />
         ))}
       </div>

@@ -2,13 +2,19 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { updateDocument } from "@/lib/api/documents";
+import { removeTagFromDocument } from "@/lib/api/tags";
 import { useDict } from "@/components/i18n/DictProvider";
+import TagBadge from "./TagBadge";
+import TagPicker from "./TagPicker";
 import type { DocumentSummary } from "@/lib/api/types";
+import type { TagWithCount } from "@/lib/api/tags";
 
 interface DocumentCardProps {
   document: DocumentSummary;
   onDelete: (slug: string) => void;
   onUpdate?: () => void;
+  allTags: TagWithCount[];
+  onTagsChange: () => void;
 }
 
 function formatDateTime(dateString: string): string {
@@ -32,6 +38,8 @@ export default function DocumentCard({
   document: doc,
   onDelete,
   onUpdate,
+  allTags,
+  onTagsChange,
 }: DocumentCardProps) {
   const { dict } = useDict();
   const [copied, setCopied] = useState(false);
@@ -187,6 +195,15 @@ export default function DocumentCard({
     }
   };
 
+  const handleRemoveTag = async (tagId: number) => {
+    try {
+      await removeTagFromDocument(doc.slug, tagId);
+      onTagsChange();
+    } catch {
+      // 에러 무시
+    }
+  };
+
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete(doc.slug);
@@ -198,11 +215,13 @@ export default function DocumentCard({
 
   const isHtml = doc.docType === "html";
   const hasExpiry = !!doc.expiresAt;
+  const isAutoTitle = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2} 문서$/.test(doc.title || "");
+  const isCompact = !doc.preview && doc.tags.length === 0;
 
   return (
     <div
       onClick={handleRowClick}
-      className="bg-bg-secondary border border-border-dark rounded-xl px-4 sm:px-5 py-3 sm:py-4 grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center hover:border-accent/40 hover:bg-bg-tertiary/50 transition-all cursor-pointer group"
+      className={`bg-bg-secondary border border-border-dark border-l-2 border-l-transparent rounded-xl px-4 sm:px-5 ${isCompact ? "py-2.5 sm:py-3" : "py-3 sm:py-4"} grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center hover:border-accent/40 hover:border-l-accent hover:bg-bg-tertiary/50 transition-all cursor-pointer group`}
     >
       <div className="flex flex-col gap-1.5 min-w-0">
         {/* Title row */}
@@ -221,7 +240,11 @@ export default function DocumentCard({
             />
           ) : (
             <>
-              <span className="text-[15px] font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
+              <span className={`text-[15px] font-semibold truncate transition-colors ${
+                isAutoTitle
+                  ? "text-text-muted italic"
+                  : "text-text-primary group-hover:text-accent"
+              }`}>
                 {doc.title || dict.document.noTitle}
               </span>
               <button
@@ -254,9 +277,34 @@ export default function DocumentCard({
           )}
         </div>
         {/* Meta row */}
-        <div className="flex gap-4 text-xs text-text-muted">
+        <div className="flex gap-3 text-xs text-text-muted">
           <span>{formatFileSize(doc.contentSize)}</span>
           <span>{formatDateTime(doc.createdAt)}</span>
+        </div>
+        {/* Preview */}
+        {doc.preview && (
+          <p className="text-xs text-text-muted/70 line-clamp-1 leading-relaxed">
+            {doc.preview}
+          </p>
+        )}
+        {/* Tags row */}
+        <div className={`flex flex-wrap items-center gap-1 ${doc.tags.length > 0 ? "mt-0.5" : ""}`}>
+          {doc.tags.map((tag) => (
+            <TagBadge
+              key={tag.id}
+              tag={tag}
+              onRemove={() => handleRemoveTag(tag.id)}
+            />
+          ))}
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <TagPicker
+              allTags={allTags}
+              documentTags={doc.tags}
+              slug={doc.slug}
+              onTagsChange={onTagsChange}
+              variant={doc.tags.length === 0 ? "pill" : "icon"}
+            />
+          </span>
         </div>
       </div>
 

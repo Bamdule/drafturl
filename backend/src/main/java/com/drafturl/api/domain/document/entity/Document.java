@@ -51,13 +51,16 @@ public class Document extends BaseEntity {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(columnDefinition = "TEXT")
+    private String preview;
+
     protected Document() {
     }
 
     public Document(String id, String slug, UUID userId, String title,
                     DocType docType, String r2Key, long contentSize,
                     DocumentStatus status, LocalDateTime expiresAt,
-                    String passwordHash) {
+                    String passwordHash, String preview) {
         this.id = id;
         this.slug = slug;
         this.userId = userId;
@@ -68,6 +71,7 @@ public class Document extends BaseEntity {
         this.status = status;
         this.expiresAt = expiresAt;
         this.passwordHash = passwordHash;
+        this.preview = preview;
     }
 
     public String getId() {
@@ -164,5 +168,13 @@ public class Document extends BaseEntity {
 
     public void updatePasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getPreview() {
+        return preview;
+    }
+
+    public void updatePreview(String preview) {
+        this.preview = preview;
     }
 }

@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Pencil } from "lucide-react";
 import { useDict } from "@/components/i18n/DictProvider";
-import { updateDocument } from "@/lib/api/documents";
 import type { DocumentSummary } from "@/lib/api/types";
 
 interface PublishResultModalProps {
@@ -24,29 +21,6 @@ export default function PublishResultModal({
   const { dict } = useDict();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
-  const [passwordOpen, setPasswordOpen] = useState(false);
-  const [password, setPassword] = useState("");
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordSaved, setPasswordSaved] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-
-  const handleSetPassword = async () => {
-    if (!doc || password.trim().length < 4) {
-      setPasswordError(dict.publishModal.passwordMinLength);
-      return;
-    }
-    setPasswordSaving(true);
-    setPasswordError(null);
-    try {
-      await updateDocument(doc.slug, { password: password.trim() });
-      setPasswordSaved(true);
-      setPasswordOpen(false);
-    } catch {
-      setPasswordError(dict.publishModal.passwordError);
-    } finally {
-      setPasswordSaving(false);
-    }
-  };
 
   if (!doc || !open) return null;
 
@@ -126,66 +100,6 @@ export default function PublishResultModal({
               {dict.publishModal.loginButton}
             </button>
           </div>
-        )}
-
-        {/* Edit button — 로그인 사용자만 */}
-        {isAuthenticated && (
-          <Link
-            href={`/dashboard/${doc.slug}/edit`}
-            className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover transition-colors mb-4"
-          >
-            <Pencil size={14} />
-            {dict.publishModal.editDocument}
-          </Link>
-        )}
-
-        {/* Password setting — 로그인 사용자만 */}
-        {isAuthenticated && !passwordSaved && !passwordOpen && (
-          <button
-            onClick={() => setPasswordOpen(true)}
-            className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer mb-2"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-            {dict.publishModal.addPassword}
-          </button>
-        )}
-        {isAuthenticated && passwordOpen && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-2">
-            <input
-              type="text"
-              name="doc-pin"
-              autoComplete="off"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={dict.publishModal.passwordPlaceholder}
-              className="h-10 sm:h-9 flex-1 rounded-md border border-border-dark bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/50 [-webkit-text-security:disc]"
-              onKeyDown={(e) => e.key === "Enter" && handleSetPassword()}
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={handleSetPassword}
-                disabled={passwordSaving}
-                className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-md transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {passwordSaving ? "..." : dict.publishModal.passwordConfirm}
-              </button>
-              <button
-                onClick={() => { setPasswordOpen(false); setPassword(""); setPasswordError(null); }}
-                className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
-              >
-                {dict.publishModal.passwordCancel}
-              </button>
-            </div>
-          </div>
-        )}
-        {passwordError && (
-          <p className="text-xs text-danger mb-2">{passwordError}</p>
-        )}
-        {passwordSaved && (
-          <p className="inline-flex items-center gap-1.5 text-sm text-success mb-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-            {dict.publishModal.passwordSet}
-          </p>
         )}
 
         {/* Actions */}

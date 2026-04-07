@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -96,16 +97,19 @@ public class CreateDocumentUseCase {
         String r2Key = "documents/" + slug + "/content." + ext;
         long contentSize = contentBytes.length;
         LocalDateTime expiresAt = (userId == null) ? LocalDateTime.now().plusHours(24) : null;
-        String title = (request.title() != null && !request.title().isBlank())
+        // NFC 정규화: macOS NFD 파일명이 입력될 경우에도 검색 가능하도록
+        String rawTitle = (request.title() != null && !request.title().isBlank())
                 ? request.title().strip()
                 : java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Seoul")).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " 문서";
+        String title = Normalizer.normalize(rawTitle, Normalizer.Form.NFC);
 
         String passwordHash = (request.password() != null && !request.password().isBlank())
                 ? passwordEncoder.encode(request.password())
                 : null;
 
         // DB INSERT (PENDING)
-        Document document = txService.insertPendingDocument(id, slug, userId, title, docType, r2Key, contentSize, expiresAt, passwordHash);
+        String preview = extractPreview(content, docType);
+        Document document = txService.insertPendingDocument(id, slug, userId, title, docType, r2Key, contentSize, expiresAt, passwordHash, preview);
 
         // R2 업로드
         String contentType = docType == DocType.HTML ? "text/html" : "text/markdown";
@@ -125,6 +129,26 @@ public class CreateDocumentUseCase {
         }
 
         return DocumentResponse.from(document, frontendUrl);
+    }
+
+    private String extractPreview(String content, DocType docType) {
+        String text;
+        if (docType == DocType.HTML) {
+            text = content.replaceAll("<[^>]+>", " ")
+                         .replaceAll("&[a-zA-Z]+;", " ")
+                         .replaceAll("\\s+", " ")
+                         .trim();
+        } else {
+            text = content.replaceAll("(?m)^#{1,6}\\s+", "")
+                         .replaceAll("\\*\\*([^*]+)\\*\\*", "$1")
+                         .replaceAll("\\*([^*]+)\\*", "$1")
+                         .replaceAll("`[^`]+`", "")
+                         .replaceAll("!?\\[[^\\]]*\\]\\([^)]*\\)", "")
+                         .replaceAll("(?m)^[-*+>]\\s+", "")
+                         .replaceAll("\\s+", " ")
+                         .trim();
+        }
+        return text.length() > 120 ? text.substring(0, 120) + "\u2026" : text;
     }
 
     private DocType parseDocType(String type) {

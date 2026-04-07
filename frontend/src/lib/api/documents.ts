@@ -27,6 +27,8 @@ export function getMyDocuments(params?: {
   page?: number;
   size?: number;
   sort?: string;
+  search?: string;
+  tagId?: number;
 }): Promise<DocumentListResponse> {
   const searchParams = new URLSearchParams();
   if (params?.page !== undefined)
@@ -34,6 +36,9 @@ export function getMyDocuments(params?: {
   if (params?.size !== undefined)
     searchParams.set("size", String(params.size));
   if (params?.sort) searchParams.set("sort", params.sort);
+  if (params?.search) searchParams.set("search", params.search);
+  if (params?.tagId !== undefined)
+    searchParams.set("tagId", String(params.tagId));
 
   const query = searchParams.toString();
   const path = `/api/v1/documents${query ? `?${query}` : ""}`;

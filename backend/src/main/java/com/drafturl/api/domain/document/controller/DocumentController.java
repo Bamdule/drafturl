@@ -111,9 +111,12 @@ public class DocumentController {
     public ResponseEntity<ApiResponse<DocumentListResponse>> getMyDocuments(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") @Max(50) int size) {
+            @RequestParam(defaultValue = "20") @Max(50) int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long tagId,
+            @RequestParam(required = false) String sort) {
         return ResponseEntity.ok(ApiResponse.success(
-                getDocumentListUseCase.execute(userPrincipal.userId(), page, size)));
+                getDocumentListUseCase.execute(userPrincipal.userId(), page, size, search, tagId, sort)));
     }
 
     @GetMapping("/{slug}")

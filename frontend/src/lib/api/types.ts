@@ -30,6 +30,13 @@ export class ApiError extends Error {
   }
 }
 
+// ─── 태그 관련 타입 ─────────────────────────────────
+
+export interface Tag {
+  id: number;
+  name: string;
+}
+
 // ─── 문서 관련 타입 ─────────────────────────────────
 
 export interface DocumentSummary {
@@ -41,6 +48,8 @@ export interface DocumentSummary {
   contentSize: number;
   status: "active" | "expired" | "deleted";
   isPasswordProtected: boolean;
+  preview?: string | null;
+  tags: Tag[];
   expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
