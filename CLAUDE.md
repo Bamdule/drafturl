@@ -28,7 +28,7 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
 - 프로젝트 질문에 claude-api 같은 대형 외부 스킬 로드하지 않음
 
 ## 문서
-- `docs/features/` — 기능 기획+설계 (임시, 배포 후 삭제)
+- `docs/features/` — 기능 기획+설계 (임시, 배포 후 삭제); 파일명: `{기능명}.md`, 기획·설계·구현계획 한 파일로
 - `docs/product/` — 백로그, 제품 방향 (영구)
 - `docs/infra/` — 인프라/배포 설계 (영구)
 - `docs/market/` — 시장/경쟁 분석 (영구)
