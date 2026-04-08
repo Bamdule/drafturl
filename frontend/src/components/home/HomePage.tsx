@@ -463,7 +463,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8p
                           type="text"
                           value={newTagName}
                           onChange={(e) => setNewTagName(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && handleCreatePreShareTag()}
+                          onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && handleCreatePreShareTag()}
                           placeholder={preShareTags.length === 0 ? dict.home.tagEnterHint : dict.home.tagAddPlaceholder}
                           maxLength={50}
                           className="text-sm bg-transparent border-none outline-none text-accent placeholder:text-accent/40 hover:placeholder:text-accent/70 w-full transition-colors"

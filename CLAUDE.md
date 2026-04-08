@@ -13,8 +13,9 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
 
 ## 배포 ("배포해줘" 요청 시)
 - 버전: `VERSION` 파일 (SemVer). Major/Minor/Patch 자동 판단
-- 절차: VERSION 업데이트 → CHANGELOG 추가 → 릴리즈 노트 작성 → backlog 갱신 → commit → tag → push (main + release)
+- 절차: VERSION 업데이트 → CHANGELOG 추가 → 릴리즈 노트 작성 → backlog 갱신 → commit → tag → push (main + release) → **활성 플랜 파일 삭제**
 - 트리거: `release` 브랜치 push → GitHub Actions 자동 배포
+- 플랜 삭제: `rm /Users/bam/.claude/plans/<plan-name>.md` (서브에이전트 파일 포함)
 
 ## 토큰 효율성
 - snapshot > screenshot (시각적 확인 꼭 필요할 때만 screenshot)
@@ -22,6 +23,7 @@ DraftURL — HTML/Markdown 문서를 URL로 즉시 공유하는 웹 서비스.
 - 에이전트에 "핵심만 간결하게" 지시
 - **고비용 작업(fullPage 스크린샷, 대규모 코드 생성, 광범위 탐색) 전 사용자에게 사전 고지**
 - 프로젝트 질문에 claude-api 같은 대형 외부 스킬 로드하지 않음
+- 완료된 플랜은 배포 직후 삭제 (매 턴 system-reminder에 주입되므로 방치 시 컨텍스트 낭비)
 
 ## 문서
 - `docs/archive/` — 탐색 제외

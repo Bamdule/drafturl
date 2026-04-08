@@ -1,6 +1,6 @@
 # DraftURL QA 가이드
 
-> 최종 수정일: 2026-03-25
+> 최종 수정일: 2026-04-08
 
 ---
 
@@ -9,13 +9,13 @@
 | 영역 | 문서 | TC 수 | 상태 |
 |------|------|-------|------|
 | 인증 | [auth.md](auth.md) | 12 | - |
-| 문서 생성 | [document-create.md](document-create.md) | 15 | - |
-| 문서 관리 | [document-manage.md](document-manage.md) | 11 | - |
+| 문서 생성 | [document-create.md](document-create.md) | 19 | - |
+| 문서 관리 | [document-manage.md](document-manage.md) | 27 | - |
 | 문서 조회 | [document-view.md](document-view.md) | 8 | - |
 | 에디터 | [editor.md](editor.md) | 13 | - |
 | 인프라 | [infra.md](infra.md) | 11 | - |
 
-**전체 테스트 케이스: 70개**
+**전체 테스트 케이스: 90개**
 
 ---
 
@@ -66,8 +66,10 @@ cd frontend && npm run dev
 | 변경 파일/컴포넌트 | 실행할 QA |
 |-------------------|-----------|
 | `auth/`, `token.ts`, `cookies.ts`, `SecurityConfig` | auth.md |
-| `PublishButton`, `PublishResultModal`, `CreateDocumentUseCase` | document-create.md |
+| `PublishResultModal`, `CreateDocumentUseCase`, `HomePage` (공유 옵션) | document-create.md |
 | `dashboard/`, `DocumentCard`, `DocumentList`, `StorageUsageBar` | document-manage.md |
+| `TagFilter`, `TagPicker`, `TagBadge`, `TagService`, `DeleteDocumentUseCase` | document-manage.md |
+| `GetDocumentListUseCase` (검색/정렬), `DocumentRepository` | document-manage.md |
 | `[slug]/`, `HtmlViewer`, `MarkdownViewer`, `ViewDocumentUseCase` | document-view.md |
 | `EditorPanel`, `PreviewPanel`, `FileDropZone`, `TypewriterOverlay` | editor.md |
 | `docker-compose*`, `SecurityConfig`, `RateLimitFilter` | infra.md |
