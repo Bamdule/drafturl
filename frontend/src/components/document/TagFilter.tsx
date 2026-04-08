@@ -47,7 +47,6 @@ export default function TagFilter({
             className="flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
           >
             {tag.name}
-            <span className="opacity-0 group-hover:opacity-50 transition-opacity text-[10px]">{tag.documentCount}</span>
           </button>
           {onDelete && (
             <button
